@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A892D41D-7D68-42DE-B275-2D6A6DA27226}</ProjectGuid>
+    <RootNamespace>QuestNavigator</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>.\build\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>.\build\bin\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>awesomium.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>awesomium.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\deps\qsp\actions.c" />
+    <ClCompile Include="src\deps\qsp\callbacks.c" />
+    <ClCompile Include="src\deps\qsp\codetools.c" />
+    <ClCompile Include="src\deps\qsp\coding.c" />
+    <ClCompile Include="src\deps\qsp\common.c" />
+    <ClCompile Include="src\deps\qsp\errors.c" />
+    <ClCompile Include="src\deps\qsp\game.c" />
+    <ClCompile Include="src\deps\qsp\locations.c" />
+    <ClCompile Include="src\deps\qsp\mathops.c" />
+    <ClCompile Include="src\deps\qsp\memwatch.c" />
+    <ClCompile Include="src\deps\qsp\menu.c" />
+    <ClCompile Include="src\deps\qsp\objects.c" />
+    <ClCompile Include="src\deps\qsp\playlist.c" />
+    <ClCompile Include="src\deps\qsp\statements.c" />
+    <ClCompile Include="src\deps\qsp\text.c" />
+    <ClCompile Include="src\deps\qsp\time.c" />
+    <ClCompile Include="src\deps\qsp\towlower.c" />
+    <ClCompile Include="src\deps\qsp\towupper.c" />
+    <ClCompile Include="src\deps\qsp\variables.c" />
+    <ClCompile Include="src\deps\qsp\variant.c" />
+    <ClCompile Include="src\deps\qsp\onig\regcomp.c" />
+    <ClCompile Include="src\deps\qsp\onig\regenc.c" />
+    <ClCompile Include="src\deps\qsp\onig\regerror.c" />
+    <ClCompile Include="src\deps\qsp\onig\regexec.c" />
+    <ClCompile Include="src\deps\qsp\onig\regparse.c" />
+    <ClCompile Include="src\deps\qsp\onig\regsyntax.c" />
+    <ClCompile Include="src\deps\qsp\onig\regtrav.c" />
+    <ClCompile Include="src\deps\qsp\onig\regversion.c" />
+    <ClCompile Include="src\deps\qsp\onig\st.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\ascii.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\cp1251.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\koi8_r.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\unicode.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\utf16_be.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\utf16_le.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\utf32_be.c" />
+    <ClCompile Include="src\deps\qsp\onig\enc\utf32_le.c" />
+    <ClCompile Include="src\deps\qsp\bindings\default\default_callbacks.c" />
+    <ClCompile Include="src\deps\qsp\bindings\default\default_coding.c" />
+    <ClCompile Include="src\deps\qsp\bindings\default\default_control.c" />
+    <ClCompile Include="src\common\application_win.cc" />
+    <ClCompile Include="src\common\view_win.cc" />
+    <ClCompile Include="src\main.cc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

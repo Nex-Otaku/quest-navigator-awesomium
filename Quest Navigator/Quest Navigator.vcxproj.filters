@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Файлы исходного кода">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Заголовочные файлы">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Файлы исходного кода\qsp">
+      <UniqueIdentifier>{53baaf3a-369f-41c7-87cb-668d93a22c07}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cc">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\application_win.cc">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\view_win.cc">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\actions.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\callbacks.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\codetools.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\coding.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\common.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\errors.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\game.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\locations.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\mathops.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\memwatch.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\menu.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\objects.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\playlist.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\statements.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\text.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\time.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\towlower.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\towupper.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\variables.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\variant.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\bindings\default\default_callbacks.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\bindings\default\default_coding.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\bindings\default\default_control.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regcomp.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regenc.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regerror.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regexec.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regparse.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regsyntax.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regtrav.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\regversion.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\st.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\ascii.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\cp1251.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\koi8_r.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\unicode.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\utf16_be.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\utf16_le.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\utf32_be.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\qsp\onig\enc\utf32_le.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

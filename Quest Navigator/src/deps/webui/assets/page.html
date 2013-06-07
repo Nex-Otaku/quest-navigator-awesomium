@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>WebUI Sample</title>
+<style type="text/css">
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  background-image: url('fabric_plaid.png');
+  box-shadow: inset 0px 0px 20px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  padding: 15px;
+  height: 482px;
+}
+.cobalt {
+  background-color: hsl(214, 37%, 28%) !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#7a99c1", endColorstr="#2c4361");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#7a99c1), to(#2c4361));
+  background-image: -moz-linear-gradient(top, #7a99c1, #2c4361);
+  background-image: -ms-linear-gradient(top, #7a99c1, #2c4361);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7a99c1), color-stop(100%, #2c4361));
+  background-image: -webkit-linear-gradient(top, #7a99c1, #2c4361);
+  background-image: -o-linear-gradient(top, #7a99c1, #2c4361);
+  background-image: linear-gradient(#7a99c1, #2c4361);
+  border-width: 1px;
+  border-color: #2c4361 #2c4361 hsl(214, 37%, 19.5%);
+  color: #fff !important;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.56);
+  -webkit-font-smoothing: antialiased;
+}
+.salmon {
+  background-color: hsl(0, 100%, 82%) !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fecccc", endColorstr="#fea3a3");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#fecccc), to(#fea3a3));
+  background-image: -moz-linear-gradient(top, #fecccc, #fea3a3);
+  background-image: -ms-linear-gradient(top, #fecccc, #fea3a3);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fecccc), color-stop(100%, #fea3a3));
+  background-image: -webkit-linear-gradient(top, #fecccc, #fea3a3);
+  background-image: -o-linear-gradient(top, #fecccc, #fea3a3);
+  background-image: linear-gradient(#fecccc, #fea3a3);
+  border-width: 1px;
+  border-color: #fea3a3 #fea3a3 hsl(0, 100%, 80%);
+  color: #333 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.13);
+  -webkit-font-smoothing: antialiased;
+}
+.btn:hover {
+  background-position: 0 -15px;
+  color: #333;
+  text-decoration: none;
+  -webkit-transition: 0.1s linear all;
+}
+.btn.large {
+  font-size: 16px;
+  line-height: normal;
+  padding: 9px 14px 9px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-block;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+#msg {
+  padding: 12px;
+  margin: 12px 2px;
+  font-size: 16px;
+  -webkit-transition: 0.1s linear all;
+}
+#backgroundz {
+  width: 341px;
+  height: 295px;
+	background-image: url('awe_logo_shadow.png');
+	opacity: 0.1;
+  z-index:1;
+  position: absolute;
+  top: 85px;
+  left: 85px;
+}
+#content {
+  border-radius: 6px;
+  background-color: white;
+  margin: 10px;
+  padding: 10px;
+  box-shadow: inset 0px 1px #D2D2D2;
+}
+h1 {
+  color: #222;
+  margin: 8px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  -webkit-font-smoothing: antialiased;
+}
+</style>
+</head>
+<body>
+<h1>Web UI Sample</h1>
+<div id="content">
+	<button class="btn large cobalt" onclick="App.SayHello();">Say Hello</button>
+	<button class="btn large cobalt" onclick="document.getElementById('msg').innerHTML = App.GetSecretMessage();">Get Secret Message</button>
+	<button class="btn large salmon" onclick="App.Exit();">Exit</button>
+	<div id="msg"></div>
+</div>
+</body>
+</html>
