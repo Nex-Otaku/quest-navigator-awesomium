@@ -147,5 +147,22 @@
     <ClCompile Include="src\deps\qsp\onig\enc\utf32_le.c">
       <Filter>Файлы исходного кода\qsp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\qsplib-experimental\regexp.c">
+      <Filter>Файлы исходного кода\qsp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\common\application.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\js_delegate.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\method_dispatcher.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\view.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
