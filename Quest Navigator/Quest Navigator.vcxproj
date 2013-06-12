@@ -42,13 +42,13 @@
     <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>.\build\bin\</OutDir>
+    <OutDir>.\build\bin\русских и не только буков тест! Приве́т नमस्ते</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>.\build\bin\</OutDir>
+    <OutDir>.\build\bin\русских и не только буков тест! Приве́т नमस्ते</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -59,7 +59,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>awesomium.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;awesomium.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -76,7 +76,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>awesomium.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;awesomium.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -125,12 +125,14 @@
     <ClCompile Include="src\common\application_win.cc" />
     <ClCompile Include="src\common\view_win.cc" />
     <ClCompile Include="src\main.cc" />
+    <ClCompile Include="src\quest-navigator\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\application.h" />
     <ClInclude Include="src\common\js_delegate.h" />
     <ClInclude Include="src\common\method_dispatcher.h" />
     <ClInclude Include="src\common\view.h" />
+    <ClInclude Include="src\quest-navigator\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

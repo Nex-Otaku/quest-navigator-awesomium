@@ -9,6 +9,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
+#include "quest-navigator/utils.h"
 
 using namespace Awesomium;
 
@@ -44,13 +45,21 @@ class WebUISample : public Application::Listener {
 
     BindMethods(view_->web_view());
 
-	QSPInit();
+	//QSPInit();
+	//std::wstring message_str = QSPGetVersion();
+ //   MessageBox(0, message_str.c_str(), message_str.c_str(), NULL);
+	//QSPDeInit();
 
-    data_source_ = new DataPakSource(ToWebString("webui_assets.pak"));
-    view_->web_view()->session()->AddDataSource(WSLit("webui"), data_source_);
+    //data_source_ = new DataPakSource(ToWebString("webui_assets.pak"));
+    //view_->web_view()->session()->AddDataSource(WSLit("webui"), data_source_);
 
     // Load the page asynchronously from the resource PAK.
-    view_->web_view()->LoadURL(WebURL(WSLit("asset://webui/page.html")));
+    //view_->web_view()->LoadURL(WebURL(WSLit("asset://webui/page.html")));
+    
+	QuestNavigator::initOptions();
+
+	std::string url = QuestNavigator::getContentUrl();
+	view_->web_view()->LoadURL(WebURL(ToWebString(url)));
   }
 
   // Inherited from Application::Listener

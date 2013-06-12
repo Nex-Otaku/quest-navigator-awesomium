@@ -16,6 +16,12 @@
     <Filter Include="Файлы исходного кода\qsp">
       <UniqueIdentifier>{53baaf3a-369f-41c7-87cb-668d93a22c07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы исходного кода\special">
+      <UniqueIdentifier>{fcfb1394-4417-4ad9-936f-862563d16882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\special">
+      <UniqueIdentifier>{44adb32d-02d5-4ed9-936f-e7a808d325ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cc">
@@ -150,6 +156,9 @@
     <ClCompile Include="..\..\qsplib-experimental\regexp.c">
       <Filter>Файлы исходного кода\qsp</Filter>
     </ClCompile>
+    <ClCompile Include="src\quest-navigator\utils.cpp">
+      <Filter>Файлы исходного кода\special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\application.h">
@@ -163,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="src\common\view.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quest-navigator\utils.h">
+      <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
