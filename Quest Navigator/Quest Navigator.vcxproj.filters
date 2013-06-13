@@ -159,6 +159,9 @@
     <ClCompile Include="src\quest-navigator\utils.cpp">
       <Filter>Файлы исходного кода\special</Filter>
     </ClCompile>
+    <ClCompile Include="src\quest-navigator\configuration.cpp">
+      <Filter>Файлы исходного кода\special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\application.h">
@@ -174,6 +177,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="src\quest-navigator\utils.h">
+      <Filter>Заголовочные файлы\special</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quest-navigator\configuration.h">
       <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
   </ItemGroup>
