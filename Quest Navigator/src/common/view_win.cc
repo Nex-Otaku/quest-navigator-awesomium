@@ -43,14 +43,14 @@ public:
     if (!hwnd_)
       exit(-1);
 
+    g_active_views_.push_back(this);
+
     web_view_->set_parent_window(hwnd_);
 
     ShowWindow(hwnd_, SW_SHOWNORMAL);
     UpdateWindow(hwnd_);
 
     SetTimer (hwnd_, 0, 15, NULL );
-
-    g_active_views_.push_back(this);
   }
 
   virtual ~ViewWin() {
