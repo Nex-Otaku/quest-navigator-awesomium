@@ -7,7 +7,7 @@ using namespace std;
 
 namespace QuestNavigator {
 
-	// В этом классе хранятся всяческие параметры плеера
+	// Р’ СЌС‚РѕРј РєР»Р°СЃСЃРµ С…СЂР°РЅСЏС‚СЃСЏ РІСЃСЏС‡РµСЃРєРёРµ РїР°СЂР°РјРµС‚СЂС‹ РїР»РµРµСЂР°
 	class Configuration {
 	private:
 		static string _contentPath;

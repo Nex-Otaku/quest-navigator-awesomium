@@ -13,20 +13,20 @@
 
 using namespace Awesomium;
 
-class WebUISample : public Application::Listener {
+class QnApplicationListener : public Application::Listener {
   Application* app_;
   View* view_;
   DataSource* data_source_;
   MethodDispatcher method_dispatcher_;
  public:
-  WebUISample() 
+  QnApplicationListener() 
     : app_(Application::Create()),
       view_(0),
       data_source_(0) {
     app_->set_listener(this);
   }
 
-  virtual ~WebUISample() {
+  virtual ~QnApplicationListener() {
     if (view_)
       app_->DestroyView(view_);
     if (data_source_)
@@ -45,16 +45,17 @@ class WebUISample : public Application::Listener {
 
     BindMethods(view_->web_view());
 
+
 	//QSPInit();
 	//std::wstring message_str = QSPGetVersion();
  //   MessageBox(0, message_str.c_str(), message_str.c_str(), NULL);
 	//QSPDeInit();
 
-    //data_source_ = new DataPakSource(ToWebString("webui_assets.pak"));
-    //view_->web_view()->session()->AddDataSource(WSLit("webui"), data_source_);
-
-    // Load the page asynchronously from the resource PAK.
-    //view_->web_view()->LoadURL(WebURL(WSLit("asset://webui/page.html")));
+	// Подключаем пак с данными по умолчанию.
+	// Существование пака не проверяется.
+	// Если нам в параметрах указали путь к файлу - тогда просто не используем пак.
+    data_source_ = new DataPakSource(ToWebString("assets.pak"));
+    view_->web_view()->session()->AddDataSource(WSLit("webui"), data_source_);
     
 	QuestNavigator::initOptions();
 
@@ -78,13 +79,13 @@ class WebUISample : public Application::Listener {
       JSObject& app_object = result.ToObject();
       method_dispatcher_.Bind(app_object,
         WSLit("SayHello"),
-        JSDelegate(this, &WebUISample::OnSayHello));
+        JSDelegate(this, &QnApplicationListener::OnSayHello));
       method_dispatcher_.Bind(app_object,
         WSLit("Exit"),
-        JSDelegate(this, &WebUISample::OnExit));
+        JSDelegate(this, &QnApplicationListener::OnExit));
       method_dispatcher_.BindWithRetval(app_object,
         WSLit("GetSecretMessage"),
-        JSDelegateWithRetval(this, &WebUISample::OnGetSecretMessage));
+        JSDelegateWithRetval(this, &QnApplicationListener::OnGetSecretMessage));
     }
 
     // Bind our method dispatcher to the WebView
@@ -118,8 +119,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, wchar_t*,
 int main() {
 #endif
 
-  WebUISample sample;
-  sample.Run();
+  QnApplicationListener listener;
+  listener.Run();
 
   return 0;
 }

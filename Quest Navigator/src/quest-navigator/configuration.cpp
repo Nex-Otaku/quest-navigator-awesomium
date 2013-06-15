@@ -2,7 +2,7 @@
 
 namespace QuestNavigator {
 
-	string Configuration::_contentPath;
+	string Configuration::_contentPath = "";
 	string Configuration::getContentPath()
 	{
 		return _contentPath;
