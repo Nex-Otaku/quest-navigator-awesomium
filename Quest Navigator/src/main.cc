@@ -54,11 +54,7 @@ public:
 
 		BindMethods(view_->web_view());
 
-
-		//QSPInit();
-		//std::wstring message_str = QSPGetVersion();
-		//   MessageBox(0, message_str.c_str(), message_str.c_str(), NULL);
-		//QSPDeInit();
+		initLib();
 
 		// Подключаем пак с данными по умолчанию.
 		// Существование пака не проверяется.
@@ -141,31 +137,566 @@ public:
 
 	void initLib()
 	{
-		/*
+		//QSPInit();
+		//std::wstring message_str = QSPGetVersion();
+		//   MessageBox(0, message_str.c_str(), message_str.c_str(), NULL);
+		//QSPDeInit();
+
 		gameIsRunning = false;
 		qspInited = false;
 		
-		curGameFile = "www/standalone_content/game.qsp";
-		curSaveDir = mainActivity.getFilesDir().getPath().concat(File.separator);
+		//curGameFile = "www/standalone_content/game.qsp";
+		//curSaveDir = mainActivity.getFilesDir().getPath().concat(File.separator);
 
-        //Создаем список для всплывающего меню
-        menuList = new Vector<ContainerMenuItem>();
+  //      //Создаем список для всплывающего меню
+  //      menuList = new Vector<ContainerMenuItem>();
 
-        //Создаем объект для таймера
-        timerHandler = new Handler(Looper.getMainLooper());
+  //      //Создаем объект для таймера
+  //      timerHandler = new Handler(Looper.getMainLooper());
 
-        //Запускаем поток библиотеки
-        StartLibThread();
-		*/
+  //      //Запускаем поток библиотеки
+  //      StartLibThread();
 	}
 
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************
-	//                 Колбэки библиотеки интерпретатора
+	//                       Колбэки интерпретатора
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************
+
+    static void RefreshInt(int isRedraw) 
+    {
+    	//Контекст библиотеки
+  //      bool needUpdate = skin.isSomethingChanged();
+  //      skin.updateBaseVars();
+  //      needUpdate = needUpdate || skin.isSomethingChanged();
+  //      skin.updateMainScreen();
+  //      needUpdate = needUpdate || skin.isSomethingChanged();
+  //      
+		//JSONObject jsSkin = null;
+  //      if (needUpdate)
+  //          jsSkin = skin.getJsSkin();
+
+  //      //основное описание
+  //      String mainDesc = null;
+  //      if ((QSPIsMainDescChanged() == true) || skin.isHtmlModeChanged)
+  //      {
+  //          mainDesc = skin.applyHtmlFixes(QSPGetMainDesc());
+  //      }
+  //  	
+  //      //список действий
+  //      JSONArray acts = null;
+  //      if ((QSPIsActionsChanged() == true) || skin.isHtmlModeChanged)
+  //      {
+		//	int nActsCount = QSPGetActionsCount();
+		//	acts = new JSONArray();
+		//	for (int i = 0; i < nActsCount; i++)
+		//	{
+		//      	ContainerJniResult actsResult = (ContainerJniResult) QSPGetActionData(i);
+		//		JSONObject act = new JSONObject();
+		//		try {
+		//			act.put("image", actsResult.str2);
+		//			act.put("desc", skin.applyHtmlFixes(actsResult.str1));
+		//			acts.put(i, act);
+		//		} catch (JSONException e) {
+		//    		Utility.WriteLog("ERROR - act or acts[] in RefreshInt!");
+		//			e.printStackTrace();
+		//		}
+		//	}
+		//}
+  //      
+  //      //инвентарь
+  //      JSONArray objs = null;
+  //      if ((QSPIsObjectsChanged() == true) || skin.isHtmlModeChanged)
+  //      {
+  //          int nObjsCount = QSPGetObjectsCount();
+  //          int nSelectedObject = QSPGetSelObjectIndex();
+  //          objs = new JSONArray();
+  //          for (int i = 0; i < nObjsCount; i++)
+  //          {
+	 //       	ContainerJniResult objsResult = (ContainerJniResult) QSPGetObjectData(i);
+  //              
+		//		JSONObject obj = new JSONObject();
+		//		try {
+		//			obj.put("image", objsResult.str2);
+		//			obj.put("desc", skin.applyHtmlFixes(objsResult.str1));
+		//			obj.put("selected", (i == nSelectedObject)? 1 : 0);
+		//			objs.put(i, obj);
+		//		} catch (JSONException e) {
+		//    		Utility.WriteLog("ERROR - obj or objs[] in RefreshInt!");
+		//			e.printStackTrace();
+		//		}
+  //          }
+  //      }
+  //      
+  //      //доп. описание
+  //      String varsDesc = null;
+  //      if ((QSPIsVarsDescChanged() == true) || skin.isHtmlModeChanged)
+  //      {
+  //          varsDesc = skin.applyHtmlFixes(QSPGetVarsDesc());
+  //      }
+  //      
+  //      // Яваскрипт, переданный из игры командой EXEC('JS:...')
+  //      String jsCmd = null;
+  //      if (jsExecBuffer.length() > 0)
+  //      {
+  //      	jsCmd = jsExecBuffer;
+  //      	jsExecBuffer = "";
+  //      }
+  //      
+  //      // Передаем собранные данные в яваскрипт
+  //      if ((jsSkin != null) || (mainDesc != null) || (acts != null) || (objs != null) || (varsDesc != null) ||
+  //      	(jsCmd != null))
+  //      {
+  //      	JSONObject groupedContent = new JSONObject();
+  //      	try {
+	 //           if (jsSkin != null)
+	 //           {
+	 //               groupedContent.put("skin", jsSkin);
+	 //           }
+	 //           if (mainDesc != null)
+	 //           {
+	 //               groupedContent.put("main", mainDesc);
+	 //           }
+	 //           if (acts != null)
+	 //           {
+	 //               groupedContent.put("acts", acts);
+	 //           }
+	 //           if (varsDesc != null)
+	 //           {
+	 //               groupedContent.put("vars", varsDesc);
+	 //           }
+	 //           if (objs != null)
+	 //           {
+	 //               groupedContent.put("objs", objs);
+	 //           }
+	 //           if (jsCmd != null)
+	 //           {
+	 //               groupedContent.put("js", jsCmd);
+	 //           }
+		//	} catch (JSONException e) {
+	 //   		Utility.WriteLog("ERROR - groupedContent in RefreshInt!");
+		//		e.printStackTrace();
+		//	}
+  //      	final JSONObject groupedContentObject = groupedContent;
+		//	mainActivity.runOnUiThread(new Runnable() {
+		//		public void run() {
+		//			jsSetGroupedContent(groupedContentObject);
+		//		}
+		//	});
+  //      }
+  //      skin.resetUpdate();
+    }
+    
+    static void SetTimer(int msecs)
+    {
+  //  	//Контекст библиотеки
+  //  	final int timeMsecs = msecs;
+		//mainActivity.runOnUiThread(new Runnable() {
+		//	public void run() {
+		//		timerInterval = timeMsecs;
+		//	}
+		//});
+    }
+
+	static void ShowMessage(QSP_CHAR* message)
+    {
+  //  	//Контекст библиотеки
+		//if (libThread==null)
+		//{
+		//	Utility.WriteLog("ShowMessage: failed, libThread is null");
+		//	return;
+		//}
+
+	 //   // Обновляем скин
+  //      skin.updateBaseVars();
+  //      skin.updateMsgDialog();
+  //      skin.updateEffects();
+	 //   // Если что-то изменилось, то передаем в яваскрипт
+	 //   if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
+	 //   {
+	 //       Utility.WriteLog("Hey! Skin was changed! Updating it before showing MSG.");
+	 //       RefreshInt(QSP_TRUE);
+	 //   }
+		//
+		//String msgValue = "";
+		//if (message != null)
+		//	msgValue = message;
+		//
+		//dialogHasResult = false;
+
+  //  	final String msg = skin.applyHtmlFixes(msgValue);
+		//mainActivity.runOnUiThread(new Runnable() {
+		//	public void run() {
+		//		jsQspMsg(msg);
+		//		Utility.WriteLog("ShowMessage(UI): dialog showed");
+		//	}
+		//});
+  //  	
+		//Utility.WriteLog("ShowMessage: parking library thread");
+  //      while (!dialogHasResult) {
+  //      	setThreadPark();
+  //      }
+  //      parkThread = null;
+		//Utility.WriteLog("ShowMessage: library thread unparked, finishing");
+    }
+    
+    static void PlayFile(QSP_CHAR* file, int volume)
+    {
+  //  	//Контекст библиотеки
+  //  	file = Utility.QspPathTranslate(file);
+  //  	
+  //  	if (file == null || file.length() == 0)
+  //  	{
+  //  		Utility.WriteLog("ERROR - filename is " + (file == null ? "null" : "empty"));
+  //  		return;
+  //  	}
+  //  	
+  //  	//Проверяем, проигрывается ли уже этот файл.
+  //  	//Если проигрывается, ничего не делаем.
+  //  	if (CheckPlayingFileSetVolume(file, true, volume))
+  //  		return;
+
+  //  	// Добавляем к имени файла полный путь
+  //  	String prefix = "";
+  //  	if (curGameDir != null)
+  //  		prefix = curGameDir;
+  //  	String assetFilePath = prefix.concat(file);
+
+  //  	//Проверяем, существует ли файл.
+		////Если нет, ничего не делаем.
+  //      if (!Utility.CheckAssetExists(uiContext, assetFilePath, "PlayFile"))
+  //      	return;
+
+  //  	AssetManager assetManager = uiContext.getAssets();
+  //  	if (assetManager == null)
+  //  	{
+  //  		Utility.WriteLog("PlayFile: failed, assetManager is null");
+  //  		return;
+  //  	}
+  //  	AssetFileDescriptor afd = null;
+  //  	try {
+		//	afd = assetManager.openFd(assetFilePath);
+		//} catch (IOException e) {
+		//	e.printStackTrace();
+		//	return;
+		//}
+  //  	if (afd == null)
+  //  		return;
+  //      
+  //  	MediaPlayer mediaPlayer = new MediaPlayer();
+	 //   try {
+		//	mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+		//} catch (IllegalArgumentException e) {
+		//	e.printStackTrace();
+		//	return;
+		//} catch (IllegalStateException e) {
+		//	e.printStackTrace();
+		//	return;
+		//} catch (IOException e) {
+		//	e.printStackTrace();
+		//	return;
+		//}
+	 //   try {
+		//	mediaPlayer.prepare();
+		//} catch (IllegalStateException e) {
+		//	e.printStackTrace();
+		//	return;
+		//} catch (IOException e) {
+		//	e.printStackTrace();
+		//	return;
+		//}
+		//final String fileName = file;
+		//mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+		//	@Override
+		//	public void onCompletion(MediaPlayer mp) {
+		//        musicLock.lock();
+		//        try {
+		//	    	for (int i=0; i<mediaPlayersList.size(); i++)
+		//	    	{
+		//	    		ContainerMusic it = mediaPlayersList.elementAt(i);    		
+		//	    		if (it.path.equals(fileName))
+		//	    		{
+		//	    			it.player.release();
+		//	    			it.player = null;
+		//	    			mediaPlayersList.remove(it);
+		//	    			break;
+		//	    		}
+		//	    	}
+		//        } finally {
+		//        	musicLock.unlock();
+		//        }
+		//	}
+		//});
+		//
+  //      musicLock.lock();
+  //      try {
+		//	float realVolume = GetRealVolume(volume);
+		//	mediaPlayer.setVolume(realVolume, realVolume);
+		//    mediaPlayer.start();
+		//    ContainerMusic ContainerMusic = new ContainerMusic();
+		//    ContainerMusic.path = file;
+		//    ContainerMusic.volume = volume;
+		//    ContainerMusic.player = mediaPlayer;
+  //      	mediaPlayersList.add(ContainerMusic);
+  //      } finally {
+  //      	musicLock.unlock();
+  //      }
+    }
+    
+	static QSP_BOOL IsPlayingFile(QSP_CHAR* file)
+    {
+    	////Контекст библиотеки
+    	//return CheckPlayingFileSetVolume(Utility.QspPathTranslate(file), false, 0);
+
+		return QSP_FALSE;
+    }
+
+    static void CloseFile(QSP_CHAR* file)
+    {
+    	////Контекст библиотеки
+    	//file = Utility.QspPathTranslate(file);
+    	//
+    	////Если вместо имени файла пришел null, значит закрываем все файлы(CLOSE ALL)
+    	//bool bCloseAll = false;
+    	//if (file == null)
+    	//	bCloseAll = true;
+    	//else if (file.length() == 0)
+    	//	return;
+     //   musicLock.lock();
+     //   try {
+	    //	for (int i=0; i<mediaPlayersList.size(); i++)
+	    //	{
+	    //		ContainerMusic it = mediaPlayersList.elementAt(i);    		
+	    //		if (bCloseAll || it.path.equals(file))
+	    //		{
+	    //			if (it.player.isPlaying())
+	    //				it.player.stop();
+	    //			it.player.release();
+	    //			it.player = null;
+	    //			if (!bCloseAll)
+	    //			{
+	    //				mediaPlayersList.remove(it);
+	    //				break;
+	    //			}
+	    //		}
+	    //	}
+    	//	if (bCloseAll)
+    	//		mediaPlayersList.clear();
+     //   } finally {
+     //   	musicLock.unlock();
+     //   }
+    }
+    
+    static void ShowPicture(QSP_CHAR* file)
+    {
+  //  	//Контекст библиотеки
+  //  	if (file == null)
+  //  		file = "";
+  //  	
+  //  	final String fileName = Utility.QspPathTranslate(file);
+  //  	
+		//mainActivity.runOnUiThread(new Runnable() {
+		//	public void run() {
+		//		if (fileName.length() > 0)
+		//		{
+		//	    	String prefix = "";
+		//	    	if (curGameDir != null)
+		//	    		prefix = curGameDir;
+		//	    	
+		//	    	//Проверяем, существует ли файл.
+		//	    	//Если нет - выходим
+		//	        if (!Utility.CheckAssetExists(uiContext, prefix.concat(fileName), "ShowPicture"))
+		//	        	return;
+		//		}
+		//        // "Пустое" имя файла тоже имеет значение - так мы скрываем картинку
+		//        jsQspView(fileName);
+		//	}
+		//});    	    	
+    }
+    
+    static void InputBox(const QSP_CHAR* prompt, QSP_CHAR* buffer, int maxLen)
+    {
+  //  	//Контекст библиотеки
+		//if (libThread==null)
+		//{
+		//	Utility.WriteLog("InputBox: failed, libThread is null");
+		//	return "";
+		//}
+
+	 //   // Обновляем скин
+	 //   skin.updateBaseVars();
+	 //   skin.updateInputDialog();
+	 //   skin.updateEffects();
+	 //   // Если что-то изменилось, то передаем в яваскрипт
+	 //   if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
+	 //   {
+	 //       Utility.WriteLog("Hey! Skin was changed! Updating it before showing INPUT.");
+	 //       RefreshInt(QSP_TRUE);
+	 //   }
+		//
+		//String promptValue = "";
+		//if (prompt != null)
+		//	promptValue = prompt;
+		//
+		//dialogHasResult = false;
+		//
+  //  	final String inputboxTitle = skin.applyHtmlFixes(promptValue);
+		//mainActivity.runOnUiThread(new Runnable() {
+		//	public void run() {
+		//		inputboxResult = "";
+		//		jsQspInput(inputboxTitle);
+		//		Utility.WriteLog("InputBox(UI): dialog showed");
+		//	}
+		//});
+  //  	
+		//Utility.WriteLog("InputBox: parking library thread");
+  //      while (!dialogHasResult) {
+  //      	setThreadPark();
+  //      }
+  //      parkThread = null;
+		//Utility.WriteLog("InputBox: library thread unparked, finishing");
+  //  	return inputboxResult;
+		
+		
+		//wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
+    }
+    
+    /**
+     * Функция запросов к плееру.
+     * С помощью этой функции мы можем в игре узнать параметры окружения плеера.
+     * Вызывается так: $platform = GETPLAYER('platform')
+     * @param resource
+     * @return
+     */
+    static void PlayerInfo(QSP_CHAR* resource, QSP_CHAR* buffer, int maxLen)
+    {
+    	////Контекст библиотеки
+    	//resource = resource.toLowerCase();
+    	//if (resource.equals("platform")) {
+    	//	return "Android";
+    	//} else if (resource.equals("player")) {
+    	//	return "Quest Navigator";
+    	//} else if (resource.equals("player.version")) {
+    	//	return "1.0.0";
+    	//}
+    	//return "";
+
+
+		//wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
+    }
+    
+    static int GetMSCount()
+    {
+    	////Контекст библиотеки
+    	//return (int) (System.currentTimeMillis() - gameStartTime);
+    }
+    
+    static void AddMenuItem(QSP_CHAR* name, QSP_CHAR* imgPath)
+    {
+    	////Контекст библиотеки
+    	//ContainerMenuItem item = new ContainerMenuItem();
+    	//item.imgPath = Utility.QspPathTranslate(imgPath);
+    	//item.name = name;
+    	//menuList.add(item);
+    }
+    
+    static int ShowMenu()
+    {
+  //  	//Контекст библиотеки
+		//if (libThread==null)
+		//{
+		//	Utility.WriteLog("ShowMenu: failed, libThread is null");
+		//	return -1;
+		//}
+
+	 //   // Обновляем скин
+	 //   skin.updateMenuDialog();
+	 //   skin.updateEffects();
+	 //   // Если что-то изменилось, то передаем в яваскрипт
+	 //   if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
+	 //   {
+	 //       Utility.WriteLog("Hey! Skin was changed! Updating it before showing user menu.");
+	 //       RefreshInt(QSP_TRUE);
+	 //   }
+		//
+		//dialogHasResult = false;
+		//menuResult = -1;
+
+		//final Vector<ContainerMenuItem> uiMenuList = menuList; 
+  //  	
+		//mainActivity.runOnUiThread(new Runnable() {
+		//	public void run() {
+		//        JSONArray jsonMenuList = new JSONArray();
+		//		for (int i = 0; i < uiMenuList.size(); i++)
+		//		{
+		//			JSONObject jsonMenuItem = new JSONObject();
+		//			try {
+		//				jsonMenuItem.put("image", uiMenuList.elementAt(i).imgPath);
+		//				jsonMenuItem.put("desc", skin.applyHtmlFixes(uiMenuList.elementAt(i).name));
+		//				jsonMenuList.put(i, jsonMenuItem);
+		//			} catch (JSONException e) {
+		//	    		Utility.WriteLog("ERROR - jsonMenuItem or jsonMenuList[] in ShowMenu!");
+		//				e.printStackTrace();
+		//			}
+		//		}
+		//		jsQspMenu(jsonMenuList);
+		//	    Utility.WriteLog("ShowMenu(UI): dialog showed");
+		//	}
+		//});
+  //  	
+		//Utility.WriteLog("ShowMenu: parking library thread");
+  //      while (!dialogHasResult) {
+  //      	setThreadPark();
+  //      }
+  //      parkThread = null;
+		//Utility.WriteLog("ShowMenu: library thread unparked, finishing");
+  //  	
+		//return menuResult;
+    }
+    
+    static void DeleteMenu()
+    {
+    	////Контекст библиотеки
+    	//menuList.clear();
+    }
+    
+    static void Wait(int msecs)
+    {
+  //  	//Контекст библиотеки
+  //  	try {
+		//	Thread.sleep(msecs);
+		//} catch (InterruptedException e) {
+		//	Utility.WriteLog("WAIT in library thread was interrupted");
+		//	e.printStackTrace();
+		//}
+    }
+    
+	static void ShowWindow(int type, QSP_BOOL isShow)
+    {
+    	//// Контекст библиотеки
+    	//skin.showWindow(type, isShow);
+    }
+    
+    static void System(QSP_CHAR* cmd)
+    {
+    	////Контекст библиотеки
+    	//if (cmd == null)
+    	//	cmd = "";
+    	//
+    	//if (cmd.toUpperCase().startsWith("JS:"))
+    	//{
+     //   	// Выполняем яваскрипт, переданный из игры командой EXEC('JS:...')
+    	//	final String jsCommand = cmd.substring("JS:".length());
+    	//	mainActivity.runOnUiThread(new Runnable() {
+    	//		public void run() {
+    	//			execJS(jsCommand);
+    	//		}
+    	//	});
+    	//}
+    }
 
 	// ********************************************************************
 	// ********************************************************************
