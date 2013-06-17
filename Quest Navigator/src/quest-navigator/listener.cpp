@@ -63,6 +63,7 @@ void QnApplicationListener::OnUpdate() {
 
 // Inherited from Application::Listener
 void QnApplicationListener::OnShutdown() {
+	FreeResources();
 }
 
 void QnApplicationListener::BindMethods(WebView* web_view) {
@@ -99,21 +100,21 @@ void QnApplicationListener::BindMethods(WebView* web_view) {
 
 // Bound to App.SayHello() in JavaScript
 void QnApplicationListener::OnSayHello(WebView* caller,
-				const JSArray& args) {
-					app_->ShowMessage("Hello!");
+									   const JSArray& args) {
+										   app_->ShowMessage("Hello!");
 }
 
 // Bound to App.Exit() in JavaScript
 void QnApplicationListener::OnExit(WebView* caller,
-			const JSArray& args) {
-				app_->Quit();
+								   const JSArray& args) {
+									   app_->Quit();
 }
 
 // Bound to App.GetSecretMessage() in JavaScript
 JSValue QnApplicationListener::OnGetSecretMessage(WebView* caller,
-						   const JSArray& args) {
-							   return JSValue(WSLit(
-								   "<img src='asset://webui/key.png'/> You have unlocked the secret message!"));
+												  const JSArray& args) {
+													  return JSValue(WSLit(
+														  "<img src='asset://webui/key.png'/> You have unlocked the secret message!"));
 }
 
 // ********************************************************************
@@ -163,8 +164,157 @@ void QnApplicationListener::initLib()
 	//      //Создаем объект для таймера
 	//      timerHandler = new Handler(Looper.getMainLooper());
 
-	//      //Запускаем поток библиотеки
-	//      StartLibThread();
+	//Запускаем поток библиотеки
+	StartLibThread();
+}
+
+void QnApplicationListener::FreeResources()
+{
+	//Контекст UI
+
+	//Процедура "честного" высвобождения всех ресурсов - в т.ч. остановка потока библиотеки
+
+	//Очищаем ВСЕ на выходе
+	if (qspInited)
+	{
+//		Utility.WriteLog("onDestroy: stopping game");
+		StopGame(false);
+	}
+	//Останавливаем поток библиотеки
+	StopLibThread();
+}
+
+void QnApplicationListener::runGame(string fileName)
+{
+	////Контекст UI
+	//if (!Utility.CheckAssetExists(uiContext, fileName, "runGame"))
+	//	return;
+
+	//if (libThreadHandler == null)
+	//{
+	//	Utility.WriteLog("runGame: failed, libThreadHandler is null");
+	//	return;
+	//}
+
+	//if (libraryThreadIsRunning)
+	//{
+	//	Utility.WriteLog("runGame: failed, library thread is already running");
+	//	return;
+	//}
+
+	//final bool inited = qspInited;
+	//qspInited = true;
+	//jsExecBuffer = "";
+	//final String gameFileName = fileName;
+	//curGameFile = gameFileName;
+	//curGameDir = gameFileName.substring(0, gameFileName.lastIndexOf(File.separator, gameFileName.length() - 1) + 1);
+
+	//libThreadHandler.post(new Runnable() {
+	//	public void run() {
+	//		InputStream fIn = null;
+	//		int size = 0;
+
+	//		AssetManager assetManager = uiContext.getAssets();
+	//		if (assetManager == null)
+	//		{
+	//			Utility.WriteLog("runGame(in library thread): failed, assetManager is null");
+	//			return;
+	//		}
+	//		try {
+	//			fIn = assetManager.open(gameFileName);
+	//			size = fIn.available();
+	//		} catch (Exception e) {
+	//			e.printStackTrace();
+	//			Utility.ShowError(uiContext, "Не удалось получить доступ к файлу");
+	//			try {
+	//				fIn.close();
+	//			} catch (IOException e1) {
+	//				Utility.ShowError(uiContext, "Не удалось освободить дескриптор файла");
+	//				e1.printStackTrace();
+	//			}
+	//			return;
+	//		}
+
+	//		byte[] inputBuffer = new byte[size];
+	//		try {
+	//			// Fill the Buffer with data from the file
+	//			fIn.read(inputBuffer);
+	//			fIn.close();
+	//		} catch (IOException e) {
+	//			e.printStackTrace();
+	//			Utility.ShowError(uiContext, "Не удалось прочесть файл");
+	//			return;
+	//		}
+
+	//		if (!inited)
+	//			QSPInit();
+	//		final bool gameLoaded = QSPLoadGameWorldFromData(inputBuffer, size, gameFileName);
+	//		CheckQspResult(gameLoaded, "runGame: QSPLoadGameWorldFromData");
+
+	//		if (gameLoaded)
+	//		{
+	//			mainActivity.runOnUiThread(new Runnable() {
+	//				public void run() {
+	//					//Запускаем таймер
+	//					timerInterval = 500;
+	//					timerStartTime = System.currentTimeMillis();
+	//					timerHandler.removeCallbacks(timerUpdateTask);
+	//					timerHandler.postDelayed(timerUpdateTask, timerInterval);
+
+	//					//Запускаем счетчик миллисекунд
+	//					gameStartTime = System.currentTimeMillis();
+
+	//					//Все готово, запускаем игру
+	//					libThreadHandler.post(new Runnable() {
+	//						public void run() {
+	//							libraryThreadIsRunning = true;
+	//							bool result = QSPRestartGame(true);
+	//							CheckQspResult(result, "runGame: QSPRestartGame");
+	//							libraryThreadIsRunning = false;
+	//						}
+	//					});
+
+	//					gameIsRunning = true;
+	//				}
+	//			});
+	//		}
+	//	}
+	//});
+}
+
+void QnApplicationListener::StopGame(bool restart)
+{
+	////Контекст UI
+	//if (gameIsRunning)
+	//{
+	//	//останавливаем таймер
+	//	timerHandler.removeCallbacks(timerUpdateTask);
+
+	//	//останавливаем музыку
+	//	libThreadHandler.post(new Runnable() {
+	//		public void run() {
+	//			CloseFile(null);
+	//		}
+	//	});
+
+	//	gameIsRunning = false;
+	//}
+	//curGameDir = "";
+	//curGameFile = "";
+	//jsExecBuffer = "";
+
+	////Очищаем библиотеку
+	//if (restart || libraryThreadIsRunning)
+	//	return;
+
+	//qspInited = false;
+	//libThreadHandler.post(new Runnable() {
+	//	public void run() {
+	//		libraryThreadIsRunning = true;
+	//		QSPDeInit();
+	//		libraryThreadIsRunning = false;
+	//	}
+	//});
 }
 
 // ********************************************************************
@@ -836,3 +986,113 @@ void QnApplicationListener::alert(WebView* caller, const JSArray& args)
 	}
 	showMessage(msg, "");
 }
+
+//******************************************************************************
+//******************************************************************************
+//****** / THREADS \ ***********************************************************
+//******************************************************************************
+//******************************************************************************
+// паркует-останавливает указанный тред, и сохраняет на него указатель в parkThread
+void QnApplicationListener::setThreadPark()
+{
+
+	//Utility.WriteLog("setThreadPark: enter ");    	
+	////Контекст библиотеки
+	//if (libThread == null)
+	//{
+	//	Utility.WriteLog("setThreadPark: failed, libthread is null");
+	//	return;
+	//}
+	//parkThread = libThread;
+	//LockSupport.park();
+	//Utility.WriteLog("setThreadPark: success ");    	
+}
+
+// возобновляет работу треда сохраненного в указателе parkThread
+bool QnApplicationListener::setThreadUnpark()
+{
+	//Utility.WriteLog("setThreadUnPark: enter ");
+	////Контекст UI
+	//if (parkThread!=null && parkThread.isAlive()) {
+	//	LockSupport.unpark(parkThread);
+	//	Utility.WriteLog("setThreadUnPark: success ");    	
+	//	return true;
+	//}
+	//Utility.WriteLog("setThreadUnPark: failed, ");
+	//if (parkThread==null)
+	//	Utility.WriteLog("parkThread is null ");
+	//else
+	//	Utility.WriteLog("parkThread is dead ");
+	//return false;
+
+	return false;
+}
+
+// Запуск потока библиотеки
+void QnApplicationListener::StartLibThread()
+{
+	//Utility.WriteLog("StartLibThread: enter ");    	
+	////Контекст UI
+	//if (libThread != null)
+	//{
+	//	Utility.WriteLog("StartLibThread: failed, libThread is not null");    	
+	//	return;
+	//}
+
+	//final QspLib pluginObject = this; 
+
+	////Запускаем поток библиотеки
+	//Thread t = new Thread() {
+	//	public void run() {
+	//		Looper.prepare();
+	//		libThreadHandler = new Handler();
+	//		Utility.WriteLog("LibThread runnable: libThreadHandler is set");    	
+
+	//		libThreadHandler.post(new Runnable() {
+	//			public void run() {
+	//				// Создаем скин
+	//				skin = new QspSkin(pluginObject);
+
+	//				//Создаем список для звуков и музыки
+	//				musicLock.lock();
+	//				try {
+	//					mediaPlayersList = new Vector<ContainerMusic>();
+	//					muted = false;
+	//				} finally {
+	//					musicLock.unlock();
+	//				}
+
+	//				// Сообщаем яваскрипту, что библиотека запущена
+	//				// и можно продолжить инициализацию
+	//				mainActivity.runOnUiThread(new Runnable() {
+	//					public void run() {
+	//						jsInitNext();
+	//					}
+	//				});
+	//			}
+	//		});
+
+	//		Looper.loop();
+	//		Utility.WriteLog("LibThread runnable: library thread exited");
+	//	}
+	//};
+	//libThread = t;
+	//t.start();
+	//Utility.WriteLog("StartLibThread: success");
+}
+
+// Остановка потока библиотеки
+void QnApplicationListener::StopLibThread()
+{
+	//Utility.WriteLog("StopLibThread: enter");    	
+	////Контекст UI
+	////Останавливаем поток библиотеки
+	//libThreadHandler.getLooper().quit();
+	//libThread = null;
+	//Utility.WriteLog("StopLibThread: success");    	
+}
+//******************************************************************************
+//******************************************************************************
+//****** \ THREADS / ***********************************************************
+//******************************************************************************
+//******************************************************************************
