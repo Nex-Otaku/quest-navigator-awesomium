@@ -162,6 +162,12 @@
     <ClCompile Include="src\quest-navigator\configuration.cpp">
       <Filter>Файлы исходного кода\special</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\method_dispatcher.cc">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="src\quest-navigator\listener.cpp">
+      <Filter>Файлы исходного кода\special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\application.h">
@@ -180,6 +186,9 @@
       <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
     <ClInclude Include="src\quest-navigator\configuration.h">
+      <Filter>Заголовочные файлы\special</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quest-navigator\listener.h">
       <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
   </ItemGroup>
