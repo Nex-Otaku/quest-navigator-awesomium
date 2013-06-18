@@ -139,7 +139,7 @@ public:
 	// Остановка потока библиотеки
 	void StopLibThread();
 	// Основная функция потока библиотеки
-	static DWORD WINAPI libThreadFunc(LPVOID pvParam);
+	static unsigned int __stdcall libThreadFunc(void* pvParam);
 };
 
 

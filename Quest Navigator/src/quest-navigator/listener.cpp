@@ -9,6 +9,7 @@
 #include <Awesomium/DataPak.h>
 #include <Awesomium/STLHelpers.h>
 #include "utils.h"
+#include <process.h>
 
 using namespace Awesomium;
 using namespace QuestNavigator;
@@ -1050,12 +1051,12 @@ void QnApplicationListener::StartLibThread()
 //  _Out_opt_  LPDWORD lpThreadId
 //);
 
-	libThread = CreateThread(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
+	//libThread = CreateThread(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
+	libThread = (HANDLE)_beginthreadex(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
 	if (libThread == NULL) {
 		showError("Не получилось создать поток интерпретатора.");
 		return;
 	}
-
 
 	//final QspLib pluginObject = this; 
 
@@ -1108,7 +1109,8 @@ void QnApplicationListener::StopLibThread()
 	//libThreadHandler.getLooper().quit();
 
 	//STUB
-	// Сделать правильное завершение потока
+	// Сделать правильное завершение потока 
+	//(сообщить потоку что ему нужно завершиться, после чего просто подождать)
 
 	CloseHandle(libThread);
 	libThread = NULL;
@@ -1116,11 +1118,11 @@ void QnApplicationListener::StopLibThread()
 }
 
 // Основная функция потока библиотеки
-DWORD WINAPI QnApplicationListener::libThreadFunc(LPVOID pvParam)
+unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 {
-	DWORD dwResult = 0;
 	// STUB
-	return dwResult;
+	_endthreadex(0);
+	return 0;
 }
 //******************************************************************************
 //******************************************************************************
