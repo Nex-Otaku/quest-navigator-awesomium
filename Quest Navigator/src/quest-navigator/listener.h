@@ -23,6 +23,8 @@ class QnApplicationListener : public Application::Listener {
 	bool gameIsRunning;
 	bool qspInited;
 
+	HANDLE libThread;
+
 public:
 	QnApplicationListener();
 	virtual ~QnApplicationListener();
@@ -136,6 +138,8 @@ public:
 	void StartLibThread();
 	// Остановка потока библиотеки
 	void StopLibThread();
+	// Основная функция потока библиотеки
+	static DWORD WINAPI libThreadFunc(LPVOID pvParam);
 };
 
 

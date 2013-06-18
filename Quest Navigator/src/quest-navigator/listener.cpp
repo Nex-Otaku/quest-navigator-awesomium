@@ -19,7 +19,9 @@ QnApplicationListener::QnApplicationListener()
 	data_source_(0),
 
 	gameIsRunning(false),
-	qspInited(false)
+	qspInited(false),
+
+	libThread(NULL)
 {
 	app_->set_listener(this);
 }
@@ -1032,12 +1034,28 @@ bool QnApplicationListener::setThreadUnpark()
 void QnApplicationListener::StartLibThread()
 {
 	//Utility.WriteLog("StartLibThread: enter ");    	
-	////Контекст UI
-	//if (libThread != null)
-	//{
-	//	Utility.WriteLog("StartLibThread: failed, libThread is not null");    	
-	//	return;
-	//}
+	//Контекст UI
+	if (libThread != NULL)
+	{
+//		Utility.WriteLog("StartLibThread: failed, libThread is not null");    	
+		return;
+	}
+
+//HANDLE WINAPI CreateThread(
+//  _In_opt_   LPSECURITY_ATTRIBUTES lpThreadAttributes,
+//  _In_       SIZE_T dwStackSize,
+//  _In_       LPTHREAD_START_ROUTINE lpStartAddress,
+//  _In_opt_   LPVOID lpParameter,
+//  _In_       DWORD dwCreationFlags,
+//  _Out_opt_  LPDWORD lpThreadId
+//);
+
+	libThread = CreateThread(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
+	if (libThread == NULL) {
+		showError("Не получилось создать поток интерпретатора.");
+		return;
+	}
+
 
 	//final QspLib pluginObject = this; 
 
@@ -1088,8 +1106,21 @@ void QnApplicationListener::StopLibThread()
 	////Контекст UI
 	////Останавливаем поток библиотеки
 	//libThreadHandler.getLooper().quit();
-	//libThread = null;
+
+	//STUB
+	// Сделать правильное завершение потока
+
+	CloseHandle(libThread);
+	libThread = NULL;
 	//Utility.WriteLog("StopLibThread: success");    	
+}
+
+// Основная функция потока библиотеки
+DWORD WINAPI QnApplicationListener::libThreadFunc(LPVOID pvParam)
+{
+	DWORD dwResult = 0;
+	// STUB
+	return dwResult;
 }
 //******************************************************************************
 //******************************************************************************
