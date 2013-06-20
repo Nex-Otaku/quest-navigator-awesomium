@@ -9,11 +9,26 @@
 #include <Awesomium/DataPak.h>
 #include <Awesomium/STLHelpers.h>
 #include "utils.h"
+#include "configuration.h"
 #include <process.h>
 
 using namespace Awesomium;
 
 namespace QuestNavigator {
+
+// Глобальные переменные для работы с потоками
+
+// Структура для критических секций
+CRITICAL_SECTION g_csSharedData;
+
+// Разделяемые данные
+struct
+{
+	string str;
+} g_sharedData;
+
+// События для синхронизации потоков
+HANDLE g_eventList[evLast];
 
 QnApplicationListener::QnApplicationListener() 
 	: app_(Application::Create()),
@@ -172,6 +187,15 @@ void QnApplicationListener::FreeResources()
 
 void QnApplicationListener::runGame(string fileName)
 {
+
+	// Готовим данные для передачи в поток
+	lockData();
+	g_sharedData.str = fileName;
+	runSyncEvent(evRunGame);
+	unlockData();
+
+
+
 	////Контекст UI
 	//if (!Utility.CheckAssetExists(uiContext, fileName, "runGame"))
 	//	return;
@@ -313,6 +337,7 @@ void QnApplicationListener::StopGame(bool restart)
 
 void QnApplicationListener::RefreshInt(int isRedraw) 
 {
+	showMessage("RefreshInt called!", "");
 	//Контекст библиотеки
 	//      bool needUpdate = skin.isSomethingChanged();
 	//      skin.updateBaseVars();
@@ -909,6 +934,15 @@ void QnApplicationListener::qspView(WebString path)
 void QnApplicationListener::restartGame(WebView* caller, const JSArray& args)
 {
 	app_->ShowMessage("restarted!");
+		//// Контекст UI
+  //  	Utility.WriteLog("[[restartGame]]");
+
+  //  	String gameFile = curGameFile;
+  //  	StopGame(true);
+  //  	runGame(gameFile);
+	string gameFile = Configuration::getString(ecpGameFile);
+	StopGame(true);
+	runGame(gameFile);
 }
 
 void QnApplicationListener::executeAction(WebView* caller, const JSArray& args)
@@ -981,21 +1015,6 @@ void QnApplicationListener::alert(WebView* caller, const JSArray& args)
 
 // Все функции библиотеки QSP (QSPInit и т.д.) 
 // вызываются только внутри потока библиотеки.
-
-// Глобальные переменные для работы с потоками
-
-
-// Структура для критических секций
-CRITICAL_SECTION g_csSharedData;
-
-// Разделяемые данные
-struct
-{
-	string str;
-} g_sharedData;
-
-// События для синхронизации потоков
-HANDLE g_eventList[evLast];
 
 // паркует-останавливает указанный тред, и сохраняет на него указатель в parkThread
 void QnApplicationListener::setThreadPark()
@@ -1145,19 +1164,23 @@ void QnApplicationListener::StartLibThread()
 		return;
 	}
 
-	// Готовим данные для передачи в поток
-	lockData();
-	g_sharedData.str = "abc";
-	runSyncEvent(evTest);
-	unlockData();
+	//// Готовим данные для передачи в поток
+	//lockData();
+	//g_sharedData.str = "abc";
+	//runSyncEvent(evTest);
+	//unlockData();
 
-	// Ждём возврата данных из потока
-	string blabla = "";
-	waitForSingle(evCommitted);
-	lockData();
-	blabla = g_sharedData.str;
-	unlockData();
-	showMessage(blabla, "");
+	//// Ждём возврата данных из потока
+	//string blabla = "";
+	//waitForSingle(evCommitted);
+	//lockData();
+	//blabla = g_sharedData.str;
+	//unlockData();
+//	showMessage(blabla, "");
+
+
+
+
 
 	//final QspLib pluginObject = this; 
 
@@ -1228,6 +1251,9 @@ void QnApplicationListener::StopLibThread()
 // Основная функция потока библиотеки. Вызывается только раз за весь жизненный цикл программы.
 unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 {
+	// Инициализируем библиотеку
+	QSPInit();
+
 	// Привязываем колбэки
 	QSPSetCallBack(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
 	//QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
@@ -1247,8 +1273,6 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 	//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
 	//QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
 
-	// Инициализируем библиотеку
-	QSPInit();
 
 
 	// Обработка событий происходит в цикле
@@ -1265,10 +1289,46 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 			{
 			case evTest:
 				{
+					// Чисто для тестирования.
+					// Читаем переданные нам данные и перезаписываем их.
 					lockData();
 					g_sharedData.str += " def";
 					runSyncEvent(evCommitted);
 					unlockData();
+				}
+				break;
+			case evRunGame:
+				{
+					// Запуск игры
+					string path = "";
+					lockData();
+					path = g_sharedData.str;
+					unlockData();
+					QSP_BOOL res = QSPLoadGameWorld(widen(path).c_str());
+					CheckQspResult(res, "QSPLoadGameWorld");
+    	    //	            //Запускаем таймер
+    	    //	            timerInterval = 500;
+    	    //	            timerStartTime = System.currentTimeMillis();
+    	    //	            timerHandler.removeCallbacks(timerUpdateTask);
+    	    //	            timerHandler.postDelayed(timerUpdateTask, timerInterval);
+    	    //	            
+    	    //	            //Запускаем счетчик миллисекунд
+    	    //	            gameStartTime = System.currentTimeMillis();
+
+    	    //	            //Все готово, запускаем игру
+    	    //	            libThreadHandler.post(new Runnable() {
+    	    //	        		public void run() {
+    	    //	                	libraryThreadIsRunning = true;
+    	    //	        			boolean result = QSPRestartGame(true);
+									//CheckQspResult(result, "runGame: QSPRestartGame");
+    	    //	                	libraryThreadIsRunning = false;
+    	    //	        		}
+    	    //	            });
+    	    //	            
+    	    //	            gameIsRunning = true;
+
+					res = QSPRestartGame(true);
+					CheckQspResult(res, "QSPRestartGame");
 				}
 				break;
 			case evShutdown:
@@ -1298,5 +1358,67 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 //****** \ THREADS / ***********************************************************
 //******************************************************************************
 //******************************************************************************
+
+	// Проверяем статус выполнения операции и сообщаем об ошибке, если требуется.
+	void QnApplicationListener::CheckQspResult(QSP_BOOL successfull, string failMsg)
+	{
+    	//Контекст библиотеки
+		if (successfull == QSP_FALSE)
+    	{
+			showError(failMsg + " failed.");
+
+   //     	//Контекст библиотеки
+   // 		Utility.WriteLog(failMsg + " failed");
+
+   // 		ContainerJniResult error = (ContainerJniResult) QSPGetLastErrorData();
+			//error.str2 = QSPGetErrorDesc(error.int1);
+	  //  	String locName = skin.applyHtmlFixes((error.str1 == null) ? "" : error.str1);
+	  //  	String errDesc = skin.applyHtmlFixes((error.str2 == null) ? "" : error.str2);
+
+   // 		if (libThread==null)
+   // 		{
+   // 			Utility.WriteLog("CheckQspResult: failed, libThread is null");
+   // 			return;
+   // 		}
+
+   // 	    // Обновляем скин
+   //         skin.updateBaseVars();
+   //         skin.updateMsgDialog();
+   //         skin.updateEffects();
+   // 	    // Если что-то изменилось, то передаем в яваскрипт
+   // 	    if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
+   // 	    {
+   // 	        Utility.WriteLog("Hey! Skin was changed! Updating it before showing error dialog.");
+   // 	        RefreshInt(QSP_TRUE);
+   // 	    }
+   // 		
+   // 		dialogHasResult = false;
+   // 		
+   //     	final JSONObject jsErrorContainer = new JSONObject();
+   //     	try {
+	  //              jsErrorContainer.put("desc", errDesc);
+	  //              jsErrorContainer.put("loc", locName);
+	  //              jsErrorContainer.put("actIndex", error.int2);
+	  //              jsErrorContainer.put("line", error.int3);
+			//} catch (JSONException e) {
+	  //  		Utility.WriteLog("ERROR - jsErrorContainer in CheckQspResult!");
+			//	e.printStackTrace();
+			//}
+   // 		
+   // 		mainActivity.runOnUiThread(new Runnable() {
+   // 			public void run() {
+   // 				jsQspError(jsErrorContainer);
+   // 				Utility.WriteLog("CheckQspResult(UI): error dialog showed");
+   // 			}
+   // 		});
+   //     	
+   // 		Utility.WriteLog("CheckQspResult: parking library thread");
+   //         while (!dialogHasResult) {
+   //         	setThreadPark();
+   //         }
+   //         parkThread = null;
+   // 		Utility.WriteLog("CheckQspResult: library thread unparked, finishing");
+    	}
+	}
 
 }

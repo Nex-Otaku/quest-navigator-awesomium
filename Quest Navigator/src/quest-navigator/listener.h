@@ -144,6 +144,12 @@ namespace QuestNavigator {
 		void StopLibThread();
 		// Основная функция потока библиотеки
 		static unsigned int __stdcall libThreadFunc(void* pvParam);
+
+
+
+		// Проверка результатов выполнения библиотечного кода
+		static void CheckQspResult(QSP_BOOL successfull, string failMsg);
+
 	};
 
 	// Список событий для синхронизации потоков
@@ -151,6 +157,9 @@ namespace QuestNavigator {
 	{
 		// Ui -> Библиотека
 		evTest = 0,
+
+		evRunGame,
+
 		evShutdown,				// Завершить работу потока
 
 		// Библиотека -> Ui
@@ -174,6 +183,7 @@ namespace QuestNavigator {
 	// Ожидаем события
 	bool waitForSingle(HANDLE handle);
 	bool waitForSingle(eSyncEvent ev);
+
 }
 
 
