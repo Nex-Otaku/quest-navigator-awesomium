@@ -11,7 +11,8 @@ namespace QuestNavigator {
 
 	// Константы
 
-	static const string DEFAULT_CONTENT_REL_PATH = "standalone_content\\gameAwesomium.html";
+	static const string DEFAULT_CONTENT_REL_PATH = "standalone_content";
+	static const string DEFAULT_SKIN_FILE = "gameAwesomium.html";
 
 	// Утилиты для преобразования строк
 
@@ -43,6 +44,8 @@ namespace QuestNavigator {
 	string getContentUrl();
 	// Проверяем файл на существование и читаемость
 	bool fileExists(string path);
+	// Проверяем папку на существование и читаемость
+	bool dirExists(string path);
 	// Получаем путь к рабочей папке
 	string getCurrentDir();
 

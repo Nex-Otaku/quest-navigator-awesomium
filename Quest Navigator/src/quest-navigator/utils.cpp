@@ -90,9 +90,9 @@ string getContentUrl()
 	// Если путь к содержимому не задан явно,
 	// указываем путь по умолчанию для пака "assets.pak".
 	// Файл "assets.pak" ищется в рабочей папке.
-	string contentPath = Configuration::getContentPath();
+	string contentPath = Configuration::getString(ecpSkinFile);
 	string contentUrl = (contentPath.length() == 0) ?
-		"asset://webui/" + backSlashToSlash(DEFAULT_CONTENT_REL_PATH) : 
+		"asset://webui/" + backSlashToSlash(DEFAULT_CONTENT_REL_PATH + "\\" + DEFAULT_SKIN_FILE) : 
 		getUrlFromFilePath(contentPath);
 	return contentUrl;
 }
@@ -101,8 +101,16 @@ string getContentUrl()
 bool fileExists(string path)
 {
 	DWORD dwAttrib = GetFileAttributes(widen(path).c_str());
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
+	return ((dwAttrib != INVALID_FILE_ATTRIBUTES) && 
 		!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+// Проверяем папку на существование и читаемость
+bool dirExists(string path)
+{
+	DWORD dwAttrib = GetFileAttributes(widen(path).c_str());
+	return ((dwAttrib != INVALID_FILE_ATTRIBUTES) && 
+		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
 // Получаем путь к рабочей папке
@@ -168,13 +176,49 @@ void initOptions()
 	}
 	// Всё разобрано правильно
 	if (contentPathSet) {
-		// Пока что мы умеем обрабатывать только пути к файлам .html и .htm
-		if (!endsWith(contentPath, ".html") && !endsWith(contentPath, ".htm")) {
-			showError("Неизвестный формат файла!\nПоддерживаемые форматы: html, htm");
-			return;
-		}
-		// Проверяем файл на существование и читаемость
-		if (!fileExists(contentPath)) {
+		// Нам передали путь к игре.
+		// Всего три варианта:
+		// 1. Это путь к архиву .qn;
+		// 2. Это путь к файлу .qsp;
+		// 3. Это путь к папке игры.
+		// Проверяем путь на существование и читаемость.
+		string contentDir = getCurrentDir();
+		string skinFile = "";
+		string gameFile = "";
+		string configFile = "";
+
+		bool bValidDirectory = dirExists(contentPath);
+		bool bValidFile = fileExists(contentPath);
+		if (bValidFile) {
+			// Проверяем расширение файла
+			bool bExtQn = endsWith(contentPath, ".qn");
+			bool bExtQsp = endsWith(contentPath, ".qsp");
+			if (!bExtQn && !bExtQsp) {
+				showError("Неизвестный формат файла!\nПоддерживаемые форматы: qn, qsp");
+				return;
+			}
+			if (bExtQn) {
+				// STUB
+				showError("Загрузка архива qn ещё не реализована.");
+				return;
+			} else {
+				// STUB
+				showError("Загрузка файла qsp ещё не реализована.");
+				return;
+			}
+			// STUB
+		} else if (bValidDirectory) {
+			// Сохраняем путь к папке игры
+			contentDir = contentPath;
+			// Вычисляем пути к необходимым файлам
+			skinFile = contentDir + "\\" + DEFAULT_SKIN_FILE;
+			// STUB
+			// Сделать проверку на количество QSP-файлов, 
+			// если файлов более одного, то выводить ошибку.
+			// Сделать поиск QSP-файлов.
+			gameFile = contentDir + "\\" + "game.qsp";
+			configFile = contentDir + "\\" + "config.xml";
+		} else {
 			DWORD error = GetLastError();
 			if (error == ERROR_FILE_NOT_FOUND) {
 				showError("Не найден файл: [" + contentPath + "]");
@@ -185,11 +229,19 @@ void initOptions()
 			}
 			return;
 		}
-		// В параметре конфигурации ContentPath пока что будет храниться
-		// полный путь к html-файлу проекта.
-		string fullPath = startsWith(contentPath.substr(1), ":\\") ?
-			contentPath : getCurrentDir() + "\\" + contentPath;
-		Configuration::setContentPath(fullPath);
+
+		// STUB
+		// Сделать проверку всех файлов на читаемость
+		Configuration::setString(ecpContentDir, contentDir);
+		Configuration::setString(ecpSkinFile, skinFile);
+		Configuration::setString(ecpGameFile, gameFile);
+		Configuration::setString(ecpConfigFile, configFile);
+
+		//// В параметре конфигурации ContentPath пока что будет храниться
+		//// полный путь к html-файлу проекта.
+		//string fullPath = startsWith(contentPath.substr(1), ":\\") ?
+		//	contentPath : getCurrentDir() + "\\" + contentPath;
+		//Configuration::setContentPath(fullPath);
 	}
 }
 

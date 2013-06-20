@@ -8,15 +8,36 @@ using namespace std;
 namespace QuestNavigator {
 
 	// В этом классе хранятся всяческие параметры плеера
-	class Configuration {
+	enum eConfigParam
+	{
+		// Строки
+		ecpContentDir = 0,
+		ecpSkinFile,
+		ecpGameFile,
+		ecpConfigFile,
+
+		ecpLast
+	};
+
+	class ConfigValue {
 	private:
-		static string _contentPath;
+		string _str;
+	public:
+		ConfigValue();
+		ConfigValue(string str);
+		string getString();
+		void setString(string str);
+	};
+
+	class Configuration {
+		// Параметр может быть разного типа
+	private:
+		// Хранилище параметров
+		static ConfigValue _paramList[ecpLast];
 
 	public:
-
-		static string getContentPath();
-		static void setContentPath(string path);
-
+		static string getString(eConfigParam param);
+		static void setString(eConfigParam param, string value);
 
 	};
 }
