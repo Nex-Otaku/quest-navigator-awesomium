@@ -4,6 +4,8 @@
 
 #include "quest-navigator/listener.h"
 
+using namespace QuestNavigator;
+
 #ifdef _WIN32
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, wchar_t*, 
 					  int nCmdShow) {

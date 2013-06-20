@@ -12,7 +12,8 @@
 #include <process.h>
 
 using namespace Awesomium;
-using namespace QuestNavigator;
+
+namespace QuestNavigator {
 
 QnApplicationListener::QnApplicationListener() 
 	: app_(Application::Create()),
@@ -130,24 +131,6 @@ JSValue QnApplicationListener::OnGetSecretMessage(WebView* caller,
 
 void QnApplicationListener::initLib()
 {
-	// Привязываем колбэки
-	QSPSetCallBack(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
-	//QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
-	//QSPSetCallBack(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
-	//QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlay);
-	//QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
-	//QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
-	//QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&Msg);
-	//QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
-	//QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
-	//QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
-	//QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
-	//QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
-	//QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
-	//QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
-	//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
-	//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
-	//QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
 
 
 	//QSPInit();
@@ -995,9 +978,29 @@ void QnApplicationListener::alert(WebView* caller, const JSArray& args)
 //****** / THREADS \ ***********************************************************
 //******************************************************************************
 //******************************************************************************
+
+// Все функции библиотеки QSP (QSPInit и т.д.) 
+// вызываются только внутри потока библиотеки.
+
+// Глобальные переменные для работы с потоками
+
+
+// Структура для критических секций
+CRITICAL_SECTION g_csSharedData;
+
+// Разделяемые данные
+struct
+{
+	string str;
+} g_sharedData;
+
+// События для синхронизации потоков
+HANDLE g_eventList[evLast];
+
 // паркует-останавливает указанный тред, и сохраняет на него указатель в parkThread
 void QnApplicationListener::setThreadPark()
 {
+	// SuspendThread(GetCurrentThread())
 
 	//Utility.WriteLog("setThreadPark: enter ");    	
 	////Контекст библиотеки
@@ -1014,6 +1017,8 @@ void QnApplicationListener::setThreadPark()
 // возобновляет работу треда сохраненного в указателе parkThread
 bool QnApplicationListener::setThreadUnpark()
 {
+	// ResumeThread(libThread)
+
 	//Utility.WriteLog("setThreadUnPark: enter ");
 	////Контекст UI
 	//if (parkThread!=null && parkThread.isAlive()) {
@@ -1031,7 +1036,77 @@ bool QnApplicationListener::setThreadUnpark()
 	return false;
 }
 
-// Запуск потока библиотеки
+// Создаём объект ядра для синхронизации потоков,
+// событие с автосбросом, инициализированное в занятом состоянии.
+HANDLE CreateSyncEvent()
+{
+	HANDLE eventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
+	if (eventHandle == NULL) {
+		showError("Не получилось создать объект ядра \"событие\" для синхронизации потоков.");
+		exit(0);
+	}
+	return eventHandle;
+}
+
+// Получаем HANDLE события по его индексу
+HANDLE getEventHandle(eSyncEvent ev)
+{
+	return g_eventList[ev];
+}
+
+// Запускаем событие
+void runSyncEvent(eSyncEvent ev)
+{
+	BOOL res = SetEvent(getEventHandle(ev));
+	if (res == 0) {
+		showError("Не удалось запустить событие синхронизации потоков.");
+		exit(0);
+	}
+}
+
+// Высвобождаем описатель и ругаемся если что не так.
+void freeHandle(HANDLE handle)
+{
+	BOOL res = CloseHandle(handle);
+	if (res == 0) {
+		showError("Не удалось высвободить описатель объекта ядра.");
+		exit(0);
+	}
+}
+
+// Входим в критическую секцию
+void lockData()
+{
+	try {
+		EnterCriticalSection(&g_csSharedData);
+	} catch (...) {
+		showError("Не удалось войти в критическую секцию.");
+		exit(0);
+	}
+}
+
+// Выходим из критической секции
+void unlockData()
+{
+	LeaveCriticalSection(&g_csSharedData);
+}
+
+// Ожидаем события
+bool waitForSingle(HANDLE handle)
+{
+	DWORD res = WaitForSingleObject(handle, INFINITE);
+	if (res != WAIT_OBJECT_0) {
+		showError("Не удалось дождаться события синхронизации");
+		return false;
+	}
+	return true;
+}
+bool waitForSingle(eSyncEvent ev)
+{
+	return waitForSingle(getEventHandle(ev));
+}
+
+// Запуск потока библиотеки. Вызывается только раз при старте программы.
 void QnApplicationListener::StartLibThread()
 {
 	//Utility.WriteLog("StartLibThread: enter ");    	
@@ -1039,24 +1114,50 @@ void QnApplicationListener::StartLibThread()
 	if (libThread != NULL)
 	{
 //		Utility.WriteLog("StartLibThread: failed, libThread is not null");    	
+		showError("StartLibThread: failed, libThread is not null");
+		exit(0);
 		return;
 	}
 
-//HANDLE WINAPI CreateThread(
-//  _In_opt_   LPSECURITY_ATTRIBUTES lpThreadAttributes,
-//  _In_       SIZE_T dwStackSize,
-//  _In_       LPTHREAD_START_ROUTINE lpStartAddress,
-//  _In_opt_   LPVOID lpParameter,
-//  _In_       DWORD dwCreationFlags,
-//  _Out_opt_  LPDWORD lpThreadId
-//);
+	// Инициализируем объекты синхронизации.
+	// Все используемые объекты - события с автосбросом, 
+	// инициализированные в занятом состоянии.
+	for (int i = 0; i < (int)evLast; i++) {
+		HANDLE eventHandle = CreateSyncEvent();
+		if (eventHandle == NULL)
+			return;
+		g_eventList[i] = eventHandle;
+	}
+	// Инициализируем структуру критической секции
+	try {
+		InitializeCriticalSection(&g_csSharedData);
+	} catch (...) {
+		showError("Не удалось проинициализировать структуру критической секции.");
+		exit(0);
+		return;
+	}
 
-	//libThread = CreateThread(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
+
 	libThread = (HANDLE)_beginthreadex(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
 	if (libThread == NULL) {
 		showError("Не получилось создать поток интерпретатора.");
+		exit(0);
 		return;
 	}
+
+	// Готовим данные для передачи в поток
+	lockData();
+	g_sharedData.str = "abc";
+	runSyncEvent(evTest);
+	unlockData();
+
+	// Ждём возврата данных из потока
+	string blabla = "";
+	waitForSingle(evCommitted);
+	lockData();
+	blabla = g_sharedData.str;
+	unlockData();
+	showMessage(blabla, "");
 
 	//final QspLib pluginObject = this; 
 
@@ -1100,7 +1201,7 @@ void QnApplicationListener::StartLibThread()
 	//Utility.WriteLog("StartLibThread: success");
 }
 
-// Остановка потока библиотеки
+// Остановка потока библиотеки. Вызывается только раз при завершении программы.
 void QnApplicationListener::StopLibThread()
 {
 	//Utility.WriteLog("StopLibThread: enter");    	
@@ -1108,19 +1209,87 @@ void QnApplicationListener::StopLibThread()
 	////Останавливаем поток библиотеки
 	//libThreadHandler.getLooper().quit();
 
-	//STUB
-	// Сделать правильное завершение потока 
-	//(сообщить потоку что ему нужно завершиться, после чего просто подождать)
-
-	CloseHandle(libThread);
+	// Сообщаем потоку библиотеки, что нужно завершить работу
+	runSyncEvent(evShutdown);
+	// Ждём завершения библиотечного потока
+	waitForSingle(libThread);
+	// Закрываем хэндл библиотечного потока
+	freeHandle(libThread);
 	libThread = NULL;
+	// Закрываем хэндлы событий
+	for (int i = 0; i < (int)evLast; i++) {
+		freeHandle(g_eventList[i]);
+	}
+	// Высвобождаем структуру критической секции
+	DeleteCriticalSection(&g_csSharedData);
 	//Utility.WriteLog("StopLibThread: success");    	
 }
 
-// Основная функция потока библиотеки
+// Основная функция потока библиотеки. Вызывается только раз за весь жизненный цикл программы.
 unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 {
-	// STUB
+	// Привязываем колбэки
+	QSPSetCallBack(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
+	//QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
+	//QSPSetCallBack(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
+	//QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlay);
+	//QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
+	//QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
+	//QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&Msg);
+	//QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
+	//QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
+	//QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
+	//QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
+	//QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
+	//QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
+	//QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
+	//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
+	//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
+	//QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
+
+	// Инициализируем библиотеку
+	QSPInit();
+
+
+	// Обработка событий происходит в цикле
+	bool bShutdown = false;
+	while (!bShutdown) {
+		// Ожидаем любое из событий синхронизации
+		DWORD res = WaitForMultipleObjects((DWORD)evLast, g_eventList, FALSE, INFINITE);
+		if ((res < WAIT_OBJECT_0) || (res > (WAIT_OBJECT_0 + evLast - 1))) {
+			showError("Не удалось дождаться события синхронизации.");
+			bShutdown = true;
+		} else {
+			eSyncEvent ev = (eSyncEvent)res;
+			switch (ev)
+			{
+			case evTest:
+				{
+					lockData();
+					g_sharedData.str += " def";
+					runSyncEvent(evCommitted);
+					unlockData();
+				}
+				break;
+			case evShutdown:
+				{
+					// Завершение работы
+					bShutdown = true;
+				}
+				break;
+			default:
+				{
+					showError("Необработанное событие синхронизации!");
+					bShutdown = true;
+				}
+				break;
+			}
+		}
+	}
+
+	// Завершаем работу библиотеки
+	QSPDeInit();
+	// Завершаем работу потока
 	_endthreadex(0);
 	return 0;
 }
@@ -1129,3 +1298,5 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 //****** \ THREADS / ***********************************************************
 //******************************************************************************
 //******************************************************************************
+
+}

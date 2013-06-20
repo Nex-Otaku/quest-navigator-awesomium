@@ -12,137 +12,169 @@
 #include "utils.h"
 
 using namespace Awesomium;
-using namespace QuestNavigator;
 
-class QnApplicationListener : public Application::Listener {
-	Application* app_;
-	View* view_;
-	DataSource* data_source_;
-	MethodDispatcher method_dispatcher_;
+namespace QuestNavigator {
 
-	bool gameIsRunning;
-	bool qspInited;
+	class QnApplicationListener : public Application::Listener {
+		Application* app_;
+		View* view_;
+		DataSource* data_source_;
+		MethodDispatcher method_dispatcher_;
 
-	HANDLE libThread;
+		bool gameIsRunning;
+		bool qspInited;
 
-public:
-	QnApplicationListener();
-	virtual ~QnApplicationListener();
-	
-	void Run();
+		HANDLE libThread;
 
-	// Inherited from Application::Listener
-	virtual void OnLoaded();
-	virtual void OnUpdate();
-	virtual void OnShutdown();
+	public:
+		QnApplicationListener();
+		virtual ~QnApplicationListener();
 
-	void BindMethods(WebView* web_view);
+		void Run();
 
-	// Bound to App.SayHello() in JavaScript
-	void OnSayHello(WebView* caller, const JSArray& args);
+		// Inherited from Application::Listener
+		virtual void OnLoaded();
+		virtual void OnUpdate();
+		virtual void OnShutdown();
 
-	// Bound to App.Exit() in JavaScript
-	void OnExit(WebView* caller, const JSArray& args);
+		void BindMethods(WebView* web_view);
 
-	// Bound to App.GetSecretMessage() in JavaScript
-	JSValue OnGetSecretMessage(WebView* caller, const JSArray& args);
+		// Bound to App.SayHello() in JavaScript
+		void OnSayHello(WebView* caller, const JSArray& args);
 
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
-	//                   Основная логика
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
+		// Bound to App.Exit() in JavaScript
+		void OnExit(WebView* caller, const JSArray& args);
 
-	void initLib();
-	void FreeResources();
-	void runGame(string fileName);
-	void StopGame(bool restart);
+		// Bound to App.GetSecretMessage() in JavaScript
+		JSValue OnGetSecretMessage(WebView* caller, const JSArray& args);
 
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
-	//                       Колбэки интерпретатора
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
+		//                   Основная логика
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
 
-    static void RefreshInt(int isRedraw);
-    static void SetTimer(int msecs);
-	static void ShowMessage(QSP_CHAR* message);
-    static void PlayFile(QSP_CHAR* file, int volume);
-	static QSP_BOOL IsPlayingFile(QSP_CHAR* file);
-    static void CloseFile(QSP_CHAR* file);
-    static void ShowPicture(QSP_CHAR* file);
-    static void InputBox(const QSP_CHAR* prompt, QSP_CHAR* buffer, int maxLen);
-    static void PlayerInfo(QSP_CHAR* resource, QSP_CHAR* buffer, int maxLen);
-    static int GetMSCount();
-    static void AddMenuItem(QSP_CHAR* name, QSP_CHAR* imgPath);
-    static int ShowMenu();
-    static void DeleteMenu();
-    static void Wait(int msecs);
-	static void ShowWindow(int type, QSP_BOOL isShow);
-    static void System(QSP_CHAR* cmd);
+		void initLib();
+		void FreeResources();
+		void runGame(string fileName);
+		void StopGame(bool restart);
 
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
-	//                        Вызовы JS-функций
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
+		//                       Колбэки интерпретатора
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
 
-	void jsCallApi(string name, JSValue arg);
-	void qspSetGroupedContent(JSObject content);
-	void qspShowSaveSlotsDialog(JSObject content);
-	void qspMsg(WebString text);
-	void qspError(WebString error);
-	void qspMenu(JSObject menu);
-	void qspInput(WebString text);
-	void qspView(WebString path);
+		static void RefreshInt(int isRedraw);
+		static void SetTimer(int msecs);
+		static void ShowMessage(QSP_CHAR* message);
+		static void PlayFile(QSP_CHAR* file, int volume);
+		static QSP_BOOL IsPlayingFile(QSP_CHAR* file);
+		static void CloseFile(QSP_CHAR* file);
+		static void ShowPicture(QSP_CHAR* file);
+		static void InputBox(const QSP_CHAR* prompt, QSP_CHAR* buffer, int maxLen);
+		static void PlayerInfo(QSP_CHAR* resource, QSP_CHAR* buffer, int maxLen);
+		static int GetMSCount();
+		static void AddMenuItem(QSP_CHAR* name, QSP_CHAR* imgPath);
+		static int ShowMenu();
+		static void DeleteMenu();
+		static void Wait(int msecs);
+		static void ShowWindow(int type, QSP_BOOL isShow);
+		static void System(QSP_CHAR* cmd);
 
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
-	//                   Обработчики вызовов из JS
-	// ********************************************************************
-	// ********************************************************************
-	// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
+		//                        Вызовы JS-функций
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
 
-	void restartGame(WebView* caller, const JSArray& args);
-	void executeAction(WebView* caller, const JSArray& args);
-	void selectObject(WebView* caller, const JSArray& args);
-	void loadGame(WebView* caller, const JSArray& args);
-	void saveGame(WebView* caller, const JSArray& args);
-	void saveSlotSelected(WebView* caller, const JSArray& args);
-	void msgResult(WebView* caller, const JSArray& args);
-	void errorResult(WebView* caller, const JSArray& args);
-	void userMenuResult(WebView* caller, const JSArray& args);
-	void inputResult(WebView* caller, const JSArray& args);
-	void setMute(WebView* caller, const JSArray& args);
+		void jsCallApi(string name, JSValue arg);
+		void qspSetGroupedContent(JSObject content);
+		void qspShowSaveSlotsDialog(JSObject content);
+		void qspMsg(WebString text);
+		void qspError(WebString error);
+		void qspMenu(JSObject menu);
+		void qspInput(WebString text);
+		void qspView(WebString path);
 
-	// ********************************************************************
-	// Вспомогательные обработчики для отладки
-	// ********************************************************************
-	void alert(WebView* caller, const JSArray& args);
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
+		//                   Обработчики вызовов из JS
+		// ********************************************************************
+		// ********************************************************************
+		// ********************************************************************
 
-	// ********************************************************************
-	// THREADS
-	// ********************************************************************
-	// паркует-останавливает указанный тред, и сохраняет на него указатель в parkThread
-	void setThreadPark();
-	// возобновляет работу треда сохраненного в указателе parkThread
-	bool setThreadUnpark();
-	// Запуск потока библиотеки
-	void StartLibThread();
-	// Остановка потока библиотеки
-	void StopLibThread();
-	// Основная функция потока библиотеки
-	static unsigned int __stdcall libThreadFunc(void* pvParam);
-};
+		void restartGame(WebView* caller, const JSArray& args);
+		void executeAction(WebView* caller, const JSArray& args);
+		void selectObject(WebView* caller, const JSArray& args);
+		void loadGame(WebView* caller, const JSArray& args);
+		void saveGame(WebView* caller, const JSArray& args);
+		void saveSlotSelected(WebView* caller, const JSArray& args);
+		void msgResult(WebView* caller, const JSArray& args);
+		void errorResult(WebView* caller, const JSArray& args);
+		void userMenuResult(WebView* caller, const JSArray& args);
+		void inputResult(WebView* caller, const JSArray& args);
+		void setMute(WebView* caller, const JSArray& args);
+
+		// ********************************************************************
+		// Вспомогательные обработчики для отладки
+		// ********************************************************************
+		void alert(WebView* caller, const JSArray& args);
+
+		// ********************************************************************
+		// THREADS
+		// ********************************************************************
 
 
+
+		// паркует-останавливает указанный тред, и сохраняет на него указатель в parkThread
+		void setThreadPark();
+		// возобновляет работу треда сохраненного в указателе parkThread
+		bool setThreadUnpark();
+		// Запуск потока библиотеки
+		void StartLibThread();
+		// Остановка потока библиотеки
+		void StopLibThread();
+		// Основная функция потока библиотеки
+		static unsigned int __stdcall libThreadFunc(void* pvParam);
+	};
+
+	// Список событий для синхронизации потоков
+	enum eSyncEvent
+	{
+		// Ui -> Библиотека
+		evTest = 0,
+		evShutdown,				// Завершить работу потока
+
+		// Библиотека -> Ui
+		evCommitted,
+
+		evLast
+	};
+	// Создаём объект ядра для синхронизации потоков,
+	// событие с автосбросом, инициализированное в занятом состоянии.
+	HANDLE CreateSyncEvent();
+	// Получаем HANDLE события по его индексу
+	HANDLE getEventHandle(eSyncEvent ev);
+	// Запускаем событие
+	void runSyncEvent(eSyncEvent ev);
+	// Высвобождаем описатель и ругаемся если что не так.
+	void freeHandle(HANDLE handle);
+	// Входим в критическую секцию
+	void lockData();
+	// Выходим из критической секции
+	void unlockData();
+	// Ожидаем события
+	bool waitForSingle(HANDLE handle);
+	bool waitForSingle(eSyncEvent ev);
+}
 
 
 
