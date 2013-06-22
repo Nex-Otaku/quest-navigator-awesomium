@@ -190,7 +190,7 @@ namespace QuestNavigator {
 		runSyncEvent(evRunGame);
 		unlockData();
 
-
+		gameIsRunning = true;
 
 		////Контекст UI
 		//if (!Utility.CheckAssetExists(uiContext, fileName, "runGame"))
@@ -287,6 +287,10 @@ namespace QuestNavigator {
 		if (gameIsRunning)
 		{
 			runSyncEvent(evStopGame);
+			// Возможен Deadlock при закрытии окна, 
+			// когда библиотека ждёт ответа интерфейса.
+			// Когда-нибудь нужно с этим разобраться.
+			waitForSingle(evGameStopped);
 			gameIsRunning = false;
 		}
 	}
@@ -1277,7 +1281,7 @@ namespace QuestNavigator {
 		bool bShutdown = false;
 		while (!bShutdown) {
 			// Ожидаем любое из событий синхронизации
-			DWORD res = WaitForMultipleObjects((DWORD)evLast, g_eventList, FALSE, INFINITE);
+			DWORD res = WaitForMultipleObjects((DWORD)evLastUi, g_eventList, FALSE, INFINITE);
 			if ((res < WAIT_OBJECT_0) || (res > (WAIT_OBJECT_0 + evLast - 1))) {
 				showError("Не удалось дождаться события синхронизации.");
 				bShutdown = true;
@@ -1285,16 +1289,6 @@ namespace QuestNavigator {
 				eSyncEvent ev = (eSyncEvent)res;
 				switch (ev)
 				{
-				case evTest:
-					{
-						// Чисто для тестирования.
-						// Читаем переданные нам данные и перезаписываем их.
-						lockData();
-						g_sharedData.str += " def";
-						//runSyncEvent(evCommitted);
-						unlockData();
-					}
-					break;
 				case evRunGame:
 					{
 						// Запуск игры
@@ -1357,6 +1351,8 @@ namespace QuestNavigator {
 						//	});
 						// Очищаем буфер JS-команд, передаваемых из игры
 						jsExecBuffer = "";
+
+						runSyncEvent(evGameStopped);
 					}
 					break;
 				case evShutdown:

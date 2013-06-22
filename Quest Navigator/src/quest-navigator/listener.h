@@ -167,17 +167,18 @@ namespace QuestNavigator {
 	enum eSyncEvent
 	{
 		// Ui -> Библиотека
-		evTest = 0,
-
-		evRunGame,				// Запустить игру.
+		evRunGame = 0,			// Запустить игру.
 		evStopGame,				// Остановить игру.
-
 		evShutdown,				// Завершить работу потока.
 
-		evJsExecuted,				// JS-запрос выполнен.
+		evJsExecuted,			// JS-запрос выполнен.
+
+		evLastUi,				// Маркер для разделения событий на две части.
 
 		// Библиотека -> Ui
 		evJsCommitted,			// Выполнить JS-запрос.
+
+		evGameStopped,			// Игра остановлена.
 
 		evLast
 	};
