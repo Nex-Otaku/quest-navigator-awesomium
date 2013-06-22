@@ -12,6 +12,7 @@
 #include "configuration.h"
 #include "skin.h"
 #include <process.h>
+#include <algorithm>
 
 using namespace Awesomium;
 
@@ -845,20 +846,17 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::System(QSP_CHAR* cmd)
 	{
-		////Контекст библиотеки
-		//if (cmd == null)
-		//	cmd = "";
-		//
-		//if (cmd.toUpperCase().startsWith("JS:"))
-		//{
-		//   	// Выполняем яваскрипт, переданный из игры командой EXEC('JS:...')
-		//	final String jsCommand = cmd.substring("JS:".length());
-		//	mainActivity.runOnUiThread(new Runnable() {
-		//		public void run() {
-		//			execJS(jsCommand);
-		//		}
-		//	});
-		//}
+		//Контекст библиотеки
+		string jsCmd = fromQsp(cmd);
+		string jsCmdUpper = jsCmd;
+		transform(jsCmd.begin(), jsCmd.end(), jsCmdUpper.begin(), ::toupper);
+		if (startsWith(jsCmdUpper, "JS:"))
+		{
+			jsCmd = jsCmd.substr(string("JS:").length());
+    		// Сохраняем яваскрипт, переданный из игры командой EXEC('JS:...')
+    		// На выполнение отдаём при обновлении интерфейса
+    		jsExecBuffer = jsExecBuffer + jsCmd;
+		}
 	}
 
 	// ********************************************************************
@@ -1304,6 +1302,7 @@ namespace QuestNavigator {
 		//QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
 		//QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
 		//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
+		QSPSetCallBack(QSP_CALL_SYSTEM, (QSP_CALLBACK)&System);
 		//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
 		//QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
 
