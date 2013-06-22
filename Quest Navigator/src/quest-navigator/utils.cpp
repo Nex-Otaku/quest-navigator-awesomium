@@ -293,11 +293,24 @@ string backSlashToSlash(string text)
 	return replaceAll(text, '\\', '/');
 }
 
-// Заменяем все вхождения подстроки в строке
+// Заменяем все вхождения символа в строке
 string replaceAll(string source, char pattern, char replacement)
 {
 	replace(source.begin(), source.end(), pattern, replacement);
 	return source;
+}
+// Заменяем все вхождения подстроки в строке
+void replaceAll(string &s, const string &search, const string &replace)
+{
+    for (size_t pos = 0; ; pos += replace.length()) {
+        // Locate the substring to replace
+        pos = s.find(search, pos);
+        if (pos == string::npos)
+			break;
+        // Replace by erasing and inserting
+        s.erase(pos, search.length());
+        s.insert(pos, replace);
+    }
 }
 
 }

@@ -35,6 +35,7 @@ namespace QuestNavigator {
 	string backSlashToSlash(string text);
 	// Заменяем все вхождения подстроки в строке
 	string replaceAll(string source, char pattern, char replacement);
+	void replaceAll(string &s, const string &search, const string &replace);
 
 	// Утилиты для работы с файловой системой
 
