@@ -147,13 +147,6 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::initLib()
 	{
-
-
-		//QSPInit();
-		//std::wstring message_str = QSPGetVersion();
-		//   MessageBox(0, message_str.c_str(), message_str.c_str(), NULL);
-		//QSPDeInit();
-
 		gameIsRunning = false;
 		qspInited = false;
 
