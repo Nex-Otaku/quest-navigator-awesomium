@@ -26,6 +26,7 @@ namespace QuestNavigator {
 	struct
 	{
 		string str;
+		JSValue jsValue;
 	} g_sharedData;
 
 	// События для синхронизации потоков
@@ -79,6 +80,11 @@ namespace QuestNavigator {
 
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnUpdate() {
+		if (checkForSingle(evJsCommitted)) {
+			// Библиотека сообщила потоку Ui,
+			// что требуется выполнить JS-запрос.
+			processLibJsCall();
+		};
 	}
 
 	// Inherited from Application::Listener
@@ -438,7 +444,7 @@ namespace QuestNavigator {
 				groupedContent.SetProperty(WSLit("objs"), objs);
 			if (bJsCmdPrepared)
 				groupedContent.SetProperty(WSLit("js"), ToWebString(jsCmd));
-			//listener->qspSetGroupedContent(groupedContent);
+			qspSetGroupedContent(groupedContent);
 		}
 		Skin::resetUpdate();
 	}
@@ -863,8 +869,22 @@ namespace QuestNavigator {
 	// ********************************************************************
 	// ********************************************************************
 
-	void QnApplicationListener::jsCallApi(string name, JSValue arg)
+	void QnApplicationListener::processLibJsCall()
 	{
+		// Контекст Ui
+		string name = "";
+		JSValue arg;
+		lockData();
+		name = g_sharedData.str;
+		arg = g_sharedData.jsValue;
+		unlockData();
+		jsCallApiFromUi(name, arg);
+		runSyncEvent(evJsExecuted);
+	}
+
+	void QnApplicationListener::jsCallApiFromUi(string name, JSValue arg)
+	{
+		// Контекст Ui
 		JSValue window = view_->web_view()->ExecuteJavascriptWithResult(
 			WSLit("window"), WSLit(""));
 		if (window.IsObject()) {
@@ -875,33 +895,48 @@ namespace QuestNavigator {
 			showError("Не удалось получить доступ к объекту окна.");
 		}
 	}
+	void QnApplicationListener::jsCallApiFromLib(string name, JSValue arg)
+	{
+		// Контекст библиотеки
+		// Вызвать функции Awesomium можно только из Ui-потока.
+		
+		// Отправляем данные в Ui-поток.
+		lockData();
+		g_sharedData.str = name;
+		g_sharedData.jsValue = arg;
+		runSyncEvent(evJsCommitted);
+		unlockData();
+
+		// Дожидаемся ответа, что JS-запрос выполнен.
+		waitForSingle(evJsExecuted);
+	}
 	void QnApplicationListener::qspSetGroupedContent(JSObject content)
 	{
-		jsCallApi("qspSetGroupedContent", content);
+		jsCallApiFromLib("qspSetGroupedContent", content);
 	}
 	void QnApplicationListener::qspShowSaveSlotsDialog(JSObject content)
 	{
-		jsCallApi("qspShowSaveSlotsDialog", content);
+		jsCallApiFromLib("qspShowSaveSlotsDialog", content);
 	}
 	void QnApplicationListener::qspMsg(WebString text)
 	{
-		jsCallApi("qspMsg", text);
+		jsCallApiFromLib("qspMsg", text);
 	}
 	void QnApplicationListener::qspError(WebString error)
 	{
-		jsCallApi("qspError", error);
+		jsCallApiFromLib("qspError", error);
 	}
 	void QnApplicationListener::qspMenu(JSObject menu)
 	{
-		jsCallApi("qspMenu", menu);
+		jsCallApiFromLib("qspMenu", menu);
 	}
 	void QnApplicationListener::qspInput(WebString text)
 	{
-		jsCallApi("qspInput", text);
+		jsCallApiFromLib("qspInput", text);
 	}
 	void QnApplicationListener::qspView(WebString path)
 	{
-		jsCallApi("qspView", path);
+		jsCallApiFromLib("qspView", path);
 	}
 
 
@@ -918,13 +953,7 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::restartGame(WebView* caller, const JSArray& args)
 	{
-		app_->ShowMessage("restarted!");
-		//// Контекст UI
-		//  	Utility.WriteLog("[[restartGame]]");
-
-		//  	String gameFile = curGameFile;
-		//  	StopGame(true);
-		//  	runGame(gameFile);
+		// Контекст UI
 		string gameFile = Configuration::getString(ecpGameFile);
 		StopGame(true);
 		runGame(gameFile);
@@ -1116,6 +1145,16 @@ namespace QuestNavigator {
 	{
 		return waitForSingle(getEventHandle(ev));
 	}
+	bool checkForSingle(eSyncEvent ev)
+	{
+		HANDLE handle = getEventHandle(ev);
+		DWORD res = WaitForSingleObject(handle, 0);
+		if ((res == WAIT_ABANDONED) || (res == WAIT_FAILED)) {
+			showError("Сбой синхронизации");
+			return false;
+		}
+		return res == WAIT_OBJECT_0;
+	}
 
 	// Запуск потока библиотеки. Вызывается только раз при старте программы.
 	void QnApplicationListener::StartLibThread()
@@ -1291,7 +1330,7 @@ namespace QuestNavigator {
 						// Читаем переданные нам данные и перезаписываем их.
 						lockData();
 						g_sharedData.str += " def";
-						runSyncEvent(evCommitted);
+						//runSyncEvent(evCommitted);
 						unlockData();
 					}
 					break;

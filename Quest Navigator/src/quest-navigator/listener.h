@@ -94,14 +94,19 @@ namespace QuestNavigator {
 		// ********************************************************************
 		// ********************************************************************
 
-		void jsCallApi(string name, JSValue arg);
-		void qspSetGroupedContent(JSObject content);
-		void qspShowSaveSlotsDialog(JSObject content);
-		void qspMsg(WebString text);
-		void qspError(WebString error);
-		void qspMenu(JSObject menu);
-		void qspInput(WebString text);
-		void qspView(WebString path);
+		// В потоке Ui
+		void processLibJsCall();
+		void jsCallApiFromUi(string name, JSValue arg);
+
+		// В потоке библиотеки
+		static void jsCallApiFromLib(string name, JSValue arg);
+		static void qspSetGroupedContent(JSObject content);
+		static void qspShowSaveSlotsDialog(JSObject content);
+		static void qspMsg(WebString text);
+		static void qspError(WebString error);
+		static void qspMenu(JSObject menu);
+		static void qspInput(WebString text);
+		static void qspView(WebString path);
 
 		// ********************************************************************
 		// ********************************************************************
@@ -167,10 +172,12 @@ namespace QuestNavigator {
 
 		evRunGame,
 
-		evShutdown,				// Завершить работу потока
+		evShutdown,				// Завершить работу потока.
+
+		evJsExecuted,				// JS-запрос выполнен.
 
 		// Библиотека -> Ui
-		evCommitted,
+		evJsCommitted,			// Выполнить JS-запрос.
 
 		evLast
 	};
@@ -190,6 +197,7 @@ namespace QuestNavigator {
 	// Ожидаем события
 	bool waitForSingle(HANDLE handle);
 	bool waitForSingle(eSyncEvent ev);
+	bool checkForSingle(eSyncEvent ev);
 
 }
 
