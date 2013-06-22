@@ -1001,45 +1001,6 @@ namespace QuestNavigator {
 	// Все функции библиотеки QSP (QSPInit и т.д.) 
 	// вызываются только внутри потока библиотеки.
 
-	// паркует-останавливает указанный тред, и сохраняет на него указатель в parkThread
-	void QnApplicationListener::setThreadPark()
-	{
-		// SuspendThread(GetCurrentThread())
-
-		//Utility.WriteLog("setThreadPark: enter ");    	
-		////Контекст библиотеки
-		//if (libThread == null)
-		//{
-		//	Utility.WriteLog("setThreadPark: failed, libthread is null");
-		//	return;
-		//}
-		//parkThread = libThread;
-		//LockSupport.park();
-		//Utility.WriteLog("setThreadPark: success ");    	
-	}
-
-	// возобновляет работу треда сохраненного в указателе parkThread
-	bool QnApplicationListener::setThreadUnpark()
-	{
-		// ResumeThread(libThread)
-
-		//Utility.WriteLog("setThreadUnPark: enter ");
-		////Контекст UI
-		//if (parkThread!=null && parkThread.isAlive()) {
-		//	LockSupport.unpark(parkThread);
-		//	Utility.WriteLog("setThreadUnPark: success ");    	
-		//	return true;
-		//}
-		//Utility.WriteLog("setThreadUnPark: failed, ");
-		//if (parkThread==null)
-		//	Utility.WriteLog("parkThread is null ");
-		//else
-		//	Utility.WriteLog("parkThread is dead ");
-		//return false;
-
-		return false;
-	}
-
 	// Создаём объект ядра для синхронизации потоков,
 	// событие с автосбросом, инициализированное в занятом состоянии.
 	HANDLE CreateSyncEvent()
