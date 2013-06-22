@@ -38,15 +38,6 @@ namespace QuestNavigator {
 
 		void BindMethods(WebView* web_view);
 
-		// Bound to App.SayHello() in JavaScript
-		void OnSayHello(WebView* caller, const JSArray& args);
-
-		// Bound to App.Exit() in JavaScript
-		void OnExit(WebView* caller, const JSArray& args);
-
-		// Bound to App.GetSecretMessage() in JavaScript
-		JSValue OnGetSecretMessage(WebView* caller, const JSArray& args);
-
 		// ********************************************************************
 		// ********************************************************************
 		// ********************************************************************

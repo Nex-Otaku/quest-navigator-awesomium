@@ -98,21 +98,50 @@ namespace QuestNavigator {
 		if (result.IsObject()) {
 			JSObject& app_object = result.ToObject();
 
-			// Привязываем тестовые колбэки
-			method_dispatcher_.Bind(app_object,
-				WSLit("SayHello"),
-				JSDelegate(this, &QnApplicationListener::OnSayHello));
-			method_dispatcher_.Bind(app_object,
-				WSLit("Exit"),
-				JSDelegate(this, &QnApplicationListener::OnExit));
-			method_dispatcher_.BindWithRetval(app_object,
-				WSLit("GetSecretMessage"),
-				JSDelegateWithRetval(this, &QnApplicationListener::OnGetSecretMessage));
-
-			// Привязываем настоящие колбэки
+			// Привязываем колбэки
 			method_dispatcher_.Bind(app_object,
 				WSLit("restartGame"),
 				JSDelegate(this, &QnApplicationListener::restartGame));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("executeAction"),
+				JSDelegate(this, &QnApplicationListener::executeAction));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("selectObject"),
+				JSDelegate(this, &QnApplicationListener::selectObject));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("loadGame"),
+				JSDelegate(this, &QnApplicationListener::loadGame));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("saveGame"),
+				JSDelegate(this, &QnApplicationListener::saveGame));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("saveSlotSelected"),
+				JSDelegate(this, &QnApplicationListener::saveSlotSelected));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("msgResult"),
+				JSDelegate(this, &QnApplicationListener::msgResult));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("errorResult"),
+				JSDelegate(this, &QnApplicationListener::errorResult));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("userMenuResult"),
+				JSDelegate(this, &QnApplicationListener::userMenuResult));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("inputResult"),
+				JSDelegate(this, &QnApplicationListener::inputResult));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("setMute"),
+				JSDelegate(this, &QnApplicationListener::setMute));
 
 			// Привязываем колбэк для обработки вызовов alert
 			method_dispatcher_.Bind(app_object,
@@ -122,25 +151,6 @@ namespace QuestNavigator {
 
 		// Привязываем обработчик колбэков к WebView
 		web_view->set_js_method_handler(&method_dispatcher_);
-	}
-
-	// Bound to App.SayHello() in JavaScript
-	void QnApplicationListener::OnSayHello(WebView* caller,
-		const JSArray& args) {
-			app_->ShowMessage("Hello!");
-	}
-
-	// Bound to App.Exit() in JavaScript
-	void QnApplicationListener::OnExit(WebView* caller,
-		const JSArray& args) {
-			app_->Quit();
-	}
-
-	// Bound to App.GetSecretMessage() in JavaScript
-	JSValue QnApplicationListener::OnGetSecretMessage(WebView* caller,
-		const JSArray& args) {
-			return JSValue(WSLit(
-				"<img src='asset://webui/key.png'/> You have unlocked the secret message!"));
 	}
 
 	// ********************************************************************
