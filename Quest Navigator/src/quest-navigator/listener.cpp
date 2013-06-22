@@ -181,6 +181,7 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::runGame(string fileName)
 	{
+		// Контекст UI
 
 		// Готовим данные для передачи в поток
 		lockData();
@@ -331,127 +332,115 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::RefreshInt(int isRedraw) 
 	{
-		showMessage("RefreshInt called!", "");
+		//showMessage("RefreshInt called!", "");
 		//Контекст библиотеки
-		//      bool needUpdate = skin.isSomethingChanged();
-		//      skin.updateBaseVars();
-		//      needUpdate = needUpdate || skin.isSomethingChanged();
-		//      skin.updateMainScreen();
-		//      needUpdate = needUpdate || skin.isSomethingChanged();
-		//      
-		//JSONObject jsSkin = null;
-		//      if (needUpdate)
-		//          jsSkin = skin.getJsSkin();
+		bool needUpdate = Skin::isSomethingChanged();
+		Skin::updateBaseVars();
+		needUpdate = needUpdate || Skin::isSomethingChanged();
+		Skin::updateMainScreen();
+		needUpdate = needUpdate || Skin::isSomethingChanged();
 
-		//      //основное описание
-		//      String mainDesc = null;
-		//      if ((QSPIsMainDescChanged() == true) || skin.isHtmlModeChanged)
-		//      {
-		//          mainDesc = skin.applyHtmlFixes(QSPGetMainDesc());
-		//      }
-		//  	
-		//      //список действий
-		//      JSONArray acts = null;
-		//      if ((QSPIsActionsChanged() == true) || skin.isHtmlModeChanged)
-		//      {
-		//	int nActsCount = QSPGetActionsCount();
-		//	acts = new JSONArray();
-		//	for (int i = 0; i < nActsCount; i++)
-		//	{
-		//      	ContainerJniResult actsResult = (ContainerJniResult) QSPGetActionData(i);
-		//		JSONObject act = new JSONObject();
-		//		try {
-		//			act.put("image", actsResult.str2);
-		//			act.put("desc", skin.applyHtmlFixes(actsResult.str1));
-		//			acts.put(i, act);
-		//		} catch (JSONException e) {
-		//    		Utility.WriteLog("ERROR - act or acts[] in RefreshInt!");
-		//			e.printStackTrace();
-		//		}
-		//	}
-		//}
-		//      
-		//      //инвентарь
-		//      JSONArray objs = null;
-		//      if ((QSPIsObjectsChanged() == true) || skin.isHtmlModeChanged)
-		//      {
-		//          int nObjsCount = QSPGetObjectsCount();
-		//          int nSelectedObject = QSPGetSelObjectIndex();
-		//          objs = new JSONArray();
-		//          for (int i = 0; i < nObjsCount; i++)
-		//          {
-		//       	ContainerJniResult objsResult = (ContainerJniResult) QSPGetObjectData(i);
-		//              
-		//		JSONObject obj = new JSONObject();
-		//		try {
-		//			obj.put("image", objsResult.str2);
-		//			obj.put("desc", skin.applyHtmlFixes(objsResult.str1));
-		//			obj.put("selected", (i == nSelectedObject)? 1 : 0);
-		//			objs.put(i, obj);
-		//		} catch (JSONException e) {
-		//    		Utility.WriteLog("ERROR - obj or objs[] in RefreshInt!");
-		//			e.printStackTrace();
-		//		}
-		//          }
-		//      }
-		//      
-		//      //доп. описание
-		//      String varsDesc = null;
-		//      if ((QSPIsVarsDescChanged() == true) || skin.isHtmlModeChanged)
-		//      {
-		//          varsDesc = skin.applyHtmlFixes(QSPGetVarsDesc());
-		//      }
-		//      
-		//      // Яваскрипт, переданный из игры командой EXEC('JS:...')
-		//      String jsCmd = null;
-		//      if (jsExecBuffer.length() > 0)
-		//      {
-		//      	jsCmd = jsExecBuffer;
-		//      	jsExecBuffer = "";
-		//      }
-		//      
-		//      // Передаем собранные данные в яваскрипт
-		//      if ((jsSkin != null) || (mainDesc != null) || (acts != null) || (objs != null) || (varsDesc != null) ||
-		//      	(jsCmd != null))
-		//      {
-		//      	JSONObject groupedContent = new JSONObject();
-		//      	try {
-		//           if (jsSkin != null)
-		//           {
-		//               groupedContent.put("skin", jsSkin);
-		//           }
-		//           if (mainDesc != null)
-		//           {
-		//               groupedContent.put("main", mainDesc);
-		//           }
-		//           if (acts != null)
-		//           {
-		//               groupedContent.put("acts", acts);
-		//           }
-		//           if (varsDesc != null)
-		//           {
-		//               groupedContent.put("vars", varsDesc);
-		//           }
-		//           if (objs != null)
-		//           {
-		//               groupedContent.put("objs", objs);
-		//           }
-		//           if (jsCmd != null)
-		//           {
-		//               groupedContent.put("js", jsCmd);
-		//           }
-		//	} catch (JSONException e) {
-		//   		Utility.WriteLog("ERROR - groupedContent in RefreshInt!");
-		//		e.printStackTrace();
-		//	}
-		//      	final JSONObject groupedContentObject = groupedContent;
-		//	mainActivity.runOnUiThread(new Runnable() {
-		//		public void run() {
-		//			jsSetGroupedContent(groupedContentObject);
-		//		}
-		//	});
-		//      }
-		//      skin.resetUpdate();
+		JSObject jsSkin;
+		bool bSkinPrepared = false;
+		if (needUpdate) {
+			jsSkin = Skin::getJsSkin();
+			bSkinPrepared = true;
+		}
+
+		//основное описание
+		string mainDesc = "";
+		bool bMainDescPrepared = false;
+		if ((QSPIsMainDescChanged() == QSP_TRUE) || Skin::isHtmlModeChanged)
+		{
+			mainDesc = Skin::applyHtmlFixes(fromQsp(QSPGetMainDesc()));
+			bMainDescPrepared = true;
+		}
+
+		//список действий
+		JSArray acts;
+		bool bActsPrepared = false;
+		if ((QSPIsActionsChanged() == QSP_TRUE) || Skin::isHtmlModeChanged)
+		{
+			int nActsCount = QSPGetActionsCount();
+			for (int i = 0; i < nActsCount; i++)
+			{
+				QSP_CHAR* pImgPath;
+				QSP_CHAR* pDesc;
+				QSPGetActionData(i, &pImgPath, &pDesc);
+				JSObject act;
+				string imgPath = fromQsp(pImgPath);
+				string desc = Skin::applyHtmlFixes(fromQsp(pDesc));
+				act.SetProperty(WSLit("image"), ToWebString(imgPath));
+				act.SetProperty(WSLit("desc"), ToWebString(desc));
+				acts.Push(act);
+			}
+			bActsPrepared = true;
+		}
+
+		//инвентарь
+		JSArray objs;
+		bool bObjsPrepared = false;
+		if ((QSPIsObjectsChanged() == QSP_TRUE) || Skin::isHtmlModeChanged)
+		{
+			int nObjsCount = QSPGetObjectsCount();
+			int nSelectedObject = QSPGetSelObjectIndex();
+			JSArray objs;
+			for (int i = 0; i < nObjsCount; i++)
+			{
+				QSP_CHAR* pImgPath;
+				QSP_CHAR* pDesc;
+				QSPGetObjectData(i, &pImgPath, &pDesc);
+				JSObject obj;
+				string imgPath = fromQsp(pImgPath);
+				string desc = Skin::applyHtmlFixes(fromQsp(pDesc));
+				int selected = (i == nSelectedObject) ? 1 : 0;
+				obj.SetProperty(WSLit("image"), ToWebString(imgPath));
+				obj.SetProperty(WSLit("desc"), ToWebString(desc));
+				obj.SetProperty(WSLit("selected"), JSValue(selected));
+				objs.Push(obj);
+			}
+			bObjsPrepared = true;
+		}
+
+		//доп. описание
+		string varsDesc = "";
+		bool bVarsDescPrepared = false;
+		if ((QSPIsVarsDescChanged() == QSP_TRUE) || Skin::isHtmlModeChanged)
+		{
+			varsDesc = Skin::applyHtmlFixes(fromQsp(QSPGetVarsDesc()));
+			bVarsDescPrepared = true;
+		}
+
+		// Яваскрипт, переданный из игры командой EXEC('JS:...')
+		string jsCmd = "";
+		bool bJsCmdPrepared = false;
+		if (jsExecBuffer.length() > 0)
+		{
+			jsCmd = jsExecBuffer;
+			jsExecBuffer = "";
+			bJsCmdPrepared = true;
+		}
+
+		// Передаем собранные данные в яваскрипт
+		if (bSkinPrepared || bMainDescPrepared || bActsPrepared || bObjsPrepared || bVarsDescPrepared ||
+			bJsCmdPrepared)
+		{
+			JSObject groupedContent;
+			if (bSkinPrepared)
+				groupedContent.SetProperty(WSLit("skin"), jsSkin);
+			if (bMainDescPrepared)
+				groupedContent.SetProperty(WSLit("main"), ToWebString(mainDesc));
+			if (bActsPrepared)
+				groupedContent.SetProperty(WSLit("acts"), acts);
+			if (bVarsDescPrepared)
+				groupedContent.SetProperty(WSLit("vars"), ToWebString(varsDesc));
+			if (bObjsPrepared)
+				groupedContent.SetProperty(WSLit("objs"), objs);
+			if (bJsCmdPrepared)
+				groupedContent.SetProperty(WSLit("js"), ToWebString(jsCmd));
+			//listener->qspSetGroupedContent(groupedContent);
+		}
+		Skin::resetUpdate();
 	}
 
 	void QnApplicationListener::SetTimer(int msecs)
@@ -882,6 +871,8 @@ namespace QuestNavigator {
 			JSArray args;
 			args.Push(arg);
 			window.ToObject().Invoke(ToWebString(name), args);
+		} else {
+			showError("Не удалось получить доступ к объекту окна.");
 		}
 	}
 	void QnApplicationListener::qspSetGroupedContent(JSObject content)
@@ -1000,6 +991,13 @@ namespace QuestNavigator {
 		}
 		showMessage(msg, "");
 	}
+
+	// ********************************************************************
+	// Переменные библиотеки
+	// ********************************************************************
+
+	string QnApplicationListener::jsExecBuffer = "";
+	QnApplicationListener* QnApplicationListener::listener = NULL;
 
 	//******************************************************************************
 	//******************************************************************************
@@ -1245,6 +1243,9 @@ namespace QuestNavigator {
 	// Основная функция потока библиотеки. Вызывается только раз за весь жизненный цикл программы.
 	unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 	{
+		// Сохраняем указатель на listener
+		listener = (QnApplicationListener*) pvParam;
+
 		// Инициализируем библиотеку
 		QSPInit();
 
@@ -1306,6 +1307,9 @@ namespace QuestNavigator {
 						// Очищаем скин
 						Skin::resetUpdate();
 						Skin::resetSettings();
+						// Очищаем буфер JS-команд, передаваемых из игры
+						// (сделать аналогичную очистку в stopGame)
+						jsExecBuffer = "";
 						//	            //Запускаем таймер
 						//	            timerInterval = 500;
 						//	            timerStartTime = System.currentTimeMillis();

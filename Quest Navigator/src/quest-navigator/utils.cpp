@@ -40,6 +40,8 @@ string cmd = narrow(wCmd);
 	wstring wUrl = szUrl;
 	string url = narrow(wUrl);
 
+При получении строк из интерпретатора пользуемся функцией fromQsp.
+
 */
 
 namespace QuestNavigator {
@@ -56,6 +58,17 @@ string narrow(wstring str)
 {
 	WebString webStr = WideToWebString(str);
 	return ToString(webStr);
+}
+string fromQsp(QSP_CHAR* str)
+{
+	wstring wStr;
+	if (str != NULL)
+		wStr = str;
+	return narrow(wStr);
+}
+string fromQsp(const QSP_CHAR* str)
+{
+	return fromQsp((QSP_CHAR*) str);
 }
 
 // UTF-8 string -> UTF-16 wstring
