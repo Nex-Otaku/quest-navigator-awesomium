@@ -22,7 +22,6 @@ namespace QuestNavigator {
 		MethodDispatcher method_dispatcher_;
 
 		bool gameIsRunning;
-		bool qspInited;
 
 		HANDLE libThread;
 
@@ -170,7 +169,8 @@ namespace QuestNavigator {
 		// Ui -> Библиотека
 		evTest = 0,
 
-		evRunGame,
+		evRunGame,				// Запустить игру.
+		evStopGame,				// Остановить игру.
 
 		evShutdown,				// Завершить работу потока.
 

@@ -39,7 +39,6 @@ namespace QuestNavigator {
 		data_source_(0),
 
 		gameIsRunning(false),
-		qspInited(false),
 
 		libThread(NULL)
 	{
@@ -155,10 +154,6 @@ namespace QuestNavigator {
 	void QnApplicationListener::initLib()
 	{
 		gameIsRunning = false;
-		qspInited = false;
-
-		//curGameFile = "www/standalone_content/game.qsp";
-		//curSaveDir = mainActivity.getFilesDir().getPath().concat(File.separator);
 
 		//      //Создаем список для всплывающего меню
 		//      menuList = new Vector<ContainerMenuItem>();
@@ -177,9 +172,8 @@ namespace QuestNavigator {
 		//Процедура "честного" высвобождения всех ресурсов - в т.ч. остановка потока библиотеки
 
 		//Очищаем ВСЕ на выходе
-		if (qspInited)
+		if (gameIsRunning)
 		{
-			//		Utility.WriteLog("onDestroy: stopping game");
 			StopGame(false);
 		}
 		//Останавливаем поток библиотеки
@@ -213,13 +207,6 @@ namespace QuestNavigator {
 		//	Utility.WriteLog("runGame: failed, library thread is already running");
 		//	return;
 		//}
-
-		//final bool inited = qspInited;
-		//qspInited = true;
-		//jsExecBuffer = "";
-		//final String gameFileName = fileName;
-		//curGameFile = gameFileName;
-		//curGameDir = gameFileName.substring(0, gameFileName.lastIndexOf(File.separator, gameFileName.length() - 1) + 1);
 
 		//libThreadHandler.post(new Runnable() {
 		//	public void run() {
@@ -296,37 +283,12 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::StopGame(bool restart)
 	{
-		////Контекст UI
-		//if (gameIsRunning)
-		//{
-		//	//останавливаем таймер
-		//	timerHandler.removeCallbacks(timerUpdateTask);
-
-		//	//останавливаем музыку
-		//	libThreadHandler.post(new Runnable() {
-		//		public void run() {
-		//			CloseFile(null);
-		//		}
-		//	});
-
-		//	gameIsRunning = false;
-		//}
-		//curGameDir = "";
-		//curGameFile = "";
-		//jsExecBuffer = "";
-
-		////Очищаем библиотеку
-		//if (restart || libraryThreadIsRunning)
-		//	return;
-
-		//qspInited = false;
-		//libThreadHandler.post(new Runnable() {
-		//	public void run() {
-		//		libraryThreadIsRunning = true;
-		//		QSPDeInit();
-		//		libraryThreadIsRunning = false;
-		//	}
-		//});
+		//Контекст UI
+		if (gameIsRunning)
+		{
+			runSyncEvent(evStopGame);
+			gameIsRunning = false;
+		}
 	}
 
 	// ********************************************************************
@@ -1346,7 +1308,6 @@ namespace QuestNavigator {
 						Skin::resetUpdate();
 						Skin::resetSettings();
 						// Очищаем буфер JS-команд, передаваемых из игры
-						// (сделать аналогичную очистку в stopGame)
 						jsExecBuffer = "";
 						//	            //Запускаем таймер
 						//	            timerInterval = 500;
@@ -1381,6 +1342,21 @@ namespace QuestNavigator {
 
 						res = QSPRestartGame(true);
 						CheckQspResult(res, "QSPRestartGame");
+					}
+					break;
+				case evStopGame:
+					{
+						//	//останавливаем таймер
+						//	timerHandler.removeCallbacks(timerUpdateTask);
+
+						//	//останавливаем музыку
+						//	libThreadHandler.post(new Runnable() {
+						//		public void run() {
+						//			CloseFile(null);
+						//		}
+						//	});
+						// Очищаем буфер JS-команд, передаваемых из игры
+						jsExecBuffer = "";
 					}
 					break;
 				case evShutdown:
