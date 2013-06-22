@@ -10,6 +10,7 @@
 #include <Awesomium/STLHelpers.h>
 #include "utils.h"
 #include "configuration.h"
+#include "skin.h"
 #include <process.h>
 
 using namespace Awesomium;
@@ -1273,6 +1274,9 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 	//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
 	//QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
 
+	// Заполняем значения по умолчанию для скина
+	Skin::initDefaults();
+
 
 
 	// Обработка событий происходит в цикле
@@ -1306,6 +1310,9 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
 					unlockData();
 					QSP_BOOL res = QSPLoadGameWorld(widen(path).c_str());
 					CheckQspResult(res, "QSPLoadGameWorld");
+					// Очищаем скин
+					Skin::resetUpdate();
+					Skin::resetSettings();
     	    //	            //Запускаем таймер
     	    //	            timerInterval = 500;
     	    //	            timerStartTime = System.currentTimeMillis();
@@ -1314,6 +1321,15 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
     	    //	            
     	    //	            //Запускаем счетчик миллисекунд
     	    //	            gameStartTime = System.currentTimeMillis();
+
+			//				//Создаем список для звуков и музыки
+			//				musicLock.lock();
+			//				try {
+			//					mediaPlayersList = new Vector<ContainerMusic>();
+			//					muted = false;
+			//				} finally {
+			//					musicLock.unlock();
+			//				}
 
     	    //	            //Все готово, запускаем игру
     	    //	            libThreadHandler.post(new Runnable() {
@@ -1324,7 +1340,8 @@ unsigned int QnApplicationListener::libThreadFunc(void* pvParam)
     	    //	                	libraryThreadIsRunning = false;
     	    //	        		}
     	    //	            });
-    	    //	            
+
+					//	            
     	    //	            gameIsRunning = true;
 
 					res = QSPRestartGame(true);

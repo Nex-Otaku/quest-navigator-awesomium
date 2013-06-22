@@ -19,14 +19,27 @@ namespace QuestNavigator {
 		ecpLast
 	};
 
+	enum eConfigValueType
+	{
+		ecvInt = 0,
+		ecvString,
+		ecvInvalid
+	};
+
 	class ConfigValue {
 	private:
+		eConfigValueType _type;
 		string _str;
+		int _num;
 	public:
 		ConfigValue();
 		ConfigValue(string str);
 		string getString();
 		void setString(string str);
+		ConfigValue(int num);
+		int getInt();
+		void setInt(int num);
+		eConfigValueType getType();
 	};
 
 	class Configuration {

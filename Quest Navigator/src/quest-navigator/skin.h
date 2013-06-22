@@ -25,15 +25,17 @@ namespace QuestNavigator {
 		//hideScrollObjs ?
 
 		//useHtml
+		//disableScroll
+		//viewAlwaysShow
+
 		//showActs
 		//showVars
 		//showObjs
+		//showInput
 
 		//msgTextFormat
-		//disableScroll
 		//menuListItemFormat
 		//inputTextFormat
-		//viewAlwaysShow
 		//mainDescTextFormat
 		//varsDescTextFormat
 		//actsListItemFormat
@@ -41,8 +43,6 @@ namespace QuestNavigator {
 		//objsListItemFormat
 
 		//backColor ? 
-		//menuBorder ? 
-		//menuBorderColor ? 
 		//linkColor ? 
 		//fontColor ?
 		//fontName ?
@@ -56,15 +56,17 @@ namespace QuestNavigator {
 		espHideScrollObjs,
 
 		espUseHtml,
+		espDisableScroll,
+		espViewAlwaysShow,
+
 		espShowActs,
 		espShowVars,
 		espShowObjs,
+		espShowInput,
 
 		espMsgTextFormat,
-		espDisableScroll,
 		espMenuListItemFormat,
 		espInputTextFormat,
-		espViewAlwaysShow,
 		espMainDescTextFormat,
 		espVarsDescTextFormat,
 		espActsListItemFormat,
@@ -72,9 +74,6 @@ namespace QuestNavigator {
 		espObjsListItemFormat,
 
 		espBackColor,
-		espMenuBorder,
-		espMenuBorderColor,
-
 		espLinkColor,
 		espFontColor,
 		espFontName,
@@ -87,6 +86,8 @@ namespace QuestNavigator {
 	private:
 		// Хранилище параметров
 		static ConfigValue _paramList[espLast];
+		// Значения параметров по умолчанию
+		static ConfigValue _defaultList[espLast];
 
 		static bool firstUpdate;
 	public:
@@ -109,14 +110,27 @@ namespace QuestNavigator {
 
 
 	private:
-		static void resetSettings();
 		static string getNewStrValue(string curVal, string varName, string defValue);
 		static int getNewNumValue(int curVal, string varName, int defValue);
-
+		static string getDefaultString(eSkinParam param);
+		static void setDefaultString(eSkinParam param, string value);
+		static int getDefaultInt(eSkinParam param);
+		static void setDefaultInt(eSkinParam param, int value);
+		static void loadValue(eSkinParam param, string name);
 	public:
 		static string getString(eSkinParam param);
 		static void setString(eSkinParam param, string value);
+		static int getInt(eSkinParam param);
+		static void setInt(eSkinParam param, int value);
+		static eConfigValueType getType(eSkinParam param);
+		static void initDefaults();
+		static void resetSettings();
 		static void resetUpdate();
+		static void updateBaseVars();
+		static void updateMainScreen();
+		static void updateInputDialog();
+		static void updateMsgDialog();
+		static void updateMenuDialog();
 	};
 
 
