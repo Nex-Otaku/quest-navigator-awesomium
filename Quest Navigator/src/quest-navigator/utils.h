@@ -42,6 +42,10 @@ namespace QuestNavigator {
 	void replaceAll(string &s, const string &search, const string &replace);
 	// Переводим все символы в верхний регистр
 	string toUpper(string str);
+	// Преобразование URL ссылки вида <a href="EXEC:...">...</a> в код QSP
+	string unescapeHtml(string text);
+	// Обратное преобразование URL в "сырой" вид
+	string decodeUrl(string url);
 
 	// Утилиты для работы с файловой системой
 

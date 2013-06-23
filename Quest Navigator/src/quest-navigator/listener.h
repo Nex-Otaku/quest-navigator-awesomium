@@ -52,6 +52,7 @@ namespace QuestNavigator {
 		void FreeResources();
 		void runGame(string fileName);
 		void StopGame(bool restart);
+		virtual void executeCode(string qspCode);
 
 		// ********************************************************************
 		// ********************************************************************
@@ -157,6 +158,7 @@ namespace QuestNavigator {
 		evRunGame = 0,			// Запустить игру.
 		evStopGame,				// Остановить игру.
 		evShutdown,				// Завершить работу потока.
+		evExecuteCode,			// Выполнить строку кода.
 
 		evJsExecuted,			// JS-запрос выполнен.
 

@@ -310,6 +310,19 @@ namespace QuestNavigator {
 		}
 	}
 
+	// Выполнение строки кода
+	void QnApplicationListener::executeCode(string qspCode)
+	{
+		//Контекст UI
+		if (gameIsRunning)
+		{
+			lockData();
+			g_sharedData.str = qspCode;
+			runSyncEvent(evExecuteCode);
+			unlockData();
+		}
+	}
+
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************
@@ -1315,6 +1328,7 @@ namespace QuestNavigator {
 					break;
 				case evStopGame:
 					{
+						// Остановка игры
 						//	//останавливаем таймер
 						//	timerHandler.removeCallbacks(timerUpdateTask);
 
@@ -1334,6 +1348,18 @@ namespace QuestNavigator {
 					{
 						// Завершение работы
 						bShutdown = true;
+					}
+					break;
+				case evExecuteCode:
+					{
+						// Выполнение строки кода
+						string code = "";
+						lockData();
+						code = g_sharedData.str;
+						unlockData();
+						wstring wCode = widen(code);
+						QSP_BOOL res = QSPExecString(wCode.c_str(), true);
+						CheckQspResult(res, "QSPExecString");
 					}
 					break;
 				default:

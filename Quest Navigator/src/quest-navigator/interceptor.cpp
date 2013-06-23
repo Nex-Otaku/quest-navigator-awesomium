@@ -2,6 +2,7 @@
 #include <string>
 #include <Awesomium/STLHelpers.h>
 #include "utils.h"
+#include "listener.h"
 
 using namespace std;
 using namespace QuestNavigator;
@@ -25,19 +26,12 @@ ResourceResponse* QnInterceptor::OnRequest(ResourceRequest* request)
 {
 	WebURL url = request->url();
 	string sUrl = ToString(url.spec());
-	string sUrlUpper = toUpper(sUrl);
-	if (startsWith(sUrlUpper, "EXEC:")) {
-		// Выполняем код EXEC
-		// STUB
+	string scheme = ToString(url.scheme());
+	if ((scheme == "http") || (scheme == "https")) {
+		// Ссылки на сайты должны открываться
+		// в браузере по умолчанию.
+		app_->openUrlInSystemBrowser(sUrl);
 		request->Cancel();
-	} else {
-		string scheme = ToString(url.scheme());
-		if ((scheme == "http") || (scheme == "https")) {
-			// Ссылки на сайты должны открываться
-			// в браузере по умолчанию.
-			app_->openUrlInSystemBrowser(sUrl);
-			request->Cancel();
-		}
 	}
 	return 0;
 }
@@ -70,6 +64,14 @@ bool QnInterceptor::OnFilterNavigation(int origin_process_id,
 									   const WebURL& url,
 									   bool is_main_frame)
 {
+	string sUrl = ToString(url.spec());
+	string sUrlUpper = toUpper(sUrl);
+	if (startsWith(sUrlUpper, "EXEC:")) {
+		// Выполняем код EXEC
+		string code = unescapeHtml(decodeUrl(sUrl.substr(5)));
+		app_->listener()->executeCode(code);
+		return true;
+	}
 	return false;
 }
 

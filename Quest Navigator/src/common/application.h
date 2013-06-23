@@ -28,6 +28,9 @@ class Application {
 
     // Event is fired when the app is shutting down.
     virtual void OnShutdown() = 0;
+	
+	// Выполнение строки кода
+	virtual void executeCode(string qspCode) = 0;
   };
 
   virtual ~Application() {}
