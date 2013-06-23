@@ -323,6 +323,12 @@ namespace QuestNavigator {
 		}
 	}
 
+	// Курсор находится в текстовом поле
+	bool QnApplicationListener::textInputIsFocused()
+	{
+		return view_->web_view()->focused_element_type() == kFocusedElementType_TextInput;
+	}
+
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************

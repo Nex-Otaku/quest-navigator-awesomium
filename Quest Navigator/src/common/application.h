@@ -31,6 +31,9 @@ class Application {
 	
 	// Выполнение строки кода
 	virtual void executeCode(string qspCode) = 0;
+
+	// Курсор находится в текстовом поле
+	virtual bool textInputIsFocused() = 0;
   };
 
   virtual ~Application() {}

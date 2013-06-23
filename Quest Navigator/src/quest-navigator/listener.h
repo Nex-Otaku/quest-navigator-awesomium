@@ -53,6 +53,7 @@ namespace QuestNavigator {
 		void runGame(string fileName);
 		void StopGame(bool restart);
 		virtual void executeCode(string qspCode);
+		virtual bool textInputIsFocused();
 
 		// ********************************************************************
 		// ********************************************************************
