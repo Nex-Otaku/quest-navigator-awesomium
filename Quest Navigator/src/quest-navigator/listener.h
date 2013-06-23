@@ -161,6 +161,7 @@ namespace QuestNavigator {
 		evShutdown,				// Завершить работу потока.
 		evExecuteCode,			// Выполнить строку кода.
 		evExecuteAction,		// Выполнить действие.
+		evSelectObject,			// Выбрать предмет.
 
 		evJsExecuted,			// JS-запрос выполнен.
 

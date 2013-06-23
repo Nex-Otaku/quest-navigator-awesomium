@@ -392,7 +392,6 @@ namespace QuestNavigator {
 		{
 			int nObjsCount = QSPGetObjectsCount();
 			int nSelectedObject = QSPGetSelObjectIndex();
-			JSArray objs;
 			for (int i = 0; i < nObjsCount; i++)
 			{
 				QSP_CHAR* pImgPath;
@@ -975,7 +974,16 @@ namespace QuestNavigator {
 	void QnApplicationListener::selectObject(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("object selected!");
+		if (args.size() < 1) {
+			showError("Не указан параметр для selectObject!");
+			return;
+		}
+		JSValue jsPos = args[0];
+		int pos = jsPos.ToInteger();
+		lockData();
+		g_sharedData.num = pos;
+		runSyncEvent(evSelectObject);
+		unlockData();
 	}
 
 	void QnApplicationListener::loadGame(WebView* caller, const JSArray& args)
@@ -1399,6 +1407,17 @@ namespace QuestNavigator {
 						CheckQspResult(res, "QSPSetSelActionIndex");
 						res = QSPExecuteSelActionCode(QSP_TRUE);
 						CheckQspResult(res, "QSPExecuteSelActionCode");
+					}
+					break;
+				case evSelectObject:
+					{
+						// Выбор предмета
+						int pos = 0;
+						lockData();
+						pos = g_sharedData.num;
+						unlockData();
+        				QSP_BOOL res = QSPSetSelObjectIndex(pos, QSP_TRUE);
+						CheckQspResult(res, "QSPSetSelObjectIndex");
 					}
 					break;
 				default:
