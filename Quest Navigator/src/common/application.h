@@ -1,6 +1,10 @@
 #ifndef COMMON_APPLICATION_H_
 #define COMMON_APPLICATION_H_
 
+#include <string>
+
+using namespace std;
+
 class View;
 
 namespace Awesomium {
@@ -54,6 +58,9 @@ class Application {
 
   // Set the Listener for various app events.
   void set_listener(Listener* listener) { listener_ = listener; }
+
+  // Открытие ссылки в новом окне, используя системный браузер
+  virtual void openUrlInSystemBrowser(string url) = 0;
 
  protected:
   Application() { }

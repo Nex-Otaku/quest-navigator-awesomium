@@ -40,6 +40,8 @@ namespace QuestNavigator {
 	// Заменяем все вхождения подстроки в строке
 	string replaceAll(string source, char pattern, char replacement);
 	void replaceAll(string &s, const string &search, const string &replace);
+	// Переводим все символы в верхний регистр
+	string toUpper(string str);
 
 	// Утилиты для работы с файловой системой
 

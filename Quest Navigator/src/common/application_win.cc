@@ -2,8 +2,11 @@
 #include "view.h"
 #include <Awesomium/WebCore.h>
 #include <string>
+#include "../quest-navigator/utils.h"
 
 using namespace Awesomium;
+using namespace std;
+using namespace QuestNavigator;
 
 class ApplicationWin : public Application {
 	bool is_running_;
@@ -56,9 +59,24 @@ public:
 	}
 
 	virtual void ShowMessage(const char* message) {
-		std::wstring message_str(message, message + strlen(message));
+		wstring message_str(message, message + strlen(message));
 		MessageBox(0, message_str.c_str(), message_str.c_str(), NULL);
 	}
+
+	// Открытие ссылки в новом окне, используя системный браузер
+	virtual void openUrlInSystemBrowser(string url)
+	{
+		HINSTANCE r = ShellExecute(NULL, 
+			widen("open").c_str(), 
+			widen(url).c_str(), 
+			NULL, 
+			NULL, 
+			SW_SHOWNORMAL);
+		if ((int)r <= 32) {
+			showError("Не удалось открыть URL: " + url);
+		}
+	}
+
 };
 
 Application* Application::Create() {

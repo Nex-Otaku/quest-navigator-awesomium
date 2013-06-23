@@ -37,6 +37,7 @@ namespace QuestNavigator {
 		: app_(Application::Create()),
 		view_(0),
 		data_source_(0),
+		resource_interceptor_(),
 
 		gameIsRunning(false),
 
@@ -61,6 +62,10 @@ namespace QuestNavigator {
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnLoaded() {
 		view_ = View::Create(512, 512);
+
+		// Перехватчик запросов, выполняющихся при нажатии на ссылку.
+		resource_interceptor_.setApp(app_);
+		app_->web_core()->set_resource_interceptor(&resource_interceptor_);
 
 		BindMethods(view_->web_view());
 
@@ -824,8 +829,7 @@ namespace QuestNavigator {
 	{
 		//Контекст библиотеки
 		string jsCmd = fromQsp(cmd);
-		string jsCmdUpper = jsCmd;
-		transform(jsCmd.begin(), jsCmd.end(), jsCmdUpper.begin(), ::toupper);
+		string jsCmdUpper = toUpper(jsCmd);
 		if (startsWith(jsCmdUpper, "JS:"))
 		{
 			jsCmd = jsCmd.substr(string("JS:").length());

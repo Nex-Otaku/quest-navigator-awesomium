@@ -325,5 +325,12 @@ void replaceAll(string &s, const string &search, const string &replace)
         s.insert(pos, replace);
     }
 }
+//
+string toUpper(string str)
+{
+	string strUpper = str;
+	transform(str.begin(), str.end(), strUpper.begin(), ::toupper);
+	return strUpper;
+}
 
 }

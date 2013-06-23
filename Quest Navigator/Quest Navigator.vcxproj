@@ -131,6 +131,7 @@
     <ClCompile Include="src\common\view_win.cc" />
     <ClCompile Include="src\main.cc" />
     <ClCompile Include="src\quest-navigator\configuration.cpp" />
+    <ClCompile Include="src\quest-navigator\interceptor.cpp" />
     <ClCompile Include="src\quest-navigator\listener.cpp" />
     <ClCompile Include="src\quest-navigator\skin.cpp" />
     <ClCompile Include="src\quest-navigator\utils.cpp" />
@@ -141,6 +142,7 @@
     <ClInclude Include="src\common\method_dispatcher.h" />
     <ClInclude Include="src\common\view.h" />
     <ClInclude Include="src\quest-navigator\configuration.h" />
+    <ClInclude Include="src\quest-navigator\interceptor.h" />
     <ClInclude Include="src\quest-navigator\listener.h" />
     <ClInclude Include="src\quest-navigator\skin.h" />
     <ClInclude Include="src\quest-navigator\utils.h" />

@@ -171,6 +171,9 @@
     <ClCompile Include="src\quest-navigator\skin.cpp">
       <Filter>Файлы исходного кода\special</Filter>
     </ClCompile>
+    <ClCompile Include="src\quest-navigator\interceptor.cpp">
+      <Filter>Файлы исходного кода\special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\application.h">
@@ -195,6 +198,9 @@
       <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
     <ClInclude Include="src\quest-navigator\skin.h">
+      <Filter>Заголовочные файлы\special</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quest-navigator\interceptor.h">
       <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
   </ItemGroup>

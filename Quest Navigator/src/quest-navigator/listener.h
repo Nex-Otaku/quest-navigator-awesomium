@@ -10,6 +10,7 @@
 #include <Awesomium/DataPak.h>
 #include <Awesomium/STLHelpers.h>
 #include "utils.h"
+#include "interceptor.h"
 
 using namespace Awesomium;
 
@@ -20,6 +21,7 @@ namespace QuestNavigator {
 		View* view_;
 		DataSource* data_source_;
 		MethodDispatcher method_dispatcher_;
+		QnInterceptor resource_interceptor_;
 
 		bool gameIsRunning;
 
