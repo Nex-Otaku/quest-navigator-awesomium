@@ -27,6 +27,7 @@ namespace QuestNavigator {
 	struct
 	{
 		string str;
+		int num;
 		JSValue jsValue;
 	} g_sharedData;
 
@@ -958,51 +959,70 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::executeAction(WebView* caller, const JSArray& args)
 	{
-		app_->ShowMessage("action pressed!");
+		// Контекст UI
+		if (args.size() < 1) {
+			showError("Не указан параметр для executeAction!");
+			return;
+		}
+		JSValue jsPos = args[0];
+		int pos = jsPos.ToInteger();
+		lockData();
+		g_sharedData.num = pos;
+		runSyncEvent(evExecuteAction);
+		unlockData();
 	}
 
 	void QnApplicationListener::selectObject(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("object selected!");
 	}
 
 	void QnApplicationListener::loadGame(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("game load dialog need to be opened!");
 	}
 
 	void QnApplicationListener::saveGame(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("game save dialog need to be opened!");
 	}
 
 	void QnApplicationListener::saveSlotSelected(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("slot selected!");
 	}
 
 	void QnApplicationListener::msgResult(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("msg dialog closed!");
 	}
 
 	void QnApplicationListener::errorResult(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("error dialog closed!");
 	}
 
 	void QnApplicationListener::userMenuResult(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("user menu dialog closed!");
 	}
 
 	void QnApplicationListener::inputResult(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("input dialog closed!!");
 	}
 
 	void QnApplicationListener::setMute(WebView* caller, const JSArray& args)
 	{
+		// Контекст UI
 		app_->ShowMessage("mute called!");
 	}
 
@@ -1328,7 +1348,7 @@ namespace QuestNavigator {
 						//	            
 						//	            gameIsRunning = true;
 
-						res = QSPRestartGame(true);
+						res = QSPRestartGame(QSP_TRUE);
 						CheckQspResult(res, "QSPRestartGame");
 					}
 					break;
@@ -1364,8 +1384,21 @@ namespace QuestNavigator {
 						code = g_sharedData.str;
 						unlockData();
 						wstring wCode = widen(code);
-						QSP_BOOL res = QSPExecString(wCode.c_str(), true);
+						QSP_BOOL res = QSPExecString(wCode.c_str(), QSP_TRUE);
 						CheckQspResult(res, "QSPExecString");
+					}
+					break;
+				case evExecuteAction:
+					{
+						// Выполнение действия
+						int pos = 0;
+						lockData();
+						pos = g_sharedData.num;
+						unlockData();
+						QSP_BOOL res = QSPSetSelActionIndex(pos, QSP_FALSE);
+						CheckQspResult(res, "QSPSetSelActionIndex");
+						res = QSPExecuteSelActionCode(QSP_TRUE);
+						CheckQspResult(res, "QSPExecuteSelActionCode");
 					}
 					break;
 				default:

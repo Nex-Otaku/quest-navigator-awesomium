@@ -160,6 +160,7 @@ namespace QuestNavigator {
 		evStopGame,				// Остановить игру.
 		evShutdown,				// Завершить работу потока.
 		evExecuteCode,			// Выполнить строку кода.
+		evExecuteAction,		// Выполнить действие.
 
 		evJsExecuted,			// JS-запрос выполнен.
 
