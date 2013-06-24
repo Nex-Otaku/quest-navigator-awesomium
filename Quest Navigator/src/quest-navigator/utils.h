@@ -15,6 +15,7 @@ namespace QuestNavigator {
 
 	static const string DEFAULT_CONTENT_REL_PATH = "standalone_content";
 	static const string DEFAULT_SKIN_FILE = "gameAwesomium.html";
+	static const string DEFAULT_SAVE_REL_PATH = "Сохранения игр Quest Navigator";
 
 	// Утилиты для преобразования строк
 

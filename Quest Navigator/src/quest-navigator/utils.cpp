@@ -2,6 +2,7 @@
 #include "configuration.h"
 #ifdef _WIN32
 #include <shlwapi.h>
+#include <Shlobj.h>
 #endif
 
 #include <Awesomium/STLHelpers.h>
@@ -245,10 +246,23 @@ namespace QuestNavigator {
 
 			// STUB
 			// Сделать проверку всех файлов на читаемость
+
+			string saveDir = "";
+			// Путь к пользовательской папке "Мои документы"
+			WCHAR wszPath[MAX_PATH];
+			HRESULT hr = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, wszPath);
+			if (hr != S_OK) {
+				showError("Не удалось получить путь к папке \"Мои документы\".");
+				return;
+			}
+			saveDir = narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH;
+
+			// Сохраняем конфигурацию
 			Configuration::setString(ecpContentDir, contentDir);
 			Configuration::setString(ecpSkinFile, skinFile);
 			Configuration::setString(ecpGameFile, gameFile);
 			Configuration::setString(ecpConfigFile, configFile);
+			Configuration::setString(ecpSaveDir, saveDir);
 
 			//// В параметре конфигурации ContentPath пока что будет храниться
 			//// полный путь к html-файлу проекта.
@@ -352,7 +366,7 @@ namespace QuestNavigator {
 		string decoded = "";
 		char ch;
 		int i, ii;
-		for (i = 0; i < url.length(); i++) {
+		for (i = 0; i < (int)url.length(); i++) {
 			if (int(url[i]) == 37) {
 				sscanf(url.substr(i + 1, 2).c_str(), "%x", &ii);
 				ch = static_cast<char>(ii);

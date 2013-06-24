@@ -15,6 +15,7 @@ namespace QuestNavigator {
 		ecpSkinFile,
 		ecpGameFile,
 		ecpConfigFile,
+		ecpSaveDir,
 
 		ecpLast
 	};
