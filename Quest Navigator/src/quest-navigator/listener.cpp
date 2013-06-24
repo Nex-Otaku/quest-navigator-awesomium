@@ -303,8 +303,9 @@ namespace QuestNavigator {
 		if (gameIsRunning)
 		{
 			runSyncEvent(evStopGame);
-			// Возможен Deadlock при закрытии окна, 
-			// когда библиотека ждёт ответа интерфейса.
+			// При закрытии окна, 
+			// когда библиотека ждёт ответа интерфейса,
+			// каждый раз будет Deadlock.
 			// Когда-нибудь нужно с этим разобраться.
 			waitForSingle(evGameStopped);
 			gameIsRunning = false;
