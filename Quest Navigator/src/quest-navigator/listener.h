@@ -164,6 +164,7 @@ namespace QuestNavigator {
 		evSelectObject,			// Выбрать предмет.
 
 		evJsExecuted,			// JS-запрос выполнен.
+		evMsgClosed,			// Диалог MSG был закрыт.
 
 		evLastUi,				// Маркер для разделения событий на две части.
 

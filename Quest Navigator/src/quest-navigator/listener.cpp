@@ -340,7 +340,6 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::RefreshInt(int isRedraw) 
 	{
-		//showMessage("RefreshInt called!", "");
 		//Контекст библиотеки
 		bool needUpdate = Skin::isSomethingChanged();
 		Skin::updateBaseVars();
@@ -463,44 +462,24 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::ShowMessage(QSP_CHAR* message)
 	{
-		//  	//Контекст библиотеки
-		//if (libThread==null)
-		//{
-		//	Utility.WriteLog("ShowMessage: failed, libThread is null");
-		//	return;
-		//}
+		//Контекст библиотеки
 
-		//   // Обновляем скин
-		//      skin.updateBaseVars();
-		//      skin.updateMsgDialog();
-		//      skin.updateEffects();
-		//   // Если что-то изменилось, то передаем в яваскрипт
-		//   if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
-		//   {
-		//       Utility.WriteLog("Hey! Skin was changed! Updating it before showing MSG.");
-		//       RefreshInt(QSP_TRUE);
-		//   }
-		//
-		//String msgValue = "";
-		//if (message != null)
-		//	msgValue = message;
-		//
-		//dialogHasResult = false;
+		// Обновляем скин
+		Skin::updateBaseVars();
+		Skin::updateMsgDialog();
+		// Если что-то изменилось, то передаем в яваскрипт
+		if (Skin::isSomethingChanged())
+		{
+			RefreshInt(QSP_TRUE);
+		}
 
-		//  	final String msg = skin.applyHtmlFixes(msgValue);
-		//mainActivity.runOnUiThread(new Runnable() {
-		//	public void run() {
-		//		jsQspMsg(msg);
-		//		Utility.WriteLog("ShowMessage(UI): dialog showed");
-		//	}
-		//});
-		//  	
-		//Utility.WriteLog("ShowMessage: parking library thread");
-		//      while (!dialogHasResult) {
-		//      	setThreadPark();
-		//      }
-		//      parkThread = null;
-		//Utility.WriteLog("ShowMessage: library thread unparked, finishing");
+		string msgValue = Skin::applyHtmlFixes(fromQsp(message));
+
+		// Передаём данные в поток Ui
+		qspMsg(ToWebString(msgValue));
+
+		// Ждём закрытия диалога
+		waitForSingle(evMsgClosed);
 	}
 
 	void QnApplicationListener::PlayFile(QSP_CHAR* file, int volume)
@@ -852,9 +831,9 @@ namespace QuestNavigator {
 		if (startsWith(jsCmdUpper, "JS:"))
 		{
 			jsCmd = jsCmd.substr(string("JS:").length());
-    		// Сохраняем яваскрипт, переданный из игры командой EXEC('JS:...')
-    		// На выполнение отдаём при обновлении интерфейса
-    		jsExecBuffer = jsExecBuffer + jsCmd;
+			// Сохраняем яваскрипт, переданный из игры командой EXEC('JS:...')
+			// На выполнение отдаём при обновлении интерфейса
+			jsExecBuffer = jsExecBuffer + jsCmd;
 		}
 	}
 
@@ -896,7 +875,7 @@ namespace QuestNavigator {
 	{
 		// Контекст библиотеки
 		// Вызвать функции Awesomium можно только из Ui-потока.
-		
+
 		// Отправляем данные в Ui-поток.
 		lockData();
 		g_sharedData.str = name;
@@ -1007,7 +986,7 @@ namespace QuestNavigator {
 	void QnApplicationListener::msgResult(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("msg dialog closed!");
+		runSyncEvent(evMsgClosed);
 	}
 
 	void QnApplicationListener::errorResult(WebView* caller, const JSArray& args)
@@ -1281,7 +1260,7 @@ namespace QuestNavigator {
 		//QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlay);
 		//QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
 		//QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
-		//QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&Msg);
+		QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&ShowMessage);
 		//QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
 		//QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
 		//QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
@@ -1416,7 +1395,7 @@ namespace QuestNavigator {
 						lockData();
 						pos = g_sharedData.num;
 						unlockData();
-        				QSP_BOOL res = QSPSetSelObjectIndex(pos, QSP_TRUE);
+						QSP_BOOL res = QSPSetSelObjectIndex(pos, QSP_TRUE);
 						CheckQspResult(res, "QSPSetSelObjectIndex");
 					}
 					break;
