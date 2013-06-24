@@ -37,7 +37,9 @@ namespace QuestNavigator {
 	// Оканчивается ли строка последовательностью символов
 	bool endsWith(string source, string suffix);
 	// Преобразовываем обратные косые черты в прямые ("\" -> "/")
-	string backSlashToSlash(string text);
+	string backslashToSlash(string text);
+	// Преобразовываем прямые косые черты в обратные ("/" -> "\")
+	string slashToBackslash(string text);
 	// Заменяем все вхождения подстроки в строке
 	string replaceAll(string source, char pattern, char replacement);
 	void replaceAll(string &s, const string &search, const string &replace);
@@ -60,6 +62,8 @@ namespace QuestNavigator {
 	bool dirExists(string path);
 	// Получаем путь к рабочей папке
 	string getCurrentDir();
+	// Меняем слэши в пути к файлу в зависимости от системы
+	string getRightPath(string path);
 
 	// Прочее
 

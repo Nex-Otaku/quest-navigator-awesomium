@@ -631,29 +631,19 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::ShowPicture(QSP_CHAR* file)
 	{
-		//  	//Контекст библиотеки
-		//  	if (file == null)
-		//  		file = "";
-		//  	
-		//  	final String fileName = Utility.QspPathTranslate(file);
-		//  	
-		//mainActivity.runOnUiThread(new Runnable() {
-		//	public void run() {
-		//		if (fileName.length() > 0)
-		//		{
-		//	    	String prefix = "";
-		//	    	if (curGameDir != null)
-		//	    		prefix = curGameDir;
-		//	    	
-		//	    	//Проверяем, существует ли файл.
-		//	    	//Если нет - выходим
-		//	        if (!Utility.CheckAssetExists(uiContext, prefix.concat(fileName), "ShowPicture"))
-		//	        	return;
-		//		}
-		//        // "Пустое" имя файла тоже имеет значение - так мы скрываем картинку
-		//        jsQspView(fileName);
-		//	}
-		//});    	    	
+		//Контекст библиотеки
+		string fileName = getRightPath(fromQsp(file));
+
+		// Проверяем читаемость файла.
+		// Если файл не существует или не читается, выходим.
+		if (fileName.length() > 0) {
+			string fullPath = getRightPath(Configuration::getString(ecpContentDir) + "\\" + fileName);
+			if (!fileExists(fullPath))
+				return;
+		}
+
+		// "Пустое" имя файла тоже имеет значение - так мы скрываем картинку
+		qspView(ToWebString(fileName));
 	}
 
 	void QnApplicationListener::InputBox(const QSP_CHAR* prompt, QSP_CHAR* buffer, int maxLen)
@@ -1267,7 +1257,7 @@ namespace QuestNavigator {
 		//QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
 		//QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
 		//QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
-		//QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
+		QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowPicture);
 		//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
 		QSPSetCallBack(QSP_CALL_SYSTEM, (QSP_CALLBACK)&System);
 		//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);

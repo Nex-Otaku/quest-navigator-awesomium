@@ -106,7 +106,7 @@ namespace QuestNavigator {
 		// Файл "assets.pak" ищется в рабочей папке.
 		string contentPath = Configuration::getString(ecpSkinFile);
 		string contentUrl = (contentPath.length() == 0) ?
-			"asset://webui/" + backSlashToSlash(DEFAULT_CONTENT_REL_PATH + "\\" + DEFAULT_SKIN_FILE) : 
+			"asset://webui/" + backslashToSlash(DEFAULT_CONTENT_REL_PATH + "\\" + DEFAULT_SKIN_FILE) : 
 		getUrlFromFilePath(contentPath);
 		return contentUrl;
 	}
@@ -146,6 +146,18 @@ namespace QuestNavigator {
 		wstring wDir = szDir;
 		string dir = narrow(wDir);
 		return dir;
+	}
+
+	// Меняем слэши в пути к файлу в зависимости от системы
+	string getRightPath(string path)
+	{
+		// Вызывая эту функцию для обработки пути,
+		// мы будем уверены что слэши всегда направлены в нужную сторону.
+		string result = path;
+		#ifdef WIN32
+		result = slashToBackslash(path);
+		#endif
+		return result;
 	}
 
 	// Загрузка конфигурации плеера
@@ -315,9 +327,15 @@ namespace QuestNavigator {
 	}
 
 	// Преобразовываем обратные косые черты в прямые ("\" -> "/")
-	string backSlashToSlash(string text)
+	string backslashToSlash(string text)
 	{
 		return replaceAll(text, '\\', '/');
+	}
+
+	// Преобразовываем прямые косые черты в обратные ("/" -> "\")
+	string slashToBackslash(string text)
+	{
+		return replaceAll(text, '/', '\\');
 	}
 
 	// Заменяем все вхождения символа в строке
@@ -339,7 +357,7 @@ namespace QuestNavigator {
 			s.insert(pos, replace);
 		}
 	}
-	//
+	// Переводим все символы в верхний регистр
 	string toUpper(string str)
 	{
 		string strUpper = str;
