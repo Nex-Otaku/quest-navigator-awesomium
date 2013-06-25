@@ -11,10 +11,18 @@
 #include <Awesomium/STLHelpers.h>
 #include "utils.h"
 #include "interceptor.h"
+#include <vector>
 
 using namespace Awesomium;
 
 namespace QuestNavigator {
+
+	// Контейнер для элемента меню
+	struct ContainerMenuItem {
+		string imgPath;
+		string name;
+	};
+
 
 	class QnApplicationListener : public Application::Listener {
 		Application* app_;
@@ -98,7 +106,7 @@ namespace QuestNavigator {
 		static void qspShowSaveSlotsDialog(JSObject content);
 		static void qspMsg(WebString text);
 		static void qspError(WebString error);
-		static void qspMenu(JSObject menu);
+		static void qspMenu(JSArray menu);
 		static void qspInput(WebString text);
 		static void qspView(WebString path);
 
@@ -133,6 +141,7 @@ namespace QuestNavigator {
 
 		static string jsExecBuffer;
 		static QnApplicationListener* listener;
+		static vector<ContainerMenuItem> menuList;
 
 		// ********************************************************************
 		// THREADS
@@ -165,6 +174,7 @@ namespace QuestNavigator {
 
 		evJsExecuted,			// JS-запрос выполнен.
 		evMsgClosed,			// Диалог MSG был закрыт.
+		evMenuClosed,			// Выбран пункт пользовательского меню.
 
 		evLastUi,				// Маркер для разделения событий на две части.
 

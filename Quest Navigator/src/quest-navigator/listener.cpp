@@ -62,6 +62,8 @@ namespace QuestNavigator {
 
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnLoaded() {
+		// Контекст UI
+
 		view_ = View::Create(512, 512);
 
 		// Перехватчик запросов, выполняющихся при нажатии на ссылку.
@@ -87,7 +89,7 @@ namespace QuestNavigator {
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnUpdate() {
 		if (checkForSingle(evJsCommitted)) {
-			// Библиотека сообщила потоку Ui,
+			// Библиотека сообщила потоку UI,
 			// что требуется выполнить JS-запрос.
 			processLibJsCall();
 		};
@@ -169,10 +171,8 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::initLib()
 	{
+		// Контекст UI
 		gameIsRunning = false;
-
-		//      //Создаем список для всплывающего меню
-		//      menuList = new Vector<ContainerMenuItem>();
 
 		//      //Создаем объект для таймера
 		//      timerHandler = new Handler(Looper.getMainLooper());
@@ -484,7 +484,7 @@ namespace QuestNavigator {
 
 		string msgValue = Skin::applyHtmlFixes(fromQsp(message));
 
-		// Передаём данные в поток Ui
+		// Передаём данные в поток UI
 		qspMsg(ToWebString(msgValue));
 
 		// Ждём закрытия диалога
@@ -736,73 +736,52 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::AddMenuItem(QSP_CHAR* name, QSP_CHAR* imgPath)
 	{
-		////Контекст библиотеки
-		//ContainerMenuItem item = new ContainerMenuItem();
-		//item.imgPath = Utility.QspPathTranslate(imgPath);
-		//item.name = name;
-		//menuList.add(item);
+		//Контекст библиотеки
+		ContainerMenuItem item;
+		item.imgPath = getRightPath(fromQsp(imgPath));
+		item.name = fromQsp(name);
+		menuList.push_back(item);
 	}
 
 	int QnApplicationListener::ShowMenu()
 	{
-		//  	//Контекст библиотеки
-		//if (libThread==null)
-		//{
-		//	Utility.WriteLog("ShowMenu: failed, libThread is null");
-		//	return -1;
-		//}
+		//Контекст библиотеки
 
-		//   // Обновляем скин
-		//   skin.updateMenuDialog();
-		//   skin.updateEffects();
-		//   // Если что-то изменилось, то передаем в яваскрипт
-		//   if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
-		//   {
-		//       Utility.WriteLog("Hey! Skin was changed! Updating it before showing user menu.");
-		//       RefreshInt(QSP_TRUE);
-		//   }
-		//
-		//dialogHasResult = false;
-		//menuResult = -1;
+		// Обновляем скин
+		Skin::updateMenuDialog();
+		// Если что-то изменилось, то передаем в яваскрипт
+		if (Skin::isSomethingChanged())
+		{
+			RefreshInt(QSP_TRUE);
+		}
 
-		//final Vector<ContainerMenuItem> uiMenuList = menuList; 
-		//  	
-		//mainActivity.runOnUiThread(new Runnable() {
-		//	public void run() {
-		//        JSONArray jsonMenuList = new JSONArray();
-		//		for (int i = 0; i < uiMenuList.size(); i++)
-		//		{
-		//			JSONObject jsonMenuItem = new JSONObject();
-		//			try {
-		//				jsonMenuItem.put("image", uiMenuList.elementAt(i).imgPath);
-		//				jsonMenuItem.put("desc", skin.applyHtmlFixes(uiMenuList.elementAt(i).name));
-		//				jsonMenuList.put(i, jsonMenuItem);
-		//			} catch (JSONException e) {
-		//	    		Utility.WriteLog("ERROR - jsonMenuItem or jsonMenuList[] in ShowMenu!");
-		//				e.printStackTrace();
-		//			}
-		//		}
-		//		jsQspMenu(jsonMenuList);
-		//	    Utility.WriteLog("ShowMenu(UI): dialog showed");
-		//	}
-		//});
-		//  	
-		//Utility.WriteLog("ShowMenu: parking library thread");
-		//      while (!dialogHasResult) {
-		//      	setThreadPark();
-		//      }
-		//      parkThread = null;
-		//Utility.WriteLog("ShowMenu: library thread unparked, finishing");
-		//  	
-		//return menuResult;
+		JSArray jsMenuList;
+		for (int i = 0; i < (int)menuList.size(); i++) {
+			JSObject jsMenuItem;
+			jsMenuItem.SetProperty(WSLit("image"), ToWebString(menuList[i].imgPath));
+			jsMenuItem.SetProperty(WSLit("desc"), ToWebString(Skin::applyHtmlFixes(menuList[i].name)));
+			jsMenuList.Push(jsMenuItem);
+		}
 
-		return 0;
+		// Передаём данные в поток UI
+		qspMenu(jsMenuList);
+
+		// Ждём закрытия диалога
+		waitForSingle(evMenuClosed);
+
+		// Возвращаем результат
+		int result = -1;
+		lockData();
+		result = g_sharedData.num;
+		unlockData();
+
+		return result;
 	}
 
 	void QnApplicationListener::DeleteMenu()
 	{
-		////Контекст библиотеки
-		//menuList.clear();
+		//Контекст библиотеки
+		menuList.clear();
 	}
 
 	void QnApplicationListener::Wait(int msecs)
@@ -846,7 +825,7 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::processLibJsCall()
 	{
-		// Контекст Ui
+		// Контекст UI
 		string name = "";
 		JSValue arg;
 		lockData();
@@ -859,7 +838,7 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::jsCallApiFromUi(string name, JSValue arg)
 	{
-		// Контекст Ui
+		// Контекст UI
 		JSValue window = view_->web_view()->ExecuteJavascriptWithResult(
 			WSLit("window"), WSLit(""));
 		if (window.IsObject()) {
@@ -873,9 +852,9 @@ namespace QuestNavigator {
 	void QnApplicationListener::jsCallApiFromLib(string name, JSValue arg)
 	{
 		// Контекст библиотеки
-		// Вызвать функции Awesomium можно только из Ui-потока.
+		// Вызвать функции Awesomium можно только из UI-потока.
 
-		// Отправляем данные в Ui-поток.
+		// Отправляем данные в UI-поток.
 		lockData();
 		g_sharedData.str = name;
 		g_sharedData.jsValue = arg;
@@ -901,7 +880,7 @@ namespace QuestNavigator {
 	{
 		jsCallApiFromLib("qspError", error);
 	}
-	void QnApplicationListener::qspMenu(JSObject menu)
+	void QnApplicationListener::qspMenu(JSArray menu)
 	{
 		jsCallApiFromLib("qspMenu", menu);
 	}
@@ -941,7 +920,7 @@ namespace QuestNavigator {
 			showError("Не указан параметр для executeAction!");
 			return;
 		}
-		
+
 		if (!checkForSingle(evLibIsReady))
 			return;
 
@@ -1005,7 +984,17 @@ namespace QuestNavigator {
 	void QnApplicationListener::userMenuResult(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("user menu dialog closed!");
+		if (args.size() < 1) {
+			showError("Не указан параметр для userMenuResult!");
+			return;
+		}
+		JSValue jsPos = args[0];
+		int pos = jsPos.ToInteger();
+
+		lockData();
+		g_sharedData.num = pos;
+		runSyncEvent(evMenuClosed);
+		unlockData();
 	}
 
 	void QnApplicationListener::inputResult(WebView* caller, const JSArray& args)
@@ -1038,6 +1027,7 @@ namespace QuestNavigator {
 
 	string QnApplicationListener::jsExecBuffer = "";
 	QnApplicationListener* QnApplicationListener::listener = NULL;
+	vector<ContainerMenuItem> QnApplicationListener::menuList;
 
 	//******************************************************************************
 	//******************************************************************************
@@ -1254,9 +1244,9 @@ namespace QuestNavigator {
 		QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&ShowMessage);
 		//QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
 		//QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
-		//QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
-		//QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
-		//QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
+		QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
+		QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
+		QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
 		//QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
 		QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowPicture);
 		//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
@@ -1272,7 +1262,7 @@ namespace QuestNavigator {
 		// Обработка событий происходит в цикле
 		bool bShutdown = false;
 		while (!bShutdown) {
-			// Сообщаем потоку Ui, что библиотека готова к выполнению команд
+			// Сообщаем потоку UI, что библиотека готова к выполнению команд
 			runSyncEvent(evLibIsReady);
 			// Ожидаем любое из событий синхронизации
 			DWORD res = WaitForMultipleObjects((DWORD)evLastUi, g_eventList, FALSE, INFINITE);
