@@ -199,6 +199,12 @@ namespace QuestNavigator {
 	void QnApplicationListener::runGame(string fileName)
 	{
 		// Контекст UI
+		if (gameIsRunning) {
+			if (!checkForSingle(evLibIsReady))
+				return;
+		} else {
+			waitForSingle(evLibIsReady);
+		}
 
 		// Готовим данные для передачи в поток
 		lockData();
@@ -302,11 +308,10 @@ namespace QuestNavigator {
 		//Контекст UI
 		if (gameIsRunning)
 		{
+			if (!checkForSingle(evLibIsReady))
+				return;
+
 			runSyncEvent(evStopGame);
-			// При закрытии окна, 
-			// когда библиотека ждёт ответа интерфейса,
-			// каждый раз будет Deadlock.
-			// Когда-нибудь нужно с этим разобраться.
 			waitForSingle(evGameStopped);
 			gameIsRunning = false;
 		}
@@ -318,6 +323,9 @@ namespace QuestNavigator {
 		//Контекст UI
 		if (gameIsRunning)
 		{
+			if (!checkForSingle(evLibIsReady))
+				return;
+
 			lockData();
 			g_sharedData.str = qspCode;
 			runSyncEvent(evExecuteCode);
@@ -933,6 +941,10 @@ namespace QuestNavigator {
 			showError("Не указан параметр для executeAction!");
 			return;
 		}
+		
+		if (!checkForSingle(evLibIsReady))
+			return;
+
 		JSValue jsPos = args[0];
 		int pos = jsPos.ToInteger();
 		lockData();
@@ -950,6 +962,10 @@ namespace QuestNavigator {
 		}
 		JSValue jsPos = args[0];
 		int pos = jsPos.ToInteger();
+
+		if (!checkForSingle(evLibIsReady))
+			return;
+
 		lockData();
 		g_sharedData.num = pos;
 		runSyncEvent(evSelectObject);
@@ -1151,20 +1167,6 @@ namespace QuestNavigator {
 			return;
 		}
 
-		//// Готовим данные для передачи в поток
-		//lockData();
-		//g_sharedData.str = "abc";
-		//runSyncEvent(evTest);
-		//unlockData();
-
-		//// Ждём возврата данных из потока
-		//string blabla = "";
-		//waitForSingle(evCommitted);
-		//lockData();
-		//blabla = g_sharedData.str;
-		//unlockData();
-		//	showMessage(blabla, "");
-
 
 
 
@@ -1214,10 +1216,8 @@ namespace QuestNavigator {
 	// Остановка потока библиотеки. Вызывается только раз при завершении программы.
 	void QnApplicationListener::StopLibThread()
 	{
-		//Utility.WriteLog("StopLibThread: enter");    	
-		////Контекст UI
-		////Останавливаем поток библиотеки
-		//libThreadHandler.getLooper().quit();
+		if (!checkForSingle(evLibIsReady))
+			return;
 
 		// Сообщаем потоку библиотеки, что нужно завершить работу
 		runSyncEvent(evShutdown);
@@ -1272,6 +1272,8 @@ namespace QuestNavigator {
 		// Обработка событий происходит в цикле
 		bool bShutdown = false;
 		while (!bShutdown) {
+			// Сообщаем потоку Ui, что библиотека готова к выполнению команд
+			runSyncEvent(evLibIsReady);
 			// Ожидаем любое из событий синхронизации
 			DWORD res = WaitForMultipleObjects((DWORD)evLastUi, g_eventList, FALSE, INFINITE);
 			if ((res < WAIT_OBJECT_0) || (res > (WAIT_OBJECT_0 + evLast - 1))) {
