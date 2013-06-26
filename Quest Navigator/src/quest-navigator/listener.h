@@ -105,7 +105,7 @@ namespace QuestNavigator {
 		static void qspSetGroupedContent(JSObject content);
 		static void qspShowSaveSlotsDialog(JSObject content);
 		static void qspMsg(WebString text);
-		static void qspError(WebString error);
+		static void qspError(JSObject error);
 		static void qspMenu(JSArray menu);
 		static void qspInput(WebString text);
 		static void qspView(WebString path);
@@ -176,6 +176,7 @@ namespace QuestNavigator {
 		evMsgClosed,			// Диалог MSG был закрыт.
 		evMenuClosed,			// Выбран пункт пользовательского меню.
 		evInputClosed,			// Диалог INPUT вернул результат.
+		evErrorClosed,			// Диалог с сообщением об ошибке был закрыт.
 
 		evLastUi,				// Маркер для разделения событий на две части.
 

@@ -859,7 +859,7 @@ namespace QuestNavigator {
 	{
 		jsCallApiFromLib("qspMsg", text);
 	}
-	void QnApplicationListener::qspError(WebString error)
+	void QnApplicationListener::qspError(JSObject error)
 	{
 		jsCallApiFromLib("qspError", error);
 	}
@@ -961,7 +961,7 @@ namespace QuestNavigator {
 	void QnApplicationListener::errorResult(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("error dialog closed!");
+		runSyncEvent(evErrorClosed);
 	}
 
 	void QnApplicationListener::userMenuResult(WebView* caller, const JSArray& args)
@@ -1403,59 +1403,37 @@ namespace QuestNavigator {
 		//Контекст библиотеки
 		if (successfull == QSP_FALSE)
 		{
-			showError(failMsg + " failed.");
+			//Контекст библиотеки
+			int line = -1;
+			int actIndex = -1;
+			string desc = "";
+			string loc = "";
+			int errorNum = -1;
+			QSP_CHAR* pErrorLoc = NULL;
+			QSPGetLastErrorData(&errorNum, &pErrorLoc, &actIndex, &line);
+			loc = Skin::applyHtmlFixes(fromQsp(pErrorLoc));
+			desc = Skin::applyHtmlFixes(fromQsp(QSPGetErrorDesc(errorNum)));
 
-			//     	//Контекст библиотеки
-			// 		Utility.WriteLog(failMsg + " failed");
+			// Обновляем скин
+			Skin::updateBaseVars();
+			Skin::updateMsgDialog();
+			// Если что-то изменилось, то передаем в яваскрипт
+			if (Skin::isSomethingChanged())
+			{
+				RefreshInt(QSP_TRUE);
+			}
 
-			// 		ContainerJniResult error = (ContainerJniResult) QSPGetLastErrorData();
-			//error.str2 = QSPGetErrorDesc(error.int1);
-			//  	String locName = skin.applyHtmlFixes((error.str1 == null) ? "" : error.str1);
-			//  	String errDesc = skin.applyHtmlFixes((error.str2 == null) ? "" : error.str2);
+			JSObject jsErrorContainer;
+			jsErrorContainer.SetProperty(WSLit("desc"), ToWebString(desc));
+			jsErrorContainer.SetProperty(WSLit("loc"), ToWebString(loc));
+			jsErrorContainer.SetProperty(WSLit("actIndex"), JSValue(actIndex));
+			jsErrorContainer.SetProperty(WSLit("line"), JSValue(line));
 
-			// 		if (libThread==null)
-			// 		{
-			// 			Utility.WriteLog("CheckQspResult: failed, libThread is null");
-			// 			return;
-			// 		}
+			// Передаём данные в поток UI
+			qspError(jsErrorContainer);
 
-			// 	    // Обновляем скин
-			//         skin.updateBaseVars();
-			//         skin.updateMsgDialog();
-			//         skin.updateEffects();
-			// 	    // Если что-то изменилось, то передаем в яваскрипт
-			// 	    if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
-			// 	    {
-			// 	        Utility.WriteLog("Hey! Skin was changed! Updating it before showing error dialog.");
-			// 	        RefreshInt(QSP_TRUE);
-			// 	    }
-			// 		
-			// 		dialogHasResult = false;
-			// 		
-			//     	final JSONObject jsErrorContainer = new JSONObject();
-			//     	try {
-			//              jsErrorContainer.put("desc", errDesc);
-			//              jsErrorContainer.put("loc", locName);
-			//              jsErrorContainer.put("actIndex", error.int2);
-			//              jsErrorContainer.put("line", error.int3);
-			//} catch (JSONException e) {
-			//  		Utility.WriteLog("ERROR - jsErrorContainer in CheckQspResult!");
-			//	e.printStackTrace();
-			//}
-			// 		
-			// 		mainActivity.runOnUiThread(new Runnable() {
-			// 			public void run() {
-			// 				jsQspError(jsErrorContainer);
-			// 				Utility.WriteLog("CheckQspResult(UI): error dialog showed");
-			// 			}
-			// 		});
-			//     	
-			// 		Utility.WriteLog("CheckQspResult: parking library thread");
-			//         while (!dialogHasResult) {
-			//         	setThreadPark();
-			//         }
-			//         parkThread = null;
-			// 		Utility.WriteLog("CheckQspResult: library thread unparked, finishing");
+			// Ждём закрытия диалога
+			waitForSingle(evErrorClosed);
 		}
 	}
 
