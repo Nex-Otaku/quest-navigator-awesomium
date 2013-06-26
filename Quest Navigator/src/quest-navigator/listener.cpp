@@ -657,49 +657,32 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::InputBox(const QSP_CHAR* prompt, QSP_CHAR* buffer, int maxLen)
 	{
-		//  	//Контекст библиотеки
-		//if (libThread==null)
-		//{
-		//	Utility.WriteLog("InputBox: failed, libThread is null");
-		//	return "";
-		//}
+		//Контекст библиотеки
 
-		//   // Обновляем скин
-		//   skin.updateBaseVars();
-		//   skin.updateInputDialog();
-		//   skin.updateEffects();
-		//   // Если что-то изменилось, то передаем в яваскрипт
-		//   if (skin.isSomethingChanged() && (skin.disableAutoRef != 1))
-		//   {
-		//       Utility.WriteLog("Hey! Skin was changed! Updating it before showing INPUT.");
-		//       RefreshInt(QSP_TRUE);
-		//   }
-		//
-		//String promptValue = "";
-		//if (prompt != null)
-		//	promptValue = prompt;
-		//
-		//dialogHasResult = false;
-		//
-		//  	final String inputboxTitle = skin.applyHtmlFixes(promptValue);
-		//mainActivity.runOnUiThread(new Runnable() {
-		//	public void run() {
-		//		inputboxResult = "";
-		//		jsQspInput(inputboxTitle);
-		//		Utility.WriteLog("InputBox(UI): dialog showed");
-		//	}
-		//});
-		//  	
-		//Utility.WriteLog("InputBox: parking library thread");
-		//      while (!dialogHasResult) {
-		//      	setThreadPark();
-		//      }
-		//      parkThread = null;
-		//Utility.WriteLog("InputBox: library thread unparked, finishing");
-		//  	return inputboxResult;
+		// Обновляем скин
+		Skin::updateBaseVars();
+		Skin::updateInputDialog();
+		// Если что-то изменилось, то передаем в яваскрипт
+		if (Skin::isSomethingChanged())
+		{
+			RefreshInt(QSP_TRUE);
+		}
 
+		string promptValue = fromQsp(prompt);
 
-		//wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
+		// Передаём данные в поток UI
+		qspInput(ToWebString(promptValue));
+
+		// Ждём закрытия диалога
+		waitForSingle(evInputClosed);
+
+		// Возвращаем результат в библиотеку
+		string result = "";
+		lockData();
+		result = g_sharedData.str;
+		unlockData();
+		wstring wResult = widen(result);
+		wcsncpy(buffer, wResult.c_str(), maxLen);
 	}
 
 
@@ -1000,7 +983,17 @@ namespace QuestNavigator {
 	void QnApplicationListener::inputResult(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("input dialog closed!!");
+		if (args.size() < 1) {
+			showError("Не указан параметр для inputResult!");
+			return;
+		}
+		JSValue jsText = args[0];
+		string text = ToString(jsText.ToString());
+
+		lockData();
+		g_sharedData.str = text;
+		runSyncEvent(evInputClosed);
+		unlockData();
 	}
 
 	void QnApplicationListener::setMute(WebView* caller, const JSArray& args)
@@ -1247,7 +1240,7 @@ namespace QuestNavigator {
 		QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
 		QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
 		QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
-		//QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
+		QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&InputBox);
 		QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowPicture);
 		//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
 		QSPSetCallBack(QSP_CALL_SYSTEM, (QSP_CALLBACK)&System);
