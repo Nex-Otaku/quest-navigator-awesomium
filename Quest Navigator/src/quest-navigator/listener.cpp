@@ -769,13 +769,8 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::Wait(int msecs)
 	{
-		//  	//Контекст библиотеки
-		//  	try {
-		//	Thread.sleep(msecs);
-		//} catch (InterruptedException e) {
-		//	Utility.WriteLog("WAIT in library thread was interrupted");
-		//	e.printStackTrace();
-		//}
+		//Контекст библиотеки
+		Sleep((DWORD)msecs);
 	}
 
 	void QnApplicationListener::ShowWindow(int type, QSP_BOOL isShow)
@@ -1235,7 +1230,7 @@ namespace QuestNavigator {
 		//QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
 		//QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
 		QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&ShowMessage);
-		//QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
+		QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Wait);
 		//QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
 		QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
 		QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
