@@ -711,10 +711,11 @@ namespace QuestNavigator {
 
 	int QnApplicationListener::GetMSCount()
 	{
-		////Контекст библиотеки
-		//return (int) (System.currentTimeMillis() - gameStartTime);
-
-		return 0;
+		//Контекст библиотеки
+		clock_t now = clock();
+		int elapsed = (int) (((now - gameStartTime) * 1000) / CLOCKS_PER_SEC);
+		gameStartTime = now;
+		return elapsed;
 	}
 
 	void QnApplicationListener::AddMenuItem(QSP_CHAR* name, QSP_CHAR* imgPath)
@@ -1016,6 +1017,7 @@ namespace QuestNavigator {
 	string QnApplicationListener::jsExecBuffer = "";
 	QnApplicationListener* QnApplicationListener::listener = NULL;
 	vector<ContainerMenuItem> QnApplicationListener::menuList;
+	clock_t QnApplicationListener::gameStartTime = 0;
 
 	//******************************************************************************
 	//******************************************************************************
@@ -1231,7 +1233,7 @@ namespace QuestNavigator {
 		//QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
 		QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&ShowMessage);
 		QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Wait);
-		//QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
+		QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
 		QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
 		QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
 		QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
@@ -1281,8 +1283,9 @@ namespace QuestNavigator {
 						//	            timerHandler.removeCallbacks(timerUpdateTask);
 						//	            timerHandler.postDelayed(timerUpdateTask, timerInterval);
 						//	            
-						//	            //Запускаем счетчик миллисекунд
-						//	            gameStartTime = System.currentTimeMillis();
+
+						//Запускаем счетчик миллисекунд
+						gameStartTime = clock();
 
 						//				//Создаем список для звуков и музыки
 						//				musicLock.lock();

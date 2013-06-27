@@ -12,6 +12,7 @@
 #include "utils.h"
 #include "interceptor.h"
 #include <vector>
+#include <time.h>
 
 using namespace Awesomium;
 
@@ -142,6 +143,7 @@ namespace QuestNavigator {
 		static string jsExecBuffer;
 		static QnApplicationListener* listener;
 		static vector<ContainerMenuItem> menuList;
+		static clock_t gameStartTime;
 
 		// ********************************************************************
 		// THREADS
