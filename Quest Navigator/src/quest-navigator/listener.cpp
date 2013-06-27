@@ -770,8 +770,8 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::ShowWindow(int type, QSP_BOOL isShow)
 	{
-		//// Контекст библиотеки
-		//skin.showWindow(type, isShow);
+		// Контекст библиотеки
+		Skin::showWindow(type, isShow);
 	}
 
 	void QnApplicationListener::System(QSP_CHAR* cmd)
@@ -1243,7 +1243,7 @@ namespace QuestNavigator {
 		QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&InputBox);
 		QSPSetCallBack(QSP_CALL_PLAYERINFO, (QSP_CALLBACK)&PlayerInfo);
 		QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowPicture);
-		//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
+		QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowWindow);
 		QSPSetCallBack(QSP_CALL_SYSTEM, (QSP_CALLBACK)&System);
 		//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
 		//QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
