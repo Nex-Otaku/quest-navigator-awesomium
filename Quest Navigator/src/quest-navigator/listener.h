@@ -156,17 +156,19 @@ namespace QuestNavigator {
 		// Основная функция потока библиотеки
 		static unsigned int __stdcall libThreadFunc(void* pvParam);
 
-
-
 		// Проверка результатов выполнения библиотечного кода
 		static void CheckQspResult(QSP_BOOL successfull, string failMsg);
-
+		// Установка и запуск таймера
+		static void startTimer(int msecs);
+		// Остановка таймера
+		static void stopTimer();
 	};
 
 	// Список событий для синхронизации потоков
 	enum eSyncEvent
 	{
 		// Ui -> Библиотека
+
 		evRunGame = 0,			// Запустить игру.
 		evStopGame,				// Остановить игру.
 		evShutdown,				// Завершить работу потока.
@@ -180,9 +182,12 @@ namespace QuestNavigator {
 		evInputClosed,			// Диалог INPUT вернул результат.
 		evErrorClosed,			// Диалог с сообщением об ошибке был закрыт.
 
+		evTimer,				// Сработал таймер
+
 		evLastUi,				// Маркер для разделения событий на две части.
 
 		// Библиотека -> Ui
+
 		evJsCommitted,			// Выполнить JS-запрос.
 
 		evGameStopped,			// Игра остановлена.
@@ -195,6 +200,8 @@ namespace QuestNavigator {
 	// Создаём объект ядра для синхронизации потоков,
 	// событие с автосбросом, инициализированное в занятом состоянии.
 	HANDLE CreateSyncEvent();
+	// Создаём таймер.
+	HANDLE CreateTimer();
 	// Получаем HANDLE события по его индексу
 	HANDLE getEventHandle(eSyncEvent ev);
 	// Запускаем событие

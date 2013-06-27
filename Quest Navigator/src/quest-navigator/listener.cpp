@@ -174,9 +174,6 @@ namespace QuestNavigator {
 		// Контекст UI
 		gameIsRunning = false;
 
-		//      //Создаем объект для таймера
-		//      timerHandler = new Handler(Looper.getMainLooper());
-
 		//Запускаем поток библиотеки
 		StartLibThread();
 	}
@@ -460,13 +457,8 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::SetTimer(int msecs)
 	{
-		//  	//Контекст библиотеки
-		//  	final int timeMsecs = msecs;
-		//mainActivity.runOnUiThread(new Runnable() {
-		//	public void run() {
-		//		timerInterval = timeMsecs;
-		//	}
-		//});
+		//Контекст библиотеки
+		startTimer(msecs);
 	}
 
 	void QnApplicationListener::ShowMessage(QSP_CHAR* message)
@@ -1040,6 +1032,17 @@ namespace QuestNavigator {
 		return eventHandle;
 	}
 
+	// Создаём таймер.
+	HANDLE CreateTimer()
+	{
+		HANDLE timerHandle = CreateWaitableTimer(NULL, FALSE, NULL);
+		if (timerHandle == NULL) {
+			showError("Не получилось создать таймер.");
+			exit(0);
+		}
+		return timerHandle;
+	}
+
 	// Получаем HANDLE события по его индексу
 	HANDLE getEventHandle(eSyncEvent ev)
 	{
@@ -1111,21 +1114,19 @@ namespace QuestNavigator {
 	// Запуск потока библиотеки. Вызывается только раз при старте программы.
 	void QnApplicationListener::StartLibThread()
 	{
-		//Utility.WriteLog("StartLibThread: enter ");    	
 		//Контекст UI
 		if (libThread != NULL)
 		{
-			//		Utility.WriteLog("StartLibThread: failed, libThread is not null");    	
 			showError("StartLibThread: failed, libThread is not null");
 			exit(0);
 			return;
 		}
 
 		// Инициализируем объекты синхронизации.
-		// Все используемые объекты - события с автосбросом, 
-		// инициализированные в занятом состоянии.
+		// Используемые объекты - события с автосбросом, 
+		// инициализированные в занятом состоянии, и один таймер.
 		for (int i = 0; i < (int)evLast; i++) {
-			HANDLE eventHandle = CreateSyncEvent();
+			HANDLE eventHandle = (i == (int)evTimer) ? CreateTimer() : CreateSyncEvent();
 			if (eventHandle == NULL)
 				return;
 			g_eventList[i] = eventHandle;
@@ -1226,7 +1227,7 @@ namespace QuestNavigator {
 
 		// Привязываем колбэки
 		QSPSetCallBack(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
-		//QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
+		QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
 		//QSPSetCallBack(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
 		//QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlay);
 		//QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
@@ -1246,8 +1247,6 @@ namespace QuestNavigator {
 
 		// Заполняем значения по умолчанию для скина
 		Skin::initDefaults();
-
-
 
 		// Обработка событий происходит в цикле
 		bool bShutdown = false;
@@ -1277,12 +1276,9 @@ namespace QuestNavigator {
 						Skin::resetSettings();
 						// Очищаем буфер JS-команд, передаваемых из игры
 						jsExecBuffer = "";
-						//	            //Запускаем таймер
-						//	            timerInterval = 500;
-						//	            timerStartTime = System.currentTimeMillis();
-						//	            timerHandler.removeCallbacks(timerUpdateTask);
-						//	            timerHandler.postDelayed(timerUpdateTask, timerInterval);
-						//	            
+
+						// Устанавливаем период выполнения и запускаем таймер
+						startTimer(500);
 
 						//Запускаем счетчик миллисекунд
 						gameStartTime = clock();
@@ -1316,8 +1312,9 @@ namespace QuestNavigator {
 				case evStopGame:
 					{
 						// Остановка игры
-						//	//останавливаем таймер
-						//	timerHandler.removeCallbacks(timerUpdateTask);
+
+						// Останавливаем таймер.
+						stopTimer();
 
 						//	//останавливаем музыку
 						//	libThreadHandler.post(new Runnable() {
@@ -1325,6 +1322,7 @@ namespace QuestNavigator {
 						//			CloseFile(null);
 						//		}
 						//	});
+
 						// Очищаем буфер JS-команд, передаваемых из игры
 						jsExecBuffer = "";
 
@@ -1371,6 +1369,13 @@ namespace QuestNavigator {
 						unlockData();
 						QSP_BOOL res = QSPSetSelObjectIndex(pos, QSP_TRUE);
 						CheckQspResult(res, "QSPSetSelObjectIndex");
+					}
+					break;
+				case evTimer:
+					{
+						// Таймер
+						QSP_BOOL res = QSPExecCounter(QSP_TRUE);
+						CheckQspResult(res, "QSPExecCounter");
 					}
 					break;
 				default:
@@ -1435,4 +1440,26 @@ namespace QuestNavigator {
 		}
 	}
 
+	// Установка и запуск таймера
+	void QnApplicationListener::startTimer(int msecs)
+	{
+		// Устанавливаем период выполнения
+		LARGE_INTEGER dueTime;
+		dueTime.QuadPart = -(msecs * 10000);
+
+		//Запускаем таймер
+		BOOL res = SetWaitableTimer(getEventHandle(evTimer), &dueTime, (LONG)msecs, NULL, NULL, FALSE);
+		if (res == 0) {
+			showError("Не удалось установить интервал таймера!");
+		}
+	}
+
+	// Остановка таймера
+	void QnApplicationListener::stopTimer()
+	{
+		BOOL res = CancelWaitableTimer(getEventHandle(evTimer));
+		if (res == 0) {
+			showError("Не удалось остановить таймер!");
+		}
+	}
 }
