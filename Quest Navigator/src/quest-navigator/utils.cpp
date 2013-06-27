@@ -364,6 +364,13 @@ namespace QuestNavigator {
 		transform(str.begin(), str.end(), strUpper.begin(), ::toupper);
 		return strUpper;
 	}
+	// Переводим все символы в нижний регистр
+	string toLower(string str)
+	{
+		string strLower = str;
+		transform(str.begin(), str.end(), strLower.begin(), ::tolower);
+		return strLower;
+	}
 
 	// Преобразование URL ссылки вида <a href="EXEC:...">...</a> в код QSP
 	string unescapeHtml(string text)

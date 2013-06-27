@@ -686,19 +686,21 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::PlayerInfo(QSP_CHAR* resource, QSP_CHAR* buffer, int maxLen)
 	{
-		////Контекст библиотеки
-		//resource = resource.toLowerCase();
-		//if (resource.equals("platform")) {
-		//	return "Android";
-		//} else if (resource.equals("player")) {
-		//	return "Quest Navigator";
-		//} else if (resource.equals("player.version")) {
-		//	return "1.0.0";
-		//}
-		//return "";
+		//Контекст библиотеки
+		string resourceName = fromQsp(resource);
+		resourceName = toLower(resourceName);
+		string result = "";
+		if (resourceName == "platform") {
+			result = "Windows";
+		} else if (resourceName == "player") {
+			result = "Quest Navigator";
+		} else if (resourceName == "player.version") {
+			result = "1.0.0";
+		}
 
-
-		//wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
+		// Возвращаем результат в библиотеку
+		wstring wResult = widen(result);
+		wcsncpy(buffer, wResult.c_str(), maxLen);
 	}
 
 	int QnApplicationListener::GetMSCount()
@@ -1239,6 +1241,7 @@ namespace QuestNavigator {
 		QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
 		QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
 		QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&InputBox);
+		QSPSetCallBack(QSP_CALL_PLAYERINFO, (QSP_CALLBACK)&PlayerInfo);
 		QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowPicture);
 		//QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
 		QSPSetCallBack(QSP_CALL_SYSTEM, (QSP_CALLBACK)&System);
