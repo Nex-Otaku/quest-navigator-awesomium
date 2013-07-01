@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "configuration.h"
 #include "skin.h"
+#include "sound.h"
 #include <process.h>
 #include <algorithm>
 
@@ -29,6 +30,7 @@ namespace QuestNavigator {
 		string str;
 		int num;
 		JSValue jsValue;
+		bool flag;
 	} g_sharedData;
 
 	// События для синхронизации потоков
@@ -210,94 +212,6 @@ namespace QuestNavigator {
 		unlockData();
 
 		gameIsRunning = true;
-
-		////Контекст UI
-		//if (!Utility.CheckAssetExists(uiContext, fileName, "runGame"))
-		//	return;
-
-		//if (libThreadHandler == null)
-		//{
-		//	Utility.WriteLog("runGame: failed, libThreadHandler is null");
-		//	return;
-		//}
-
-		//if (libraryThreadIsRunning)
-		//{
-		//	Utility.WriteLog("runGame: failed, library thread is already running");
-		//	return;
-		//}
-
-		//libThreadHandler.post(new Runnable() {
-		//	public void run() {
-		//		InputStream fIn = null;
-		//		int size = 0;
-
-		//		AssetManager assetManager = uiContext.getAssets();
-		//		if (assetManager == null)
-		//		{
-		//			Utility.WriteLog("runGame(in library thread): failed, assetManager is null");
-		//			return;
-		//		}
-		//		try {
-		//			fIn = assetManager.open(gameFileName);
-		//			size = fIn.available();
-		//		} catch (Exception e) {
-		//			e.printStackTrace();
-		//			Utility.ShowError(uiContext, "Не удалось получить доступ к файлу");
-		//			try {
-		//				fIn.close();
-		//			} catch (IOException e1) {
-		//				Utility.ShowError(uiContext, "Не удалось освободить дескриптор файла");
-		//				e1.printStackTrace();
-		//			}
-		//			return;
-		//		}
-
-		//		byte[] inputBuffer = new byte[size];
-		//		try {
-		//			// Fill the Buffer with data from the file
-		//			fIn.read(inputBuffer);
-		//			fIn.close();
-		//		} catch (IOException e) {
-		//			e.printStackTrace();
-		//			Utility.ShowError(uiContext, "Не удалось прочесть файл");
-		//			return;
-		//		}
-
-		//		if (!inited)
-		//			QSPInit();
-		//		final bool gameLoaded = QSPLoadGameWorldFromData(inputBuffer, size, gameFileName);
-		//		CheckQspResult(gameLoaded, "runGame: QSPLoadGameWorldFromData");
-
-		//		if (gameLoaded)
-		//		{
-		//			mainActivity.runOnUiThread(new Runnable() {
-		//				public void run() {
-		//					//Запускаем таймер
-		//					timerInterval = 500;
-		//					timerStartTime = System.currentTimeMillis();
-		//					timerHandler.removeCallbacks(timerUpdateTask);
-		//					timerHandler.postDelayed(timerUpdateTask, timerInterval);
-
-		//					//Запускаем счетчик миллисекунд
-		//					gameStartTime = System.currentTimeMillis();
-
-		//					//Все готово, запускаем игру
-		//					libThreadHandler.post(new Runnable() {
-		//						public void run() {
-		//							libraryThreadIsRunning = true;
-		//							bool result = QSPRestartGame(true);
-		//							CheckQspResult(result, "runGame: QSPRestartGame");
-		//							libraryThreadIsRunning = false;
-		//						}
-		//					});
-
-		//					gameIsRunning = true;
-		//				}
-		//			});
-		//		}
-		//	}
-		//});
 	}
 
 	void QnApplicationListener::StopGame(bool restart)
@@ -485,149 +399,23 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::PlayFile(QSP_CHAR* file, int volume)
 	{
-		//  	//Контекст библиотеки
-		//  	file = Utility.QspPathTranslate(file);
-		//  	
-		//  	if (file == null || file.length() == 0)
-		//  	{
-		//  		Utility.WriteLog("ERROR - filename is " + (file == null ? "null" : "empty"));
-		//  		return;
-		//  	}
-		//  	
-		//  	//Проверяем, проигрывается ли уже этот файл.
-		//  	//Если проигрывается, ничего не делаем.
-		//  	if (CheckPlayingFileSetVolume(file, true, volume))
-		//  		return;
-
-		//  	// Добавляем к имени файла полный путь
-		//  	String prefix = "";
-		//  	if (curGameDir != null)
-		//  		prefix = curGameDir;
-		//  	String assetFilePath = prefix.concat(file);
-
-		//  	//Проверяем, существует ли файл.
-		////Если нет, ничего не делаем.
-		//      if (!Utility.CheckAssetExists(uiContext, assetFilePath, "PlayFile"))
-		//      	return;
-
-		//  	AssetManager assetManager = uiContext.getAssets();
-		//  	if (assetManager == null)
-		//  	{
-		//  		Utility.WriteLog("PlayFile: failed, assetManager is null");
-		//  		return;
-		//  	}
-		//  	AssetFileDescriptor afd = null;
-		//  	try {
-		//	afd = assetManager.openFd(assetFilePath);
-		//} catch (IOException e) {
-		//	e.printStackTrace();
-		//	return;
-		//}
-		//  	if (afd == null)
-		//  		return;
-		//      
-		//  	MediaPlayer mediaPlayer = new MediaPlayer();
-		//   try {
-		//	mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-		//} catch (IllegalArgumentException e) {
-		//	e.printStackTrace();
-		//	return;
-		//} catch (IllegalStateException e) {
-		//	e.printStackTrace();
-		//	return;
-		//} catch (IOException e) {
-		//	e.printStackTrace();
-		//	return;
-		//}
-		//   try {
-		//	mediaPlayer.prepare();
-		//} catch (IllegalStateException e) {
-		//	e.printStackTrace();
-		//	return;
-		//} catch (IOException e) {
-		//	e.printStackTrace();
-		//	return;
-		//}
-		//final String fileName = file;
-		//mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-		//	@Override
-		//	public void onCompletion(MediaPlayer mp) {
-		//        musicLock.lock();
-		//        try {
-		//	    	for (int i=0; i<mediaPlayersList.size(); i++)
-		//	    	{
-		//	    		ContainerMusic it = mediaPlayersList.elementAt(i);    		
-		//	    		if (it.path.equals(fileName))
-		//	    		{
-		//	    			it.player.release();
-		//	    			it.player = null;
-		//	    			mediaPlayersList.remove(it);
-		//	    			break;
-		//	    		}
-		//	    	}
-		//        } finally {
-		//        	musicLock.unlock();
-		//        }
-		//	}
-		//});
-		//
-		//      musicLock.lock();
-		//      try {
-		//	float realVolume = GetRealVolume(volume);
-		//	mediaPlayer.setVolume(realVolume, realVolume);
-		//    mediaPlayer.start();
-		//    ContainerMusic ContainerMusic = new ContainerMusic();
-		//    ContainerMusic.path = file;
-		//    ContainerMusic.volume = volume;
-		//    ContainerMusic.player = mediaPlayer;
-		//      	mediaPlayersList.add(ContainerMusic);
-		//      } finally {
-		//      	musicLock.unlock();
-		//      }
+		//Контекст библиотеки
+		string fileName = fromQsp(file);
+		SoundManager::play(fileName, volume);
 	}
 
 	QSP_BOOL QnApplicationListener::IsPlayingFile(QSP_CHAR* file)
 	{
-		////Контекст библиотеки
-		//return CheckPlayingFileSetVolume(Utility.QspPathTranslate(file), false, 0);
-
-		return QSP_FALSE;
+		//Контекст библиотеки
+		bool isPlaying = SoundManager::isPlaying(fromQsp(file));
+		return isPlaying ? QSP_TRUE : QSP_FALSE;
 	}
 
 	void QnApplicationListener::CloseFile(QSP_CHAR* file)
 	{
-		////Контекст библиотеки
-		//file = Utility.QspPathTranslate(file);
-		//
-		////Если вместо имени файла пришел null, значит закрываем все файлы(CLOSE ALL)
-		//bool bCloseAll = false;
-		//if (file == null)
-		//	bCloseAll = true;
-		//else if (file.length() == 0)
-		//	return;
-		//   musicLock.lock();
-		//   try {
-		//	for (int i=0; i<mediaPlayersList.size(); i++)
-		//	{
-		//		ContainerMusic it = mediaPlayersList.elementAt(i);    		
-		//		if (bCloseAll || it.path.equals(file))
-		//		{
-		//			if (it.player.isPlaying())
-		//				it.player.stop();
-		//			it.player.release();
-		//			it.player = null;
-		//			if (!bCloseAll)
-		//			{
-		//				mediaPlayersList.remove(it);
-		//				break;
-		//			}
-		//		}
-		//	}
-		//	if (bCloseAll)
-		//		mediaPlayersList.clear();
-		//   } finally {
-		//   	musicLock.unlock();
-		//   }
+		//Контекст библиотеки
+		bool closeAll = file == NULL;
+		SoundManager::close(closeAll, fromQsp(file));
 	}
 
 	void QnApplicationListener::ShowPicture(QSP_CHAR* file)
@@ -989,7 +777,17 @@ namespace QuestNavigator {
 	void QnApplicationListener::setMute(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("mute called!");
+		if (args.size() < 1) {
+			showError("Не указан параметр для setMute!");
+			return;
+		}
+		JSValue jsFlag = args[0];
+		bool flag = jsFlag.ToBoolean();
+
+		lockData();
+		g_sharedData.flag = flag;
+		runSyncEvent(evMute);
+		unlockData();
 	}
 
 	// ********************************************************************
@@ -1142,58 +940,12 @@ namespace QuestNavigator {
 			return;
 		}
 
-
 		libThread = (HANDLE)_beginthreadex(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
 		if (libThread == NULL) {
 			showError("Не получилось создать поток интерпретатора.");
 			exit(0);
 			return;
 		}
-
-
-
-
-
-		//final QspLib pluginObject = this; 
-
-		////Запускаем поток библиотеки
-		//Thread t = new Thread() {
-		//	public void run() {
-		//		Looper.prepare();
-		//		libThreadHandler = new Handler();
-		//		Utility.WriteLog("LibThread runnable: libThreadHandler is set");    	
-
-		//		libThreadHandler.post(new Runnable() {
-		//			public void run() {
-		//				// Создаем скин
-		//				skin = new QspSkin(pluginObject);
-
-		//				//Создаем список для звуков и музыки
-		//				musicLock.lock();
-		//				try {
-		//					mediaPlayersList = new Vector<ContainerMusic>();
-		//					muted = false;
-		//				} finally {
-		//					musicLock.unlock();
-		//				}
-
-		//				// Сообщаем яваскрипту, что библиотека запущена
-		//				// и можно продолжить инициализацию
-		//				mainActivity.runOnUiThread(new Runnable() {
-		//					public void run() {
-		//						jsInitNext();
-		//					}
-		//				});
-		//			}
-		//		});
-
-		//		Looper.loop();
-		//		Utility.WriteLog("LibThread runnable: library thread exited");
-		//	}
-		//};
-		//libThread = t;
-		//t.start();
-		//Utility.WriteLog("StartLibThread: success");
 	}
 
 	// Остановка потока библиотеки. Вызывается только раз при завершении программы.
@@ -1215,7 +967,6 @@ namespace QuestNavigator {
 		}
 		// Высвобождаем структуру критической секции
 		DeleteCriticalSection(&g_csSharedData);
-		//Utility.WriteLog("StopLibThread: success");    	
 	}
 
 	// Основная функция потока библиотеки. Вызывается только раз за весь жизненный цикл программы.
@@ -1231,9 +982,9 @@ namespace QuestNavigator {
 		QSPSetCallBack(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
 		QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
 		//QSPSetCallBack(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
-		//QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlay);
-		//QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
-		//QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
+		QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlayingFile);
+		QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
+		QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
 		QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&ShowMessage);
 		QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Wait);
 		QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
@@ -1251,8 +1002,15 @@ namespace QuestNavigator {
 		// Заполняем значения по умолчанию для скина
 		Skin::initDefaults();
 
-		// Обработка событий происходит в цикле
+		// Флаг для завершения потока
 		bool bShutdown = false;
+
+		// Запускаем движок Audiere для проигрывания звуковых файлов
+		if (!SoundManager::init()) {
+			bShutdown = true;
+		}
+
+		// Обработка событий происходит в цикле
 		while (!bShutdown) {
 			// Сообщаем потоку UI, что библиотека готова к выполнению команд
 			runSyncEvent(evLibIsReady);
@@ -1286,28 +1044,6 @@ namespace QuestNavigator {
 						//Запускаем счетчик миллисекунд
 						gameStartTime = clock();
 
-						//				//Создаем список для звуков и музыки
-						//				musicLock.lock();
-						//				try {
-						//					mediaPlayersList = new Vector<ContainerMusic>();
-						//					muted = false;
-						//				} finally {
-						//					musicLock.unlock();
-						//				}
-
-						//	            //Все готово, запускаем игру
-						//	            libThreadHandler.post(new Runnable() {
-						//	        		public void run() {
-						//	                	libraryThreadIsRunning = true;
-						//	        			boolean result = QSPRestartGame(true);
-						//CheckQspResult(result, "runGame: QSPRestartGame");
-						//	                	libraryThreadIsRunning = false;
-						//	        		}
-						//	            });
-
-						//	            
-						//	            gameIsRunning = true;
-
 						res = QSPRestartGame(QSP_TRUE);
 						CheckQspResult(res, "QSPRestartGame");
 					}
@@ -1319,12 +1055,8 @@ namespace QuestNavigator {
 						// Останавливаем таймер.
 						stopTimer();
 
-						//	//останавливаем музыку
-						//	libThreadHandler.post(new Runnable() {
-						//		public void run() {
-						//			CloseFile(null);
-						//		}
-						//	});
+							//останавливаем музыку
+						CloseFile(NULL);
 
 						// Очищаем буфер JS-команд, передаваемых из игры
 						jsExecBuffer = "";
@@ -1381,6 +1113,16 @@ namespace QuestNavigator {
 						CheckQspResult(res, "QSPExecCounter");
 					}
 					break;
+				case evMute:
+					{
+						// Включение / выключение звука
+						bool flag = false;
+						lockData();
+						flag = g_sharedData.flag;
+						unlockData();
+						SoundManager::mute(flag);
+					}
+					break;
 				default:
 					{
 						showError("Необработанное событие синхронизации!");
@@ -1390,6 +1132,10 @@ namespace QuestNavigator {
 				}
 			}
 		}
+
+		// Останавливаем звуковой движок
+		SoundManager::close(true, "");
+		SoundManager::deinit();
 
 		// Завершаем работу библиотеки
 		QSPDeInit();

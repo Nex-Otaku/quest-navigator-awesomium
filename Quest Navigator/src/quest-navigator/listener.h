@@ -175,6 +175,7 @@ namespace QuestNavigator {
 		evExecuteCode,			// Выполнить строку кода.
 		evExecuteAction,		// Выполнить действие.
 		evSelectObject,			// Выбрать предмет.
+		evMute,					// Включить / выключить звук.
 
 		evJsExecuted,			// JS-запрос выполнен.
 		evMsgClosed,			// Диалог MSG был закрыт.

@@ -66,6 +66,8 @@ namespace QuestNavigator {
 	string getCurrentDir();
 	// Меняем слэши в пути к файлу в зависимости от системы
 	string getRightPath(string path);
+	// Загружаем файл в память
+	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength);
 
 	// Прочее
 

@@ -62,7 +62,7 @@ namespace QuestNavigator {
 	}
 	string fromQsp(QSP_CHAR* str)
 	{
-		wstring wStr;
+		wstring wStr = L"";
 		if (str != NULL)
 			wStr = str;
 		return narrow(wStr);
@@ -159,6 +159,51 @@ namespace QuestNavigator {
 		#endif
 		return result;
 	}
+
+	// Загружаем файл в память
+	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength)
+	{
+		// Открываем файл для чтения
+		wstring wPath = widen(path);
+		HANDLE hFile = CreateFile(wPath.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+			return false;
+		// Узнаём размер файла
+		DWORD dwFileSize = GetFileSize(hFile, NULL);
+		if (dwFileSize == INVALID_FILE_SIZE) {
+			CloseHandle(hFile);
+			return false;
+		}
+		// Выделяем блок памяти
+		char* pFileChunk = NULL;
+		// Может не хватить памяти (если файл слишком большой)
+		try {
+			pFileChunk = new char[dwFileSize];
+		} catch (...) {
+			CloseHandle(hFile);
+			return false;
+		}
+		// Читаем файл в память
+		DWORD dwBytesRead = 0;
+		BOOL res = ReadFile(hFile, pFileChunk, dwFileSize, &dwBytesRead, NULL);
+		if ((res == FALSE) || (dwBytesRead != dwFileSize)) {
+			CloseHandle(hFile);
+			delete pFileChunk;
+			return false;
+		}
+		// Закрываем файл
+		res = CloseHandle(hFile);
+		if (res == 0) {
+			delete pFileChunk;
+			return false;
+		}
+		// Возвращаем результат
+		*bufferPtr = pFileChunk;
+		*bufferLength = (int)dwFileSize;
+		// Не забываем освободить память вызовом "delete" после использования!
+		return true;
+	}
+
 
 	// Загрузка конфигурации плеера
 	void initOptions()
