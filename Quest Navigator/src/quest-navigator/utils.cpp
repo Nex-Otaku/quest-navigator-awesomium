@@ -333,6 +333,13 @@ namespace QuestNavigator {
 			//string fullPath = startsWith(contentPath.substr(1), ":\\") ?
 			//	contentPath : getCurrentDir() + "\\" + contentPath;
 			//Configuration::setContentPath(fullPath);
+		} else {
+			// Не задан путь к игре
+			Configuration::setString(ecpContentDir, "");
+			Configuration::setString(ecpSkinFile, "");
+			Configuration::setString(ecpGameFile, "");
+			Configuration::setString(ecpConfigFile, "");
+			Configuration::setString(ecpSaveDir, "");
 		}
 	}
 
