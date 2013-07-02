@@ -208,6 +208,9 @@ namespace QuestNavigator {
 	// Загрузка конфигурации плеера
 	void initOptions()
 	{
+		// Устанавливаем параметры по умолчанию
+		Configuration::setBool(ecpSoundCacheEnabled, false);
+
 		// Разбираем параметры запуска
 		int argCount = 0;
 		LPWSTR* szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
@@ -236,9 +239,13 @@ namespace QuestNavigator {
 				contentPath = param;
 				contentPathSet = true;
 			} else if (isOption) {
-				// Пока что ни одна опция не работает
-				showError("Неизвестная опция: [" + param + "]");
-				return;
+				// Разбираем опции
+				if (param == "-enable-sound-cache") {
+					Configuration::setBool(ecpSoundCacheEnabled, true);
+				} else {
+					showError("Неизвестная опция: [" + param + "]");
+					return;
+				}
 			} else {
 				showError("Неизвестный параметр: [" + param + "]\n" +
 					"Возможно, путь к файлу содержит пробелы и вы забыли взять его в кавычки.");

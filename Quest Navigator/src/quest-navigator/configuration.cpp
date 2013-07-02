@@ -8,12 +8,14 @@ namespace QuestNavigator {
 		_type = ecvInvalid;
 		_str = "";
 		_num = 0;
+		_flag = false;
 	}
 	ConfigValue::ConfigValue(string str)
 	{
 		_type = ecvString;
 		_str = str;
 		_num = 0;
+		_flag = false;
 	}
 	string ConfigValue::getString()
 	{
@@ -32,6 +34,7 @@ namespace QuestNavigator {
 		_type = ecvInt;
 		_str = "";
 		_num = num;
+		_flag = false;
 	}
 	int ConfigValue::getInt()
 	{
@@ -44,6 +47,25 @@ namespace QuestNavigator {
 	{
 		_type = ecvInt;
 		_num = num;
+	}
+	ConfigValue::ConfigValue(bool flag)
+	{
+		_type = ecvBool;
+		_str = "";
+		_num = 0;
+		_flag = flag;
+	}
+	bool ConfigValue::getBool()
+	{
+		if (_type != ecvBool) {
+			showError("Неправильно указан тип параметра");
+		}
+		return _flag;
+	}
+	void ConfigValue::setBool(bool flag)
+	{
+		_type = ecvBool;
+		_flag = flag;
 	}
 	eConfigValueType ConfigValue::getType()
 	{
@@ -60,5 +82,14 @@ namespace QuestNavigator {
 	{
 		_paramList[param].setString(value);
 	}
+	bool Configuration::getBool(eConfigParam param)
+	{
+		return _paramList[param].getBool();
+	}
+	void Configuration::setBool(eConfigParam param, bool value)
+	{
+		_paramList[param].setBool(value);
+	}
+
 
 }

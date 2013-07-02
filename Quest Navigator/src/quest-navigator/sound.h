@@ -28,6 +28,7 @@ namespace QuestNavigator {
 		static vector<ContainerMusic> vecMusic;
 		static AudioDevicePtr audioDevice;
 		static bool muted;
+		static bool cacheEnabled;
 
 		static bool checkPlayingFileSetVolume(string file, bool setVolume, int volume);
 		static float getRealVolume(int volume);

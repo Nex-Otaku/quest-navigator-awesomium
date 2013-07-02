@@ -16,6 +16,7 @@ namespace QuestNavigator {
 		ecpGameFile,
 		ecpConfigFile,
 		ecpSaveDir,
+		ecpSoundCacheEnabled,
 
 		ecpLast
 	};
@@ -24,6 +25,7 @@ namespace QuestNavigator {
 	{
 		ecvInt = 0,
 		ecvString,
+		ecvBool,
 		ecvInvalid
 	};
 
@@ -32,6 +34,7 @@ namespace QuestNavigator {
 		eConfigValueType _type;
 		string _str;
 		int _num;
+		bool _flag;
 	public:
 		ConfigValue();
 		ConfigValue(string str);
@@ -40,6 +43,9 @@ namespace QuestNavigator {
 		ConfigValue(int num);
 		int getInt();
 		void setInt(int num);
+		ConfigValue(bool flag);
+		bool getBool();
+		void setBool(bool flag);
 		eConfigValueType getType();
 	};
 
@@ -52,6 +58,8 @@ namespace QuestNavigator {
 	public:
 		static string getString(eConfigParam param);
 		static void setString(eConfigParam param, string value);
+		static bool getBool(eConfigParam param);
+		static void setBool(eConfigParam param, bool value);
 
 	};
 }

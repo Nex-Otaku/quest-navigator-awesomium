@@ -7,6 +7,7 @@ namespace QuestNavigator {
 	vector<SoundManager::ContainerMusic> SoundManager::vecMusic;
 	AudioDevicePtr SoundManager::audioDevice = NULL;
 	bool SoundManager::muted = false;
+	bool SoundManager::cacheEnabled = false;
 
 	bool SoundManager::checkPlayingFileSetVolume(string file, bool setVolume, int volume)
 	{
@@ -19,13 +20,20 @@ namespace QuestNavigator {
 			ContainerMusic& it = vecMusic[i];
 			if (it.name == file)
 			{
+				foundPlaying = setVolume || !cacheEnabled || it.sound->isPlaying();
 				if (setVolume)
 				{
 					it.volume = volume;
 					float realVolume = getRealVolume(volume);
 					it.sound->setVolume(realVolume);
+					// Если файл уже не проигрывается, но остался в кэше,
+					// запускаем проигрывание.
+					// Трек по завершению был отмотан на начало,
+					// поэтому просто вызываем play().
+					if (cacheEnabled && !it.sound->isPlaying()) {
+						it.sound->play();
+					}
 				}
-				foundPlaying = true;
 				break;
 			}
 		}
@@ -69,21 +77,27 @@ namespace QuestNavigator {
 	void AudiereStopCallbackHolder::streamStopped(StopEvent* event)
 	{
 		if (event->getReason() == StopEvent::STREAM_ENDED) {
-			// Убираем звук из вектора
+			// Обрабатываем завершение трека
 			SoundManager::clearBySoundPtr(event->getOutputStream());
 		}
 	}
 
 	void SoundManager::clearBySoundPtr(OutputStreamPtr sound)
 	{
-		// Останавливаем указанный трек и очищаем структуру данных
+		// Останавливаем указанный трек
 		lockMusicData();
 		for (int i = 0; i < (int)vecMusic.size(); i++) {
 			ContainerMusic& container = vecMusic[i];
 			if (container.sound == sound) {
-				container.sound->stop();
-				container.sound = 0;
-				vecMusic.erase(vecMusic.begin() + i);
+				if (cacheEnabled) {
+					// Устанавливаем на начало
+					container.sound->reset();
+				} else {
+					// Выгружаем из памяти
+					container.sound->stop();
+					container.sound = 0;
+					vecMusic.erase(vecMusic.begin() + i);
+				}
 				break;
 			}
 		}
@@ -92,6 +106,8 @@ namespace QuestNavigator {
 
 	bool SoundManager::init()
 	{
+		// Загружаем настройки
+		cacheEnabled = Configuration::getBool(ecpSoundCacheEnabled);
 		// Инициализируем структуру критической секции
 		try {
 			InitializeCriticalSection(&csMusicData);
@@ -129,8 +145,10 @@ namespace QuestNavigator {
 			return;
 		}
 
-		//Проверяем, проигрывается ли уже этот файл.
-		//Если проигрывается, ничего не делаем.
+		// Проверяем, проигрывается ли уже этот файл.
+		// Если проигрывается, ничего не делаем.
+		// Если файл закэширован, функция перезапустит его и вернёт true,
+		// опять же ничего делать не требуется.
 		if (checkPlayingFileSetVolume(file, true, volume))
 			return;
 
@@ -193,15 +211,22 @@ namespace QuestNavigator {
 			{
 				if (container.sound->isPlaying())
 					container.sound->stop();
-				container.sound = 0;
+				if (cacheEnabled) {
+					// Устанавливаем трек на начало
+					container.sound->reset();
+				} else {
+					// Высвобождаем память
+					container.sound = 0;
+				}
 				if (!closeAll)
 				{
-					vecMusic.erase(vecMusic.begin() + i);
+					if (!cacheEnabled)
+						vecMusic.erase(vecMusic.begin() + i);
 					break;
 				}
 			}
 		}
-		if (closeAll)
+		if (!cacheEnabled && closeAll)
 			vecMusic.clear();
 		unlockMusicData();
 	}
