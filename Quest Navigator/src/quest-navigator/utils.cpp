@@ -8,6 +8,7 @@
 #include <Awesomium/STLHelpers.h>
 #include <vector>
 #include <algorithm>
+#include "../deps/md5/md5.h"
 
 using namespace Awesomium;
 
@@ -204,12 +205,21 @@ namespace QuestNavigator {
 		return true;
 	}
 
+	// Создаём папки
+	bool buildDirectoryPath(string path)
+	{
+		wstring wPath = widen(path);
+		int res = SHCreateDirectoryEx(NULL, wPath.c_str(), NULL);
+		return res == ERROR_SUCCESS;
+	}
+
 
 	// Загрузка конфигурации плеера
 	void initOptions()
 	{
 		// Устанавливаем параметры по умолчанию
 		Configuration::setBool(ecpSoundCacheEnabled, false);
+		Configuration::setInt(ecpSaveSlotMax, 5);
 
 		// Разбираем параметры запуска
 		int argCount = 0;
@@ -319,7 +329,7 @@ namespace QuestNavigator {
 				showError("Не удалось получить путь к папке \"Мои документы\".");
 				return;
 			}
-			saveDir = narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH;
+			saveDir = narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH + "\\" + md5(contentDir);
 
 			// Сохраняем конфигурацию
 			Configuration::setString(ecpContentDir, contentDir);

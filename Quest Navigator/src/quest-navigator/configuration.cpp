@@ -76,20 +76,89 @@ namespace QuestNavigator {
 
 	string Configuration::getString(eConfigParam param)
 	{
-		return _paramList[param].getString();
+		string result = "";
+		lockConfigData();
+		result = _paramList[param].getString();
+		unlockConfigData();
+		return result;
 	}
 	void Configuration::setString(eConfigParam param, string value)
 	{
+		lockConfigData();
 		_paramList[param].setString(value);
+		unlockConfigData();
+	}
+	int Configuration::getInt(eConfigParam param)
+	{
+		int result = 0;
+		lockConfigData();
+		result = _paramList[param].getInt();
+		unlockConfigData();
+		return result;
+	}
+	void Configuration::setInt(eConfigParam param, int value)
+	{
+		lockConfigData();
+		_paramList[param].setInt(value);
+		unlockConfigData();
 	}
 	bool Configuration::getBool(eConfigParam param)
 	{
-		return _paramList[param].getBool();
+		bool result = false;
+		lockConfigData();
+		result = _paramList[param].getBool();
+		unlockConfigData();
+		return result;
 	}
 	void Configuration::setBool(eConfigParam param, bool value)
 	{
+		lockConfigData();
 		_paramList[param].setBool(value);
+		unlockConfigData();
 	}
 
+	bool Configuration::init()
+	{
+		// Инициализируем структуру критической секции
+		try {
+			InitializeCriticalSection(&csConfigData);
+		} catch (...) {
+			showError("Не удалось проинициализировать структуру критической секции.");
+			return false;
+		}
+		initedCritical = true;
+		return true;
+	}
+
+	void Configuration::deinit()
+	{
+		// Высвобождаем структуру критической секции
+		if (initedCritical) {
+			DeleteCriticalSection(&csConfigData);
+			initedCritical = false;
+		}
+	}
+
+	// Синхронизация потоков
+	bool Configuration::initedCritical = false;
+	// Структура для критических секций
+	CRITICAL_SECTION Configuration::csConfigData;
+
+	// Входим в критическую секцию
+	void Configuration::lockConfigData()
+	{
+		try {
+			EnterCriticalSection(&csConfigData);
+		} catch (...) {
+			showError("Не удалось войти в критическую секцию.");
+			exit(0);
+		}
+	}
+
+	// Выходим из критической секции
+	void Configuration::unlockConfigData()
+	{
+		LeaveCriticalSection(&csConfigData);
+	}
 
 }

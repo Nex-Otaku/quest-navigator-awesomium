@@ -91,6 +91,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\qsplib-experimental\regexp.c" />
     <ClCompile Include="src\common\method_dispatcher.cc" />
+    <ClCompile Include="src\deps\md5\md5.cpp" />
     <ClCompile Include="src\deps\qsp\actions.c" />
     <ClCompile Include="src\deps\qsp\callbacks.c" />
     <ClCompile Include="src\deps\qsp\codetools.c" />

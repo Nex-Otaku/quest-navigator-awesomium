@@ -22,6 +22,9 @@
     <Filter Include="Заголовочные файлы\special">
       <UniqueIdentifier>{44adb32d-02d5-4ed9-936f-e7a808d325ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы исходного кода\md5">
+      <UniqueIdentifier>{c2a01194-03a3-4677-bfb6-b75dcc6bd5cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cc">
@@ -176,6 +179,9 @@
     </ClCompile>
     <ClCompile Include="src\quest-navigator\sound.cpp">
       <Filter>Файлы исходного кода\special</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\md5\md5.cpp">
+      <Filter>Файлы исходного кода\md5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

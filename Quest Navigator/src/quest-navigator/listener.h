@@ -61,6 +61,7 @@ namespace QuestNavigator {
 		void FreeResources();
 		void runGame(string fileName);
 		void StopGame(bool restart);
+		JSObject getSaveSlots(bool open);
 		virtual void executeCode(string qspCode);
 		virtual bool textInputIsFocused();
 
@@ -100,11 +101,11 @@ namespace QuestNavigator {
 		// В потоке Ui
 		void processLibJsCall();
 		void jsCallApiFromUi(string name, JSValue arg);
+		void qspShowSaveSlotsDialog(JSObject content);
 
 		// В потоке библиотеки
 		static void jsCallApiFromLib(string name, JSValue arg);
 		static void qspSetGroupedContent(JSObject content);
-		static void qspShowSaveSlotsDialog(JSObject content);
 		static void qspMsg(WebString text);
 		static void qspError(JSObject error);
 		static void qspMenu(JSArray menu);
@@ -144,6 +145,7 @@ namespace QuestNavigator {
 		static QnApplicationListener* listener;
 		static vector<ContainerMenuItem> menuList;
 		static clock_t gameStartTime;
+		static int timerInterval;
 
 		// ********************************************************************
 		// THREADS
@@ -159,7 +161,7 @@ namespace QuestNavigator {
 		// Проверка результатов выполнения библиотечного кода
 		static void CheckQspResult(QSP_BOOL successfull, string failMsg);
 		// Установка и запуск таймера
-		static void startTimer(int msecs);
+		static void startTimer();
 		// Остановка таймера
 		static void stopTimer();
 	};
@@ -182,6 +184,8 @@ namespace QuestNavigator {
 		evMenuClosed,			// Выбран пункт пользовательского меню.
 		evInputClosed,			// Диалог INPUT вернул результат.
 		evErrorClosed,			// Диалог с сообщением об ошибке был закрыт.
+		evLoadSlotSelected,		// Был выбран слот для загрузки.
+		evSaveSlotSelected,		// Был выбран слот для сохранения.
 
 		evTimer,				// Сработал таймер
 

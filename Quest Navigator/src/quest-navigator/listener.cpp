@@ -82,7 +82,8 @@ namespace QuestNavigator {
 		data_source_ = new DataPakSource(ToWebString("assets.pak"));
 		view_->web_view()->session()->AddDataSource(WSLit("webui"), data_source_);
 
-		QuestNavigator::initOptions();
+		Configuration::init();
+		initOptions();
 
 		std::string url = QuestNavigator::getContentUrl();
 		view_->web_view()->LoadURL(WebURL(ToWebString(url)));
@@ -182,17 +183,19 @@ namespace QuestNavigator {
 
 	void QnApplicationListener::FreeResources()
 	{
-		//Контекст UI
+		// Контекст UI
 
-		//Процедура "честного" высвобождения всех ресурсов - в т.ч. остановка потока библиотеки
+		// Процедура "честного" высвобождения всех ресурсов - в т.ч. остановка потока библиотеки
 
-		//Очищаем ВСЕ на выходе
+		// Очищаем ВСЕ на выходе
 		if (gameIsRunning)
 		{
 			StopGame(false);
 		}
-		//Останавливаем поток библиотеки
+		// Останавливаем поток библиотеки
 		StopLibThread();
+		// Завершаем работу класса конфигурации
+		Configuration::deinit();
 	}
 
 	void QnApplicationListener::runGame(string fileName)
@@ -226,6 +229,29 @@ namespace QuestNavigator {
 			waitForSingle(evGameStopped);
 			gameIsRunning = false;
 		}
+	}
+
+	JSObject QnApplicationListener::getSaveSlots(bool open)
+	{
+		//Контекст UI
+		JSArray jsSlots;
+		int maxSlots = Configuration::getInt(ecpSaveSlotMax);
+		for (int i = 0; i < maxSlots; i++)
+		{
+			string title;
+			string slotname = to_string(i + 1) + ".sav";
+			string slotpath = getRightPath(Configuration::getString(ecpSaveDir) + "\\" + slotname);
+			if (fileExists(slotpath))
+				title = to_string(i + 1);
+			else
+				title = "-empty-";
+			jsSlots.Push(ToWebString(title));
+		}
+
+		JSObject jsSlotsContainer;
+		jsSlotsContainer.SetProperty(WSLit("open"), JSValue(open ? 1 : 0));
+		jsSlotsContainer.SetProperty(WSLit("slots"), jsSlots);
+		return jsSlotsContainer;
 	}
 
 	// Выполнение строки кода
@@ -372,7 +398,7 @@ namespace QuestNavigator {
 	void QnApplicationListener::SetTimer(int msecs)
 	{
 		//Контекст библиотеки
-		startTimer(msecs);
+		timerInterval = msecs;
 	}
 
 	void QnApplicationListener::ShowMessage(QSP_CHAR* message)
@@ -625,32 +651,39 @@ namespace QuestNavigator {
 		// Дожидаемся ответа, что JS-запрос выполнен.
 		waitForSingle(evJsExecuted);
 	}
-	void QnApplicationListener::qspSetGroupedContent(JSObject content)
-	{
-		jsCallApiFromLib("qspSetGroupedContent", content);
-	}
 	void QnApplicationListener::qspShowSaveSlotsDialog(JSObject content)
 	{
-		jsCallApiFromLib("qspShowSaveSlotsDialog", content);
+		// Контекст UI
+		jsCallApiFromUi("qspShowSaveSlotsDialog", content);
+	}
+	void QnApplicationListener::qspSetGroupedContent(JSObject content)
+	{
+		// Контекст библиотеки
+		jsCallApiFromLib("qspSetGroupedContent", content);
 	}
 	void QnApplicationListener::qspMsg(WebString text)
 	{
+		// Контекст библиотеки
 		jsCallApiFromLib("qspMsg", text);
 	}
 	void QnApplicationListener::qspError(JSObject error)
 	{
+		// Контекст библиотеки
 		jsCallApiFromLib("qspError", error);
 	}
 	void QnApplicationListener::qspMenu(JSArray menu)
 	{
+		// Контекст библиотеки
 		jsCallApiFromLib("qspMenu", menu);
 	}
 	void QnApplicationListener::qspInput(WebString text)
 	{
+		// Контекст библиотеки
 		jsCallApiFromLib("qspInput", text);
 	}
 	void QnApplicationListener::qspView(WebString path)
 	{
+		// Контекст библиотеки
 		jsCallApiFromLib("qspView", path);
 	}
 
@@ -715,19 +748,58 @@ namespace QuestNavigator {
 	void QnApplicationListener::loadGame(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("game load dialog need to be opened!");
+		// Останавливаем таймер
+		stopTimer();
+		// Загружаем список файлов и отдаем в яваскрипт
+		JSObject slots = getSaveSlots(true);
+		qspShowSaveSlotsDialog(slots);
 	}
 
 	void QnApplicationListener::saveGame(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("game save dialog need to be opened!");
+		// Останавливаем таймер
+		stopTimer();
+		// Загружаем список файлов и отдаем в яваскрипт
+		JSObject slots = getSaveSlots(false);
+		qspShowSaveSlotsDialog(slots);
 	}
 
 	void QnApplicationListener::saveSlotSelected(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		app_->ShowMessage("slot selected!");
+		if (args.size() < 2) {
+			showError("Не указаны параметры для saveSlotSelected!");
+			return;
+		}
+		// Номер слота
+		JSValue jsIndex = args[0];
+		int index = jsIndex.ToInteger();
+		// 1 - загрузка, 0 - сохранение
+		JSValue jsMode = args[1];
+		int mode = jsMode.ToInteger();
+
+		if (index == -1)
+		{
+			// Запускаем таймер
+			startTimer();
+			return;
+		}
+
+		if (!checkForSingle(evLibIsReady))
+			return;
+
+		if (mode == 1) {
+			lockData();
+			g_sharedData.num = index;
+			runSyncEvent(evLoadSlotSelected);
+			unlockData();
+		} else {
+			lockData();
+			g_sharedData.num = index;
+			runSyncEvent(evSaveSlotSelected);
+			unlockData();
+		}
 	}
 
 	void QnApplicationListener::msgResult(WebView* caller, const JSArray& args)
@@ -810,6 +882,7 @@ namespace QuestNavigator {
 	QnApplicationListener* QnApplicationListener::listener = NULL;
 	vector<ContainerMenuItem> QnApplicationListener::menuList;
 	clock_t QnApplicationListener::gameStartTime = 0;
+	int QnApplicationListener::timerInterval = 0;
 
 	//******************************************************************************
 	//******************************************************************************
@@ -1039,7 +1112,8 @@ namespace QuestNavigator {
 						jsExecBuffer = "";
 
 						// Устанавливаем период выполнения и запускаем таймер
-						startTimer(500);
+						SetTimer(500);
+						startTimer();
 
 						//Запускаем счетчик миллисекунд
 						gameStartTime = clock();
@@ -1055,7 +1129,7 @@ namespace QuestNavigator {
 						// Останавливаем таймер.
 						stopTimer();
 
-							//останавливаем музыку
+						//останавливаем музыку
 						CloseFile(NULL);
 
 						// Очищаем буфер JS-команд, передаваемых из игры
@@ -1121,6 +1195,53 @@ namespace QuestNavigator {
 						flag = g_sharedData.flag;
 						unlockData();
 						SoundManager::mute(flag);
+					}
+					break;
+				case evLoadSlotSelected:
+					{
+						int index = 0;
+						lockData();
+						index = g_sharedData.num;
+						unlockData();
+						jsExecBuffer = "";
+
+						string path = Configuration::getString(ecpSaveDir) + "\\" + to_string(index) + ".sav";
+						if (!fileExists(path)) {
+							showError("Не найден файл сохранения");
+							break;
+						}
+
+						// Выключаем музыку
+						CloseFile(NULL);
+
+						// Загружаем сохранение
+						QSP_BOOL res = QSPOpenSavedGame(widen(path).c_str(), QSP_TRUE);
+						CheckQspResult(res, "QSPOpenSavedGame");
+
+						// Запускаем таймер
+						startTimer();
+					}
+					break;
+				case evSaveSlotSelected:
+					{
+						int index = 0;
+						lockData();
+						index = g_sharedData.num;
+						unlockData();
+						jsExecBuffer = "";
+
+						string saveDir = Configuration::getString(ecpSaveDir);
+						if (!dirExists(saveDir) && !buildDirectoryPath(saveDir)) {
+							showError("Не удалось создать папку для сохранения: " + saveDir);
+							break;
+						}
+
+						string path = saveDir + "\\" + to_string(index) + ".sav";
+
+						QSP_BOOL res = QSPSaveGame(widen(path).c_str(), QSP_FALSE);
+						CheckQspResult(res, "QSPSaveGame");
+
+						startTimer();
 					}
 					break;
 				default:
@@ -1190,14 +1311,14 @@ namespace QuestNavigator {
 	}
 
 	// Установка и запуск таймера
-	void QnApplicationListener::startTimer(int msecs)
+	void QnApplicationListener::startTimer()
 	{
 		// Устанавливаем период выполнения
 		LARGE_INTEGER dueTime;
-		dueTime.QuadPart = -(msecs * 10000);
+		dueTime.QuadPart = -(timerInterval * 10000);
 
 		//Запускаем таймер
-		BOOL res = SetWaitableTimer(getEventHandle(evTimer), &dueTime, (LONG)msecs, NULL, NULL, FALSE);
+		BOOL res = SetWaitableTimer(getEventHandle(evTimer), &dueTime, (LONG)timerInterval, NULL, NULL, FALSE);
 		if (res == 0) {
 			showError("Не удалось установить интервал таймера!");
 		}

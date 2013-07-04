@@ -68,6 +68,8 @@ namespace QuestNavigator {
 	string getRightPath(string path);
 	// Загружаем файл в память
 	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength);
+	// Создаём папки
+	bool buildDirectoryPath(string path);
 
 	// Прочее
 
