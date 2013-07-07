@@ -42,14 +42,14 @@
     <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>.\build\bin\русских и не только буков тест! Приве́т नमस्ते</OutDir>
+    <OutDir>.\build\bin\русских буков тест!</OutDir>
     <TargetName>QuestNavigator</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>.\build\bin\русских и не только буков тест! Приве́т नमस्ते</OutDir>
+    <OutDir>.\build\bin\русских буков тест!</OutDir>
     <TargetName>QuestNavigator</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -59,14 +59,18 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>EXPORT;_CRT_SECURE_NO_WARNINGS;WIN32;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>D:\dev\sdks\audiere-1.9.4-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>audiere.lib;shlwapi.lib;awesomium.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\dev\sdks\audiere-1.9.4-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -77,16 +81,19 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>EXPORT;_CRT_SECURE_NO_WARNINGS;WIN32;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>D:\dev\sdks\audiere-1.9.4-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>audiere.lib;shlwapi.lib;awesomium.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\dev\sdks\audiere-1.9.4-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>"$(SolutionDir)installer\make_install.cmd" "$(SolutionDir)build\bin" "$(TargetDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\qsplib-experimental\regexp.c" />

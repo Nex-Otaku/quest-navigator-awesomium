@@ -19,6 +19,7 @@ namespace QuestNavigator {
 		ecpSaveDir,
 		ecpSoundCacheEnabled,
 		ecpSaveSlotMax,
+		ecpWindowTitle,
 
 		ecpLast
 	};

@@ -16,6 +16,10 @@ namespace QuestNavigator {
 	static const string DEFAULT_CONTENT_REL_PATH = "standalone_content";
 	static const string DEFAULT_SKIN_FILE = "gameAwesomium.html";
 	static const string DEFAULT_SAVE_REL_PATH = "Сохранения игр Quest Navigator";
+	static const string QN_WINDOWS_UPDATE_FEED = "http://feeds.feedburner.com/text-games/quest-navigator-windows";
+	static const string QN_COMPANY_NAME = "QSP";
+	static const string QN_APP_NAME = "Quest Navigator";
+	static const string QN_VERSION = "0.0.1";
 
 	// Утилиты для преобразования строк
 
@@ -75,6 +79,11 @@ namespace QuestNavigator {
 
 	// Устанавливаем конфигурацию плеера при старте
 	void initOptions();
+
+	// Проверяем наличие апдейта при старте
+	void checkUpdate();
+	// Завершаем работу апдейтера по выходу из приложения
+	void finishUpdate();
 
 	// Показываем системный диалог MessageBox
 	void showMessage(string msg, string title);

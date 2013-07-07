@@ -2,16 +2,18 @@
 #include <Awesomium/WebCore.h>
 #include <Awesomium/STLHelpers.h>
 #include <vector>
+#include "../quest-navigator/utils.h"
+#include "../quest-navigator/configuration.h"
 
 class ViewWin;
 
 static bool g_is_initialized = false;
 static std::vector<ViewWin*> g_active_views_;
 const wchar_t szWindowClass[] = L"ViewWinClass";
-const wchar_t szTitle[] = L"Application";
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 using namespace Awesomium;
+using namespace QuestNavigator;
 
 class ViewWin : public View,
 	public WebViewListener::View {
@@ -26,10 +28,13 @@ public:
 
 		web_view_->set_view_listener(this);
 
+		wstring wWindowTitle = widen(Configuration::getString(ecpWindowTitle));
+		LPCWSTR wszTitle = wWindowTitle.c_str();
+
 		// Create our WinAPI Window
 		HINSTANCE hInstance = GetModuleHandle(0);
 		hwnd_ = CreateWindow(szWindowClass,
-			szTitle,
+			wszTitle,
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,

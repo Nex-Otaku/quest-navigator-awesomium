@@ -66,6 +66,9 @@ namespace QuestNavigator {
 	void QnApplicationListener::OnLoaded() {
 		// Контекст UI
 
+		Configuration::init();
+		initOptions();
+
 		view_ = View::Create(512, 512);
 
 		// Перехватчик запросов, выполняющихся при нажатии на ссылку.
@@ -82,11 +85,13 @@ namespace QuestNavigator {
 		data_source_ = new DataPakSource(ToWebString("assets.pak"));
 		view_->web_view()->session()->AddDataSource(WSLit("webui"), data_source_);
 
-		Configuration::init();
-		initOptions();
-
 		std::string url = QuestNavigator::getContentUrl();
 		view_->web_view()->LoadURL(WebURL(ToWebString(url)));
+
+		// Проверяем обновления
+		#ifdef _WIN32
+		checkUpdate();
+		#endif
 	}
 
 	// Inherited from Application::Listener
@@ -101,6 +106,11 @@ namespace QuestNavigator {
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnShutdown() {
 		FreeResources();
+
+		// Завершаем работу апдейтера
+		#ifdef _WIN32
+		finishUpdate();
+		#endif
 	}
 
 	void QnApplicationListener::BindMethods(WebView* web_view) {
@@ -507,9 +517,9 @@ namespace QuestNavigator {
 		if (resourceName == "platform") {
 			result = "Windows";
 		} else if (resourceName == "player") {
-			result = "Quest Navigator";
+			result = QN_APP_NAME;
 		} else if (resourceName == "player.version") {
-			result = "1.0.0";
+			result = QN_VERSION;
 		}
 
 		// Возвращаем результат в библиотеку

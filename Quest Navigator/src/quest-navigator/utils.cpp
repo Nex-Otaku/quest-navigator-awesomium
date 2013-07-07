@@ -3,6 +3,7 @@
 #ifdef _WIN32
 #include <shlwapi.h>
 #include <Shlobj.h>
+#include <winsparkle.h>
 #endif
 
 #include <Awesomium/STLHelpers.h>
@@ -263,6 +264,12 @@ namespace QuestNavigator {
 			}
 		}
 		// Всё разобрано правильно
+		string contentDir = "";
+		string skinFile = "";
+		string gameFile = "";
+		string configFile = "";
+		string saveDir = "";
+		string windowTitle = QN_APP_NAME + " " + QN_VERSION;
 		if (contentPathSet) {
 			// Нам передали путь к игре.
 			// Всего три варианта:
@@ -270,10 +277,7 @@ namespace QuestNavigator {
 			// 2. Это путь к файлу .qsp;
 			// 3. Это путь к папке игры.
 			// Проверяем путь на существование и читаемость.
-			string contentDir = getCurrentDir();
-			string skinFile = "";
-			string gameFile = "";
-			string configFile = "";
+			contentDir = getCurrentDir();
 
 			bool bValidDirectory = dirExists(contentPath);
 			bool bValidFile = fileExists(contentPath);
@@ -321,7 +325,7 @@ namespace QuestNavigator {
 			// STUB
 			// Сделать проверку всех файлов на читаемость
 
-			string saveDir = "";
+			saveDir = "";
 			// Путь к пользовательской папке "Мои документы"
 			WCHAR wszPath[MAX_PATH];
 			HRESULT hr = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, wszPath);
@@ -330,27 +334,34 @@ namespace QuestNavigator {
 				return;
 			}
 			saveDir = narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH + "\\" + md5(contentDir);
-
-			// Сохраняем конфигурацию
-			Configuration::setString(ecpContentDir, contentDir);
-			Configuration::setString(ecpSkinFile, skinFile);
-			Configuration::setString(ecpGameFile, gameFile);
-			Configuration::setString(ecpConfigFile, configFile);
-			Configuration::setString(ecpSaveDir, saveDir);
-
-			//// В параметре конфигурации ContentPath пока что будет храниться
-			//// полный путь к html-файлу проекта.
-			//string fullPath = startsWith(contentPath.substr(1), ":\\") ?
-			//	contentPath : getCurrentDir() + "\\" + contentPath;
-			//Configuration::setContentPath(fullPath);
-		} else {
-			// Не задан путь к игре
-			Configuration::setString(ecpContentDir, "");
-			Configuration::setString(ecpSkinFile, "");
-			Configuration::setString(ecpGameFile, "");
-			Configuration::setString(ecpConfigFile, "");
-			Configuration::setString(ecpSaveDir, "");
 		}
+		// Сохраняем конфигурацию
+		Configuration::setString(ecpContentDir, contentDir);
+		Configuration::setString(ecpSkinFile, skinFile);
+		Configuration::setString(ecpGameFile, gameFile);
+		Configuration::setString(ecpConfigFile, configFile);
+		Configuration::setString(ecpSaveDir, saveDir);
+		Configuration::setString(ecpWindowTitle, windowTitle);
+	}
+
+	// Проверяем наличие апдейта при старте
+	void checkUpdate()
+	{
+		// Initialize WinSparkle as soon as the app itself is initialized, right
+		// before entering the event loop:
+		win_sparkle_set_appcast_url(QN_WINDOWS_UPDATE_FEED.c_str());
+		win_sparkle_set_app_details(widen(QN_COMPANY_NAME).c_str(), 
+			widen(QN_APP_NAME).c_str(),
+			widen(QN_VERSION).c_str());
+
+		win_sparkle_init();
+
+		//win_sparkle_check_update_with_ui();
+	}
+	// Завершаем работу апдейтера по выходу из приложения
+	void finishUpdate()
+	{
+		win_sparkle_cleanup();
 	}
 
 	// Показываем системный диалог MessageBox
