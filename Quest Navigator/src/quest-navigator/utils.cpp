@@ -303,13 +303,13 @@ namespace QuestNavigator {
 				// Сохраняем путь к папке игры
 				contentDir = contentPath;
 				// Вычисляем пути к необходимым файлам
-				skinFile = contentDir + "\\" + DEFAULT_SKIN_FILE;
+				skinFile = getRightPath(contentDir + "\\" + DEFAULT_SKIN_FILE);
 				// STUB
 				// Сделать проверку на количество QSP-файлов, 
 				// если файлов более одного, то выводить ошибку.
 				// Сделать поиск QSP-файлов.
-				gameFile = contentDir + "\\" + "game.qsp";
-				configFile = contentDir + "\\" + "config.xml";
+				gameFile = getRightPath(contentDir + "\\" + "game.qsp");
+				configFile = getRightPath(contentDir + "\\" + "config.xml");
 			} else {
 				DWORD error = GetLastError();
 				if (error == ERROR_FILE_NOT_FOUND) {
@@ -333,7 +333,7 @@ namespace QuestNavigator {
 				showError("Не удалось получить путь к папке \"Мои документы\".");
 				return;
 			}
-			saveDir = narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH + "\\" + md5(contentDir);
+			saveDir = getRightPath(narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH + "\\" + md5(contentDir));
 		}
 		// Сохраняем конфигурацию
 		Configuration::setString(ecpContentDir, contentDir);

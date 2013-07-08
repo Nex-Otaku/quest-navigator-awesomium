@@ -630,7 +630,12 @@ namespace QuestNavigator {
 	{
 		//Контекст библиотеки
 		if (file != 0) {
-			string saveFile = getRightPath(Configuration::getString(ecpSaveDir) + "\\" + fromQsp(file));
+			string saveDir = Configuration::getString(ecpSaveDir);
+			if (!dirExists(saveDir) && !buildDirectoryPath(saveDir)) {
+				showError("Не удалось создать папку для сохранения: " + saveDir);
+				return;
+			}
+			string saveFile = getRightPath(saveDir + "\\" + fromQsp(file));
 			QSP_BOOL res = QSPSaveGame(widen(saveFile).c_str(), QSP_FALSE);
 			CheckQspResult(res, "QSPSaveGame");
 		} else {
@@ -1241,7 +1246,7 @@ namespace QuestNavigator {
 						unlockData();
 						jsExecBuffer = "";
 
-						string path = Configuration::getString(ecpSaveDir) + "\\" + to_string(index) + ".sav";
+						string path = getRightPath(Configuration::getString(ecpSaveDir) + "\\" + to_string(index) + ".sav");
 						if (!fileExists(path)) {
 							showError("Не найден файл сохранения");
 							break;
@@ -1272,7 +1277,7 @@ namespace QuestNavigator {
 							break;
 						}
 
-						string path = saveDir + "\\" + to_string(index) + ".sav";
+						string path = getRightPath(saveDir + "\\" + to_string(index) + ".sav");
 
 						QSP_BOOL res = QSPSaveGame(widen(path).c_str(), QSP_FALSE);
 						CheckQspResult(res, "QSPSaveGame");
