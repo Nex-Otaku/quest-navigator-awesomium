@@ -71,6 +71,9 @@
       <Command>
       </Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)installer\assets_files\make_assets.cmd"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -92,8 +95,11 @@
       <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>"$(SolutionDir)installer\make_install.cmd" "$(SolutionDir)build\bin" "$(TargetDir)"</Command>
+      <Command>"$(SolutionDir)installer\make_install.cmd" "$(TargetDir)"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>"$(SolutionDir)installer\assets_files\make_assets.cmd"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\qsplib-experimental\regexp.c" />
