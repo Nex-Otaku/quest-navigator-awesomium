@@ -89,6 +89,8 @@ namespace QuestNavigator {
 		static void Wait(int msecs);
 		static void ShowWindow(int type, QSP_BOOL isShow);
 		static void System(QSP_CHAR* cmd);
+		static void OpenGameStatus(QSP_CHAR* file);
+		static void SaveGameStatus(QSP_CHAR* file);
 
 		// ********************************************************************
 		// ********************************************************************

@@ -612,6 +612,32 @@ namespace QuestNavigator {
 		}
 	}
 
+	void QnApplicationListener::OpenGameStatus(QSP_CHAR* file)
+	{
+		//Контекст библиотеки
+		if (file != 0) {
+			string saveFile = getRightPath(Configuration::getString(ecpSaveDir) + "\\" + fromQsp(file));
+			if (fileExists(saveFile)) {
+				QSP_BOOL res = QSPOpenSavedGame(widen(saveFile).c_str(), QSP_FALSE);
+				CheckQspResult(res, "QSPOpenSavedGame");
+			}
+		} else {
+			jsExecBuffer = jsExecBuffer + ";qspLoadGame();";
+		}
+	}
+
+	void QnApplicationListener::SaveGameStatus(QSP_CHAR* file)
+	{
+		//Контекст библиотеки
+		if (file != 0) {
+			string saveFile = getRightPath(Configuration::getString(ecpSaveDir) + "\\" + fromQsp(file));
+			QSP_BOOL res = QSPSaveGame(widen(saveFile).c_str(), QSP_FALSE);
+			CheckQspResult(res, "QSPSaveGame");
+		} else {
+			jsExecBuffer = jsExecBuffer + ";qspSaveGame();";
+		}
+	}
+
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************
@@ -1079,8 +1105,8 @@ namespace QuestNavigator {
 		QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowPicture);
 		QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowWindow);
 		QSPSetCallBack(QSP_CALL_SYSTEM, (QSP_CALLBACK)&System);
-		//QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
-		//QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
+		QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
+		QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
 
 		// Заполняем значения по умолчанию для скина
 		Skin::initDefaults();
