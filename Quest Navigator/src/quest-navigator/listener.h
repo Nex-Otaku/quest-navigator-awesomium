@@ -75,6 +75,7 @@ namespace QuestNavigator {
 
 		static void RefreshInt(int isRedraw);
 		static void SetTimer(int msecs);
+		static void SetInputStrText(QSP_CHAR* text);
 		static void ShowMessage(QSP_CHAR* message);
 		static void PlayFile(QSP_CHAR* file, int volume);
 		static QSP_BOOL IsPlayingFile(QSP_CHAR* file);
@@ -113,6 +114,7 @@ namespace QuestNavigator {
 		static void qspMenu(JSArray menu);
 		static void qspInput(WebString text);
 		static void qspView(WebString path);
+		static void qspSetInputString(WebString text);
 
 		// ********************************************************************
 		// ********************************************************************
@@ -133,6 +135,8 @@ namespace QuestNavigator {
 		void userMenuResult(WebView* caller, const JSArray& args);
 		void inputResult(WebView* caller, const JSArray& args);
 		void setMute(WebView* caller, const JSArray& args);
+		void setInputString(WebView* caller, const JSArray& args);
+		void runInputString(WebView* caller, const JSArray& args);
 
 		// ********************************************************************
 		// Вспомогательные обработчики для отладки
@@ -188,6 +192,8 @@ namespace QuestNavigator {
 		evErrorClosed,			// Диалог с сообщением об ошибке был закрыт.
 		evLoadSlotSelected,		// Был выбран слот для загрузки.
 		evSaveSlotSelected,		// Был выбран слот для сохранения.
+		evInputStringChanged,	// Изменился текст в строке ввода.
+		evInputStringEntered,	// Нажали Enter в строке ввода.
 
 		evTimer,				// Сработал таймер
 

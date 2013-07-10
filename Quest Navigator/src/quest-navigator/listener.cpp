@@ -164,6 +164,14 @@ namespace QuestNavigator {
 				WSLit("setMute"),
 				JSDelegate(this, &QnApplicationListener::setMute));
 
+			method_dispatcher_.Bind(app_object,
+				WSLit("setInputString"),
+				JSDelegate(this, &QnApplicationListener::setInputString));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("runInputString"),
+				JSDelegate(this, &QnApplicationListener::runInputString));
+
 			// Привязываем колбэк для обработки вызовов alert
 			method_dispatcher_.Bind(app_object,
 				WSLit("alert"),
@@ -409,6 +417,12 @@ namespace QuestNavigator {
 	{
 		//Контекст библиотеки
 		timerInterval = msecs;
+	}
+
+	void QnApplicationListener::SetInputStrText(QSP_CHAR* text)
+	{
+		//Контекст библиотеки
+		qspSetInputString(ToWebString(fromQsp(text)));
 	}
 
 	void QnApplicationListener::ShowMessage(QSP_CHAR* message)
@@ -727,6 +741,11 @@ namespace QuestNavigator {
 		// Контекст библиотеки
 		jsCallApiFromLib("qspView", path);
 	}
+	void QnApplicationListener::qspSetInputString(WebString text)
+	{
+		// Контекст библиотеки
+		jsCallApiFromLib("qspSetInputString", text);
+	}
 
 
 
@@ -901,6 +920,30 @@ namespace QuestNavigator {
 		g_sharedData.flag = flag;
 		runSyncEvent(evMute);
 		unlockData();
+	}
+
+	void QnApplicationListener::setInputString(WebView* caller, const JSArray& args)
+	{
+		// Контекст UI
+		// Изменился текст в строке ввода
+		if (args.size() < 1) {
+			showError("Не указан параметр для setInputString!");
+			return;
+		}
+		JSValue jsText = args[0];
+		string text = ToString(jsText.ToString());
+
+		lockData();
+		g_sharedData.str = text;
+		runSyncEvent(evInputStringChanged);
+		unlockData();
+	}
+
+	void QnApplicationListener::runInputString(WebView* caller, const JSArray& args)
+	{
+		// Контекст UI
+		// Нажали Enter в строке ввода
+		runSyncEvent(evInputStringEntered);
 	}
 
 	// ********************************************************************
@@ -1095,7 +1138,7 @@ namespace QuestNavigator {
 		// Привязываем колбэки
 		QSPSetCallBack(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
 		QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
-		//QSPSetCallBack(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
+		QSPSetCallBack(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
 		QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlayingFile);
 		QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
 		QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
@@ -1283,6 +1326,22 @@ namespace QuestNavigator {
 						CheckQspResult(res, "QSPSaveGame");
 
 						startTimer();
+					}
+					break;
+				case evInputStringChanged:
+					{
+						// Изменился текст в строке ввода
+						string text = "";
+						lockData();
+						text = g_sharedData.str;
+						unlockData();
+						QSPSetInputStrText(widen(text).c_str());
+					}
+					break;
+				case evInputStringEntered:
+					{
+						QSP_BOOL res = QSPExecUserInput(QSP_TRUE);
+						CheckQspResult(res, "QSPExecUserInput");
 					}
 					break;
 				default:
