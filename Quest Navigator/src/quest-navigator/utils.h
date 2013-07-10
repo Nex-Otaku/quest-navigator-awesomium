@@ -19,7 +19,7 @@ namespace QuestNavigator {
 	static const string QN_WINDOWS_UPDATE_FEED = "http://feeds.feedburner.com/text-games/quest-navigator-windows";
 	static const string QN_COMPANY_NAME = "QSP";
 	static const string QN_APP_NAME = "Quest Navigator";
-	static const string QN_VERSION = "0.0.1";
+	static const string QN_VERSION = "0.0.2";
 
 	// Утилиты для преобразования строк
 
