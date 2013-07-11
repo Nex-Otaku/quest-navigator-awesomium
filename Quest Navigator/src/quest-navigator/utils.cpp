@@ -108,7 +108,7 @@ namespace QuestNavigator {
 		// Файл "assets.pak" ищется в рабочей папке.
 		string contentPath = Configuration::getString(ecpSkinFile);
 		string contentUrl = (contentPath.length() == 0) ?
-			"asset://webui/" + backslashToSlash(DEFAULT_CONTENT_REL_PATH + "\\" + DEFAULT_SKIN_FILE) : 
+			"asset://webui/" + backslashToSlash(DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER + DEFAULT_SKIN_FILE) : 
 		getUrlFromFilePath(contentPath);
 		return contentUrl;
 	}
@@ -294,16 +294,34 @@ namespace QuestNavigator {
 					showError("Загрузка архива qn ещё не реализована.");
 					return false;
 				} else {
-					// STUB
-					showError("Загрузка файла qsp ещё не реализована.");
-					return false;
+					// Сохраняем путь к файлу игры
+					gameFile = contentPath;
+					// Вычисляем путь к папке игры
+					contentDir = "";
+					if (contentPath.length() > 0) {
+						int pos = contentPath.find_last_of(PATH_DELIMITER);
+						if  (pos != string::npos) {
+							contentDir = contentPath.substr(0, pos);
+						}
+					}
+					// Вычисляем пути к необходимым файлам
+					skinFile = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
+					configFile = getRightPath(contentDir + PATH_DELIMITER + "config.xml");
 				}
 				// STUB
 			} else if (bValidDirectory) {
-				// Сохраняем путь к папке игры
-				contentDir = contentPath;
+				// Сохраняем путь к папке игры.
+				// Если в указанной папке есть вложенная папка "standalone_content",
+				// то считаем её папкой игры. Иначе считаем папкой игры указанную папку.
+				string deepDir = contentPath + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
+				if (dirExists(deepDir)) {
+					contentDir = deepDir;
+				} else {
+					contentDir = contentPath;
+				}
+
 				// Вычисляем пути к необходимым файлам
-				skinFile = getRightPath(contentDir + "\\" + DEFAULT_SKIN_FILE);
+				skinFile = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
 				// Ищем все QSP-файлы в корне указанной папки
 				vector<string> gameFileList;
 				if (!getFilesList(contentDir, "*.qsp", gameFileList))
@@ -316,8 +334,8 @@ namespace QuestNavigator {
 					showError("В корневой папке игры должен находиться только один файл с расширением .qsp");
 					return false;
 				}
-				gameFile = getRightPath(contentDir + "\\" + gameFileList[0]);
-				configFile = getRightPath(contentDir + "\\" + "config.xml");
+				gameFile = getRightPath(contentDir + PATH_DELIMITER + gameFileList[0]);
+				configFile = getRightPath(contentDir + PATH_DELIMITER + "config.xml");
 			} else {
 				DWORD error = GetLastError();
 				if (error == ERROR_FILE_NOT_FOUND) {
@@ -333,6 +351,24 @@ namespace QuestNavigator {
 			// STUB
 			// Сделать проверку всех файлов на читаемость
 
+			// Основной алгоритм обработки файлов:
+			// 1. Если в корне архива или в корне указанной локальной папки 
+			//    есть папка standalone_content, 
+			//    то корневой папкой игры считается она,
+			//    иначе - корневой папкой игры считается корень архива 
+			//    или указанной локальной папки.
+			// 2. Проверяем наличие и читаемость скина игры.
+			// 3. Проверяем наличие папки "qsplib" на трёх уровнях:
+			// 3.1 - в корневой папке игры;
+			// 3.2 - уровнем выше;
+			// 3.3 - ещё одним уровнем выше.
+			// 4. Если есть файл скина и есть папка "qsplib", то запускается игра.
+			// 5. Иначе, создаётся временная папка, в которую копируются:
+			// 5.1 - файлы оформления игры - .js, .css, картинки;
+			// 5.2 - файл скина (если есть в папке игры - то скин игры, иначе дефолтный)
+			// 5.3 - папка "qsplib".
+			// 6. Запускается игра со скином из временной папки.
+
 			saveDir = "";
 			// Путь к пользовательской папке "Мои документы"
 			WCHAR wszPath[MAX_PATH];
@@ -341,7 +377,7 @@ namespace QuestNavigator {
 				showError("Не удалось получить путь к папке \"Мои документы\".");
 				return false;
 			}
-			saveDir = getRightPath(narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH + "\\" + md5(contentDir));
+			saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + md5(contentDir));
 		}
 		// Сохраняем конфигурацию
 		Configuration::setString(ecpContentDir, contentDir);
@@ -362,7 +398,7 @@ namespace QuestNavigator {
 		HANDLE hFind = INVALID_HANDLE_VALUE;
 		DWORD dwError = 0;
 
-		wstring wDir = widen(getRightPath(directory + "\\" + mask));
+		wstring wDir = widen(getRightPath(directory + PATH_DELIMITER + mask));
 		if (wDir.size() + 1 > MAX_PATH) {
 			showError("Слишком длинный путь");
 			return false;

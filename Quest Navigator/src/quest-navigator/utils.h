@@ -21,6 +21,11 @@ namespace QuestNavigator {
 	static const string QN_COMPANY_NAME = "QSP";
 	static const string QN_APP_NAME = "Quest Navigator";
 	static const string QN_VERSION = "0.0.2";
+#ifdef _WIN32
+	static const string PATH_DELIMITER = "\\";
+#else
+	static const string PATH_DELIMITER = "/";
+#endif
 
 	// Утилиты для преобразования строк
 
