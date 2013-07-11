@@ -2,6 +2,7 @@
 #define UTILS_H_
 
 #include <string>
+#include <vector>
 #include <Awesomium/WebString.h>
 #include "../deps/qsp/qsp.h"
 #include "../deps/qsp/bindings/default/qsp_default.h"
@@ -74,11 +75,13 @@ namespace QuestNavigator {
 	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength);
 	// Создаём папки
 	bool buildDirectoryPath(string path);
+	// Возвращаем список файлов
+	bool getFilesList(string directory, string mask, vector<string>& list);
 
 	// Прочее
 
 	// Устанавливаем конфигурацию плеера при старте
-	void initOptions();
+	bool initOptions();
 
 	// Проверяем наличие апдейта при старте
 	void checkUpdate();

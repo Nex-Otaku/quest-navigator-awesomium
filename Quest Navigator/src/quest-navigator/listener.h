@@ -33,6 +33,7 @@ namespace QuestNavigator {
 		QnInterceptor resource_interceptor_;
 
 		bool gameIsRunning;
+		bool programLoaded;
 
 		HANDLE libThread;
 

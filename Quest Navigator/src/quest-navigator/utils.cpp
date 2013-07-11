@@ -156,9 +156,9 @@ namespace QuestNavigator {
 		// Вызывая эту функцию для обработки пути,
 		// мы будем уверены что слэши всегда направлены в нужную сторону.
 		string result = path;
-		#ifdef WIN32
+#ifdef WIN32
 		result = slashToBackslash(path);
-		#endif
+#endif
 		return result;
 	}
 
@@ -216,7 +216,7 @@ namespace QuestNavigator {
 
 
 	// Загрузка конфигурации плеера
-	void initOptions()
+	bool initOptions()
 	{
 		// Устанавливаем параметры по умолчанию
 		Configuration::setBool(ecpSoundCacheEnabled, false);
@@ -227,7 +227,7 @@ namespace QuestNavigator {
 		LPWSTR* szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
 		if (szArgList == NULL) {
 			showError("Не могу прочесть аргументы командной строки");
-			return;
+			return false;
 		}
 		vector<string> params;
 		for (int i = 0; i < argCount; i++) {
@@ -255,12 +255,12 @@ namespace QuestNavigator {
 					Configuration::setBool(ecpSoundCacheEnabled, true);
 				} else {
 					showError("Неизвестная опция: [" + param + "]");
-					return;
+					return false;
 				}
 			} else {
 				showError("Неизвестный параметр: [" + param + "]\n" +
 					"Возможно, путь к файлу содержит пробелы и вы забыли взять его в кавычки.");
-				return;
+				return false;
 			}
 		}
 		// Всё разобрано правильно
@@ -287,16 +287,16 @@ namespace QuestNavigator {
 				bool bExtQsp = endsWith(contentPath, ".qsp");
 				if (!bExtQn && !bExtQsp) {
 					showError("Неизвестный формат файла!\nПоддерживаемые форматы: qn, qsp");
-					return;
+					return false;
 				}
 				if (bExtQn) {
 					// STUB
 					showError("Загрузка архива qn ещё не реализована.");
-					return;
+					return false;
 				} else {
 					// STUB
 					showError("Загрузка файла qsp ещё не реализована.");
-					return;
+					return false;
 				}
 				// STUB
 			} else if (bValidDirectory) {
@@ -304,11 +304,19 @@ namespace QuestNavigator {
 				contentDir = contentPath;
 				// Вычисляем пути к необходимым файлам
 				skinFile = getRightPath(contentDir + "\\" + DEFAULT_SKIN_FILE);
-				// STUB
-				// Сделать проверку на количество QSP-файлов, 
-				// если файлов более одного, то выводить ошибку.
-				// Сделать поиск QSP-файлов.
-				gameFile = getRightPath(contentDir + "\\" + "game.qsp");
+				// Ищем все QSP-файлы в корне указанной папки
+				vector<string> gameFileList;
+				if (!getFilesList(contentDir, "*.qsp", gameFileList))
+					return false;
+				int count = (int)gameFileList.size();
+				if (count == 0) {
+					showError("Не найден файл игры в папке " + contentDir);
+					return false;
+				} else if (count > 1) {
+					showError("В корневой папке игры должен находиться только один файл с расширением .qsp");
+					return false;
+				}
+				gameFile = getRightPath(contentDir + "\\" + gameFileList[0]);
 				configFile = getRightPath(contentDir + "\\" + "config.xml");
 			} else {
 				DWORD error = GetLastError();
@@ -319,7 +327,7 @@ namespace QuestNavigator {
 				} else {
 					showError("Не удалось прочесть файл: [" + contentPath + "]");
 				}
-				return;
+				return false;
 			}
 
 			// STUB
@@ -331,7 +339,7 @@ namespace QuestNavigator {
 			HRESULT hr = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, wszPath);
 			if (hr != S_OK) {
 				showError("Не удалось получить путь к папке \"Мои документы\".");
-				return;
+				return false;
 			}
 			saveDir = getRightPath(narrow(wszPath) + "\\" + DEFAULT_SAVE_REL_PATH + "\\" + md5(contentDir));
 		}
@@ -342,6 +350,66 @@ namespace QuestNavigator {
 		Configuration::setString(ecpConfigFile, configFile);
 		Configuration::setString(ecpSaveDir, saveDir);
 		Configuration::setString(ecpWindowTitle, windowTitle);
+		return true;
+	}
+
+	// Возвращаем список файлов
+	bool getFilesList(string directory, string mask, vector<string>& list)
+	{
+		vector<string> result;
+
+		WIN32_FIND_DATA ffd;
+		HANDLE hFind = INVALID_HANDLE_VALUE;
+		DWORD dwError = 0;
+
+		wstring wDir = widen(getRightPath(directory + "\\" + mask));
+		if (wDir.size() + 1 > MAX_PATH) {
+			showError("Слишком длинный путь");
+			return false;
+		}
+		LPCWSTR szDir = wDir.c_str();
+
+		// Find the first file in the directory.
+
+		hFind = FindFirstFile(szDir, &ffd);
+
+		if (INVALID_HANDLE_VALUE == hFind) 
+		{
+			dwError = GetLastError();
+			if (dwError == ERROR_FILE_NOT_FOUND) {
+				list = result;
+				return true;
+			} else {
+				showError("Не удалось осуществить поиск файла в папке " + directory + " по заданной маске " + mask);
+				return false;
+			}
+		} 
+
+		// List all the files in the directory with some info about them.
+
+		do
+		{
+			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				result.push_back(narrow(ffd.cFileName));
+			}
+		}
+		while (FindNextFile(hFind, &ffd) != 0);
+
+		dwError = GetLastError();
+		if (dwError != ERROR_NO_MORE_FILES) 
+		{
+			showError("Не удалось осуществить повторный поиск файла в папке " + directory + " по заданной маске " + mask);
+			return false;
+		}
+
+		BOOL res = FindClose(hFind);
+		if (res == 0) {
+			showError("Не удалось высвободить дескриптор поиска");
+			return false;
+		}
+
+		list = result;
+		return true;
 	}
 
 	// Проверяем наличие апдейта при старте
@@ -355,8 +423,6 @@ namespace QuestNavigator {
 			widen(QN_VERSION).c_str());
 
 		win_sparkle_init();
-
-		//win_sparkle_check_update_with_ui();
 	}
 	// Завершаем работу апдейтера по выходу из приложения
 	void finishUpdate()

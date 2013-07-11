@@ -43,6 +43,7 @@ namespace QuestNavigator {
 		resource_interceptor_(),
 
 		gameIsRunning(false),
+		programLoaded(false),
 
 		libThread(NULL)
 	{
@@ -66,8 +67,10 @@ namespace QuestNavigator {
 	void QnApplicationListener::OnLoaded() {
 		// Контекст UI
 
-		Configuration::init();
-		initOptions();
+		if (!Configuration::init() || !initOptions()) {
+			app_->Quit();
+			return;
+		}
 
 		view_ = View::Create(512, 512);
 
@@ -92,6 +95,8 @@ namespace QuestNavigator {
 		#ifdef _WIN32
 		checkUpdate();
 		#endif
+
+		programLoaded = true;
 	}
 
 	// Inherited from Application::Listener
@@ -105,6 +110,9 @@ namespace QuestNavigator {
 
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnShutdown() {
+		if (!programLoaded)
+			return;
+
 		FreeResources();
 
 		// Завершаем работу апдейтера
