@@ -409,10 +409,10 @@ namespace QuestNavigator {
 		// Устанавливаем настройки по умолчанию
 		Configuration::setInt(ecpGameWidth, 800);
 		Configuration::setInt(ecpGameHeight, 600);
-		Configuration::setInt(ecpGameMinWidth, -1);
-		Configuration::setInt(ecpGameMinHeight, -1);
-		Configuration::setInt(ecpGameMaxWidth, -1);
-		Configuration::setInt(ecpGameMaxHeight, -1);
+		Configuration::setInt(ecpGameMinWidth, 0);
+		Configuration::setInt(ecpGameMinHeight, 0);
+		Configuration::setInt(ecpGameMaxWidth, 0);
+		Configuration::setInt(ecpGameMaxHeight, 0);
 		Configuration::setString(ecpGameTitle, Configuration::getString(ecpGameFileName));
 		Configuration::setBool(ecpGameResizeable, true);
 

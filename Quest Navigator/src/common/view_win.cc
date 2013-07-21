@@ -32,10 +32,16 @@ public:
 		LPCWSTR wszTitle = wWindowTitle.c_str();
 
 		// Create our WinAPI Window
+		DWORD dwWindowStyle = Configuration::getBool(ecpGameResizeable) ?
+			WS_OVERLAPPEDWINDOW :
+			(WS_OVERLAPPED     | 
+				WS_CAPTION        | 
+				WS_SYSMENU        | 
+				WS_MINIMIZEBOX);
 		HINSTANCE hInstance = GetModuleHandle(0);
 		hwnd_ = CreateWindow(szWindowClass,
 			wszTitle,
-			WS_OVERLAPPEDWINDOW,
+			dwWindowStyle,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
 			width + 20,
@@ -152,12 +158,35 @@ protected:
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	ViewWin* view = ViewWin::GetFromHandle(hWnd);
-
+	
 	switch (message) {
 	case WM_COMMAND:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 		break;
 	case WM_TIMER:
+		break;
+	case WM_GETMINMAXINFO:
+		{
+			// Ограничиваем минимальный и максимальный размер окна
+            MINMAXINFO* pInfo = (MINMAXINFO*)lParam;
+			POINT ptMin = pInfo->ptMinTrackSize;
+			POINT ptMax = pInfo->ptMaxTrackSize;
+			int minWidth = Configuration::getInt(ecpGameMinWidth);
+			if (minWidth != 0)
+				ptMin.x = minWidth;
+			int minHeight = Configuration::getInt(ecpGameMinHeight);
+			if (minHeight != 0)
+				ptMin.y = minHeight;
+			int maxWidth = Configuration::getInt(ecpGameMaxWidth);
+			if (maxWidth != 0)
+				ptMax.x = maxWidth;
+			int maxHeight = Configuration::getInt(ecpGameMaxHeight);
+			if (maxHeight != 0)
+				ptMax.y = maxHeight;
+            pInfo->ptMinTrackSize = ptMin;
+            pInfo->ptMaxTrackSize = ptMax;
+            return 0;
+		}
 		break;
 	case WM_SIZE:
 		view->web_view()->Resize(LOWORD(lParam), HIWORD(lParam));
