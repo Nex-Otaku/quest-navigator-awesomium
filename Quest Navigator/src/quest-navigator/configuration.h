@@ -12,7 +12,7 @@ namespace QuestNavigator {
 	// В этом классе хранятся всяческие параметры плеера
 	enum eConfigParam
 	{
-		// Строки
+		// Основные параметры
 		ecpContentDir = 0,
 		ecpSkinFilePath,
 		ecpGameFilePath,
@@ -22,6 +22,7 @@ namespace QuestNavigator {
 		ecpSoundCacheEnabled,
 		ecpSaveSlotMax,
 		ecpWindowTitle,
+		ecpIsFullscreen,
 
 		// Настройки игры
 		ecpGameWidth,
@@ -32,6 +33,8 @@ namespace QuestNavigator {
 		ecpGameMaxHeight,
 		ecpGameTitle,
 		ecpGameResizeable,
+		ecpGameFullscreenAvailable,
+		ecpGameStartFullscreen,
 
 		ecpLast
 	};

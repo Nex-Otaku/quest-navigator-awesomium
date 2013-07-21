@@ -101,6 +101,10 @@ namespace QuestNavigator {
 	void showMessage(string msg, string title);
 	void showError(string msg);
 
+	// Стиль для окна согласно настройкам игры
+	DWORD getWindowStyle();
+	// Переключение полноэкранного режима
+	void toggleFullscreenByHwnd(HWND hWnd);
 }
 
 

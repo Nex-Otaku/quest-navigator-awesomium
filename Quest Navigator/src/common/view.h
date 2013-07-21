@@ -17,6 +17,8 @@ class View {
   // Get the associated WebView
   Awesomium::WebView* web_view() { return web_view_; }
 
+  virtual void toggleFullscreen() = 0;
+
  protected:
   View() { }
 

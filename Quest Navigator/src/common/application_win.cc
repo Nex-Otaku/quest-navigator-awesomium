@@ -37,7 +37,13 @@ public:
 			bool bBackSpace = ((msg.message == WM_KEYDOWN) || (msg.message == WM_KEYUP)) &&
 				((msg.wParam == VK_BACK) || (msg.wParam == VK_BROWSER_BACK)) &&
 				!listener()->textInputIsFocused();
-			if (!bBackSpace) {
+
+			bool bFullscreen = (msg.message == WM_SYSKEYDOWN) && (msg.wParam == VK_RETURN);
+			if (bFullscreen) {
+				listener()->toggleFullscreen();
+			}
+
+			if (!bBackSpace && !bFullscreen) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}

@@ -393,14 +393,24 @@ namespace QuestNavigator {
 		Configuration::setString(ecpConfigFilePath, configFilePath);
 		Configuration::setString(ecpSaveDir, saveDir);
 		Configuration::setString(ecpWindowTitle, windowTitle);
+		Configuration::setBool(ecpIsFullscreen, false);
+
 		// Загружаем настройки игры из файла config.xml
 		bool gameConfigLoaded = loadGameConfig();
+		if (!gameConfigLoaded)
+			return false;
 
+		// Обрабатываем настройки игры
+		if (Configuration::getBool(ecpGameFullscreenAvailable) && 
+			Configuration::getBool(ecpGameStartFullscreen)) {
+			Configuration::setBool(ecpIsFullscreen, true);
+		}
 		string gameTitle = Configuration::getString(ecpGameTitle);
 		if (gameTitle != "") {
 			Configuration::setString(ecpWindowTitle, gameTitle);
 		}
-		return gameConfigLoaded;
+
+		return true;
 	}
 
 	// Загружаем настройки игры из файла config.xml
@@ -415,6 +425,8 @@ namespace QuestNavigator {
 		Configuration::setInt(ecpGameMaxHeight, 0);
 		Configuration::setString(ecpGameTitle, Configuration::getString(ecpGameFileName));
 		Configuration::setBool(ecpGameResizeable, true);
+		Configuration::setBool(ecpGameFullscreenAvailable, true);
+		Configuration::setBool(ecpGameStartFullscreen, false);
 
 		string configFilePath = Configuration::getString(ecpConfigFilePath);
 		// Если файл не найден, то всё в порядке,
@@ -454,6 +466,8 @@ namespace QuestNavigator {
 		LOAD_XML_ATTRIB("maxHeight", ecpGameMaxHeight);
 		LOAD_XML_ATTRIB("title", ecpGameTitle);
 		LOAD_XML_ATTRIB("resizeable", ecpGameResizeable);
+		LOAD_XML_ATTRIB("fullscreenAvailable", ecpGameFullscreenAvailable);
+		LOAD_XML_ATTRIB("startFullscreen", ecpGameStartFullscreen);
 
 		return valid;
 	}
@@ -655,4 +669,37 @@ namespace QuestNavigator {
 		return decoded;
 	}
 
+	DWORD getWindowStyle() {
+		return Configuration::getBool(ecpGameResizeable) ? WS_OVERLAPPEDWINDOW :
+			(WS_OVERLAPPED     | 
+			WS_CAPTION        | 
+			WS_SYSMENU        | 
+			WS_MINIMIZEBOX);
+	}
+
+	WINDOWPLACEMENT wpc;
+
+	void toggleFullscreenByHwnd(HWND hWnd) {
+		if (Configuration::getBool(ecpIsFullscreen)) {
+			// Из всего экрана в оконное                                      
+			// Устанавливаем стили окнного режима
+			SetWindowLong(hWnd, GWL_STYLE, getWindowStyle());
+			// Загружаем парметры предыдущего оконного режима
+			SetWindowPlacement(hWnd, &wpc);
+			// Показываем обычное окно
+			ShowWindow(hWnd, SW_SHOWNORMAL);
+
+			Configuration::setBool(ecpIsFullscreen, false);
+		} else if (Configuration::getBool(ecpGameFullscreenAvailable)) {
+			// Сохраняем параметры оконного режима
+			GetWindowPlacement(hWnd, &wpc);
+			// Устанавливаем новые стили
+			SetWindowLong(hWnd, GWL_STYLE, WS_POPUP);
+			SetWindowLong(hWnd, GWL_EXSTYLE, WS_EX_TOPMOST);
+			// Окно во весь экран
+			ShowWindow(hWnd, SW_SHOWMAXIMIZED);
+
+			Configuration::setBool(ecpIsFullscreen, true);
+		}
+	}
 }

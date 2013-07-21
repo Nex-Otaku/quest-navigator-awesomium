@@ -302,6 +302,12 @@ namespace QuestNavigator {
 		return view_->web_view()->focused_element_type() == kFocusedElementType_TextInput;
 	}
 
+	// Переключение полноэкранного режима
+	void QnApplicationListener::toggleFullscreen()
+	{
+		view_->toggleFullscreen();
+	}
+
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************

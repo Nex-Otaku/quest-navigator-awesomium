@@ -34,6 +34,9 @@ class Application {
 
 	// Курсор находится в текстовом поле
 	virtual bool textInputIsFocused() = 0;
+
+	// Переключение полноэкранного режима
+	virtual void toggleFullscreen() = 0;
   };
 
   virtual ~Application() {}

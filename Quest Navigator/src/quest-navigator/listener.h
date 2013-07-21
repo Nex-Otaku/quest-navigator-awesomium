@@ -65,6 +65,7 @@ namespace QuestNavigator {
 		JSObject getSaveSlots(bool open);
 		virtual void executeCode(string qspCode);
 		virtual bool textInputIsFocused();
+		virtual void toggleFullscreen();
 
 		// ********************************************************************
 		// ********************************************************************
