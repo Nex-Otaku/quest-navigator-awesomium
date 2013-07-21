@@ -116,6 +116,63 @@ namespace QuestNavigator {
 		_paramList[param].setBool(value);
 		unlockConfigData();
 	}
+	eConfigValueType Configuration::getType(eConfigParam param)
+	{
+		eConfigValueType type = ecvInvalid;
+		lockConfigData();
+		type = _paramList[param].getType();
+		unlockConfigData();
+		return type;
+	}
+
+
+	// Обработка настроек из XML-файла
+	bool Configuration::loadXmlAttrib(TiXmlElement* pElem, string name, eConfigParam param)
+	{
+		if (pElem == NULL) {
+			showError("Элемент конфигурационного файла не найден");
+			return false;
+		}
+		eConfigValueType type = getType(param);
+		int res = 0;
+		if (type == ecvString) {
+			string value = "";
+			res = pElem->QueryStringAttribute(name.c_str(), &value);
+			if (res == TIXML_SUCCESS) {
+				setString(param, value);
+				return true;
+			}
+		} else if (type == ecvInt) {
+			int value = 0;
+			res = pElem->QueryIntAttribute(name.c_str(), &value);
+			if (res == TIXML_SUCCESS) {
+				setInt(param, value);
+				return true;
+			}
+		} else if (type == ecvBool) {
+			bool value = false;
+			res = pElem->QueryBoolAttribute(name.c_str(), &value);
+			if (res == TIXML_SUCCESS) {
+				setBool(param, value);
+				return true;
+			}
+		} else {
+			showError("Неизвестный тип атрибута \"" + name + "\". Не задано значение по умолчанию?");
+		}
+		if (res == TIXML_WRONG_TYPE) {
+			showError("Для атрибута \"" + name + "\" в конфигурационном файле указано значение неверного типа.");
+		} else if (res == TIXML_NO_ATTRIBUTE) {
+			// Если атрибут не найден, игнорируем его.
+			// Все атрибуты необязательны.
+			// При отсутствии атрибутов используются настройки по умолчанию.
+			return true;
+		} else {
+			showError("Неизвестная ошибка при разборе конфигурационного файла.");
+		}
+
+		return false;
+	}
+
 
 	bool Configuration::init()
 	{

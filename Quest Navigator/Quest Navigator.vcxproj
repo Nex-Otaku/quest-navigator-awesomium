@@ -57,7 +57,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>EXPORT;_CRT_SECURE_NO_WARNINGS;WIN32;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TIXML_USE_STL;EXPORT;_CRT_SECURE_NO_WARNINGS;WIN32;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -82,7 +82,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>EXPORT;_CRT_SECURE_NO_WARNINGS;WIN32;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TIXML_USE_STL;EXPORT;_CRT_SECURE_NO_WARNINGS;WIN32;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -147,6 +147,10 @@
     <ClCompile Include="src\deps\qsp\bindings\default\default_control.c" />
     <ClCompile Include="src\common\application_win.cc" />
     <ClCompile Include="src\common\view_win.cc" />
+    <ClCompile Include="src\deps\tinyxml\tinystr.cpp" />
+    <ClCompile Include="src\deps\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="src\deps\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="src\deps\tinyxml\tinyxmlparser.cpp" />
     <ClCompile Include="src\main.cc" />
     <ClCompile Include="src\quest-navigator\configuration.cpp" />
     <ClCompile Include="src\quest-navigator\interceptor.cpp" />

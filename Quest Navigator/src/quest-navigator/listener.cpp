@@ -72,7 +72,7 @@ namespace QuestNavigator {
 			return;
 		}
 
-		view_ = View::Create(512, 512);
+		view_ = View::Create(Configuration::getInt(QuestNavigator::ecpGameWidth), Configuration::getInt(ecpGameHeight));
 
 		// Перехватчик запросов, выполняющихся при нажатии на ссылку.
 		resource_interceptor_.setApp(app_);
@@ -770,7 +770,7 @@ namespace QuestNavigator {
 	void QnApplicationListener::restartGame(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
-		string gameFile = Configuration::getString(ecpGameFile);
+		string gameFile = Configuration::getString(ecpGameFilePath);
 		StopGame(true);
 		runGame(gameFile);
 	}

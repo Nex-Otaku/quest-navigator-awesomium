@@ -13,6 +13,8 @@
 
 using namespace Awesomium;
 
+#define LOAD_XML_ATTRIB(name, configLine) if (valid) { valid = Configuration::loadXmlAttrib(root, name, configLine); }
+
 /*
 
 Везде используем string, в нём хранятся юникодовые строки в UTF-8.
@@ -106,7 +108,7 @@ namespace QuestNavigator {
 		// Если путь к содержимому не задан явно,
 		// указываем путь по умолчанию для пака "assets.pak".
 		// Файл "assets.pak" ищется в рабочей папке.
-		string contentPath = Configuration::getString(ecpSkinFile);
+		string contentPath = Configuration::getString(ecpSkinFilePath);
 		string contentUrl = (contentPath.length() == 0) ?
 			"asset://webui/" + backslashToSlash(DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER + DEFAULT_SKIN_FILE) : 
 		getUrlFromFilePath(contentPath);
@@ -265,9 +267,10 @@ namespace QuestNavigator {
 		}
 		// Всё разобрано правильно
 		string contentDir = "";
-		string skinFile = "";
-		string gameFile = "";
-		string configFile = "";
+		string skinFilePath = "";
+		string gameFileName = "";
+		string gameFilePath = "";
+		string configFilePath = "";
 		string saveDir = "";
 		string windowTitle = QN_APP_NAME + " " + QN_VERSION;
 		if (contentPathSet) {
@@ -295,18 +298,20 @@ namespace QuestNavigator {
 					return false;
 				} else {
 					// Сохраняем путь к файлу игры
-					gameFile = contentPath;
+					gameFilePath = contentPath;
+					gameFileName = contentPath;
 					// Вычисляем путь к папке игры
 					contentDir = "";
 					if (contentPath.length() > 0) {
 						int pos = contentPath.find_last_of(PATH_DELIMITER);
 						if  (pos != string::npos) {
 							contentDir = contentPath.substr(0, pos);
+							gameFileName = contentPath.substr(pos + 1);
 						}
 					}
 					// Вычисляем пути к необходимым файлам
-					skinFile = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
-					configFile = getRightPath(contentDir + PATH_DELIMITER + "config.xml");
+					skinFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
+					configFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_CONFIG_FILE);
 				}
 				// STUB
 			} else if (bValidDirectory) {
@@ -321,7 +326,7 @@ namespace QuestNavigator {
 				}
 
 				// Вычисляем пути к необходимым файлам
-				skinFile = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
+				skinFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
 				// Ищем все QSP-файлы в корне указанной папки
 				vector<string> gameFileList;
 				if (!getFilesList(contentDir, "*.qsp", gameFileList))
@@ -334,8 +339,9 @@ namespace QuestNavigator {
 					showError("В корневой папке игры должен находиться только один файл с расширением .qsp");
 					return false;
 				}
-				gameFile = getRightPath(contentDir + PATH_DELIMITER + gameFileList[0]);
-				configFile = getRightPath(contentDir + PATH_DELIMITER + "config.xml");
+				gameFileName = gameFileList[0];
+				gameFilePath = getRightPath(contentDir + PATH_DELIMITER + gameFileName);
+				configFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_CONFIG_FILE);
 			} else {
 				DWORD error = GetLastError();
 				if (error == ERROR_FILE_NOT_FOUND) {
@@ -381,12 +387,75 @@ namespace QuestNavigator {
 		}
 		// Сохраняем конфигурацию
 		Configuration::setString(ecpContentDir, contentDir);
-		Configuration::setString(ecpSkinFile, skinFile);
-		Configuration::setString(ecpGameFile, gameFile);
-		Configuration::setString(ecpConfigFile, configFile);
+		Configuration::setString(ecpSkinFilePath, skinFilePath);
+		Configuration::setString(ecpGameFilePath, gameFilePath);
+		Configuration::setString(ecpGameFileName, gameFileName);
+		Configuration::setString(ecpConfigFilePath, configFilePath);
 		Configuration::setString(ecpSaveDir, saveDir);
 		Configuration::setString(ecpWindowTitle, windowTitle);
-		return true;
+		// Загружаем настройки игры из файла config.xml
+		bool gameConfigLoaded = loadGameConfig();
+
+		string gameTitle = Configuration::getString(ecpGameTitle);
+		if (gameTitle != "") {
+			Configuration::setString(ecpWindowTitle, gameTitle);
+		}
+		return gameConfigLoaded;
+	}
+
+	// Загружаем настройки игры из файла config.xml
+	bool loadGameConfig()
+	{
+		// Устанавливаем настройки по умолчанию
+		Configuration::setInt(ecpGameWidth, 800);
+		Configuration::setInt(ecpGameHeight, 600);
+		Configuration::setInt(ecpGameMinWidth, -1);
+		Configuration::setInt(ecpGameMinHeight, -1);
+		Configuration::setInt(ecpGameMaxWidth, -1);
+		Configuration::setInt(ecpGameMaxHeight, -1);
+		Configuration::setString(ecpGameTitle, Configuration::getString(ecpGameFileName));
+		Configuration::setBool(ecpGameResizeable, true);
+
+		string configFilePath = Configuration::getString(ecpConfigFilePath);
+		// Если файл не найден, то всё в порядке,
+		// просто оставляем дефолтные настройки.
+		if (!fileExists(configFilePath))
+			return true;
+
+		TiXmlDocument doc;
+		// Читаем файл в память
+		void* buffer = NULL;
+		int bufferLength = 0;
+		if (!loadFileToBuffer(configFilePath, &buffer, &bufferLength)) {
+			showError("Не удалось прочесть файл \"" + configFilePath + "\".");
+			return false;
+		}
+		// Разбираем XML
+		bool loadOkay = doc.Parse((const char*)buffer, 0, TIXML_ENCODING_UTF8) != 0;
+		delete buffer;
+		if (!loadOkay)
+		{
+			showError("Не удалось загрузить XML-структуру из файла \"" + configFilePath + "\".");
+			return false;
+		}
+		TiXmlElement* root = doc.FirstChildElement();
+		if (root == NULL)
+		{
+			showError("Не найден корневой элемент конфигурационного файла \"" + configFilePath + "\".");
+			return false;
+		}
+
+		bool valid = true;
+		LOAD_XML_ATTRIB("width", ecpGameWidth);
+		LOAD_XML_ATTRIB("height", ecpGameHeight);
+		LOAD_XML_ATTRIB("minWidth", ecpGameMinWidth);
+		LOAD_XML_ATTRIB("minHeight", ecpGameMinHeight);
+		LOAD_XML_ATTRIB("maxWidth", ecpGameMaxWidth);
+		LOAD_XML_ATTRIB("maxHeight", ecpGameMaxHeight);
+		LOAD_XML_ATTRIB("title", ecpGameTitle);
+		LOAD_XML_ATTRIB("resizeable", ecpGameResizeable);
+
+		return valid;
 	}
 
 	// Возвращаем список файлов

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <Windows.h>
+#include "../deps/tinyxml/tinyxml.h"
 
 using namespace std;
 
@@ -13,13 +14,24 @@ namespace QuestNavigator {
 	{
 		// Строки
 		ecpContentDir = 0,
-		ecpSkinFile,
-		ecpGameFile,
-		ecpConfigFile,
+		ecpSkinFilePath,
+		ecpGameFilePath,
+		ecpGameFileName,
+		ecpConfigFilePath,
 		ecpSaveDir,
 		ecpSoundCacheEnabled,
 		ecpSaveSlotMax,
 		ecpWindowTitle,
+
+		// Настройки игры
+		ecpGameWidth,
+		ecpGameHeight,
+		ecpGameMinWidth,
+		ecpGameMinHeight,
+		ecpGameMaxWidth,
+		ecpGameMaxHeight,
+		ecpGameTitle,
+		ecpGameResizeable,
 
 		ecpLast
 	};
@@ -75,6 +87,10 @@ namespace QuestNavigator {
 		static void setInt(eConfigParam param, int value);
 		static bool getBool(eConfigParam param);
 		static void setBool(eConfigParam param, bool value);
+		static eConfigValueType getType(eConfigParam param);
+
+		// Обработка настроек из XML-файла
+		static bool loadXmlAttrib(TiXmlElement* pElem, string name, eConfigParam param);
 
 		static bool init();
 		static void deinit();

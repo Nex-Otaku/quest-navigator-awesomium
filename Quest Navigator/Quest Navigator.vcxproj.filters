@@ -25,6 +25,9 @@
     <Filter Include="Файлы исходного кода\md5">
       <UniqueIdentifier>{c2a01194-03a3-4677-bfb6-b75dcc6bd5cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы исходного кода\xml">
+      <UniqueIdentifier>{cad20ffb-0fb9-468e-853d-130e42563058}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cc">
@@ -182,6 +185,18 @@
     </ClCompile>
     <ClCompile Include="src\deps\md5\md5.cpp">
       <Filter>Файлы исходного кода\md5</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\tinyxml\tinyxml.cpp">
+      <Filter>Файлы исходного кода\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\tinyxml\tinyxmlerror.cpp">
+      <Filter>Файлы исходного кода\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\tinyxml\tinyxmlparser.cpp">
+      <Filter>Файлы исходного кода\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\deps\tinyxml\tinystr.cpp">
+      <Filter>Файлы исходного кода\xml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -32,6 +32,8 @@ public:
 		MSG msg;
 		while (GetMessage(&msg, NULL, 0, 0) && is_running_) {
 			web_core_->Update();
+
+			// Игнорируем нажатия Backspace вне текстовых полей
 			bool bBackSpace = ((msg.message == WM_KEYDOWN) || (msg.message == WM_KEYUP)) &&
 				((msg.wParam == VK_BACK) || (msg.wParam == VK_BROWSER_BACK)) &&
 				!listener()->textInputIsFocused();
@@ -39,6 +41,7 @@ public:
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+
 			if (listener())
 				listener()->OnUpdate();
 		}
