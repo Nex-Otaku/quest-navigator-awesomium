@@ -542,6 +542,11 @@ namespace QuestNavigator {
 				showError("Не удалось создать временную папку для игры: " + gameFolder);
 				return false;
 			}
+			string contentFolder = gameFolder + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
+			if (!buildDirectoryPath(contentFolder)) {
+				showError("Не удалось создать папку для содержимого игры: " + contentFolder);
+				return false;
+			}
 
 			// Копируем qsplib.
 			// true - из базовых файлов, false - из папки игры.
@@ -554,7 +559,7 @@ namespace QuestNavigator {
 			}
 
 			// Копируем скин.
-			string destSkinFile = gameFolder + PATH_DELIMITER + DEFAULT_SKIN_FILE;
+			string destSkinFile = contentFolder + PATH_DELIMITER + DEFAULT_SKIN_FILE;
 			if (bCopySkin) {
 				// Копируем из базовых файлов
 				// Заполняем список существующих скинов.
@@ -611,9 +616,9 @@ namespace QuestNavigator {
 			}
 			// Проходим по всем расширениям.
 			for (int i = 0; i < (int)masks.size(); i++) {
-				if (!copyFileTree(contentDir, gameFolder, masks[i])) {
+				if (!copyFileTree(contentDir, contentFolder, masks[i])) {
 					showError("Не удалось переместить файлы с маской \"" + masks[i] +
-						"\" из \"" + contentDir + "\" в \"" + gameFolder + "\"");
+						"\" из \"" + contentDir + "\" в \"" + contentFolder + "\"");
 					return false;
 				}
 			}
@@ -659,8 +664,10 @@ namespace QuestNavigator {
 
 		do
 		{
-			if (!bFileMode == (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				result.push_back(narrow(ffd.cFileName));
+			if (!bFileMode == (bool)(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				string fileName = narrow(ffd.cFileName);
+				if ((fileName != ".") && (fileName != ".."))
+					result.push_back(fileName);
 			}
 		}
 		while (FindNextFile(hFind, &ffd) != 0);
