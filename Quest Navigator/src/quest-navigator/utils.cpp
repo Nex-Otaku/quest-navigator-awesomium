@@ -562,9 +562,12 @@ namespace QuestNavigator {
 			string destSkinFile = contentFolder + PATH_DELIMITER + DEFAULT_SKIN_FILE;
 			if (bCopySkin) {
 				// Копируем из базовых файлов
+
+				string skinsDir = ASSETS_DIR + PATH_DELIMITER + SKINS_DIR;
+
 				// Заполняем список существующих скинов.
 				vector<string> skinsList;
-				if (!getFoldersList(ASSETS_DIR, skinsList))
+				if (!getFoldersList(skinsDir, skinsList))
 					return false;
 
 				// Ищем указанный скин среди существующих.
@@ -584,10 +587,10 @@ namespace QuestNavigator {
 				}
 
 				// Копируем все файлы из папки шаблона
-				string source = ASSETS_DIR + PATH_DELIMITER + selectedSkin;
-				if (!copyFileTree(source, contentDir)) {
+				string source = skinsDir + PATH_DELIMITER + selectedSkin;
+				if (!copyFileTree(source, contentFolder)) {
 					showError("Не удалось скопировать шаблон оформления из \"" + 
-						source + "\" в \"" + contentDir + "\".");
+						source + "\" в \"" + contentFolder + "\".");
 					return false;
 				}
 			} else {
