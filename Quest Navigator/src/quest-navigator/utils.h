@@ -16,8 +16,13 @@ namespace QuestNavigator {
 	// Константы
 
 	static const string DEFAULT_CONTENT_REL_PATH = "standalone_content";
+	static const string ASSETS_DIR = "assets";
+	static const string SKINS_DIR = "skins";
+	static const string QSPLIB_DIR = "qsplib";
+	static const string GAME_CACHE_DIR = "Quest Navigator Cache";
 	static const string DEFAULT_SKIN_FILE = "gameAwesomium.html";
 	static const string DEFAULT_CONFIG_FILE = "config.xml";
+	static const string DEFAULT_GAME_FILE = "start.qsp";
 	static const string DEFAULT_SAVE_REL_PATH = "Сохранения игр Quest Navigator";
 	static const string QN_WINDOWS_UPDATE_FEED = "http://feeds.feedburner.com/text-games/quest-navigator-windows";
 	static const string QN_COMPANY_NAME = "QSP";
@@ -84,6 +89,13 @@ namespace QuestNavigator {
 	bool buildDirectoryPath(string path);
 	// Возвращаем список файлов
 	bool getFilesList(string directory, string mask, vector<string>& list);
+	// Возвращаем список папок
+	bool getFoldersList(string directory, vector<string>& list);
+	// Копируем файл
+	bool copyFile(string from, string to);
+	// Копируем дерево файлов
+	bool copyFileTree(string from, string to);
+	bool copyFileTree(string from, string to, string mask);
 
 	// Прочее
 
@@ -91,6 +103,8 @@ namespace QuestNavigator {
 	bool initOptions();
 	// Загружаем настройки игры из файла config.xml
 	bool loadGameConfig();
+	// Готовим игру к запуску
+	bool prepareGameFiles();
 
 	// Проверяем наличие апдейта при старте
 	void checkUpdate();

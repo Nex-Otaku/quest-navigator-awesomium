@@ -109,10 +109,11 @@ namespace QuestNavigator {
 		// указываем путь по умолчанию для пака "assets.pak".
 		// Файл "assets.pak" ищется в рабочей папке.
 		string contentPath = Configuration::getString(ecpSkinFilePath);
-		string contentUrl = (contentPath.length() == 0) ?
-			"asset://webui/" + backslashToSlash(DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER + DEFAULT_SKIN_FILE) : 
-		getUrlFromFilePath(contentPath);
-		return contentUrl;
+		//string contentUrl = (contentPath.length() == 0) ?
+		//	"asset://webui/" + backslashToSlash(DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER + DEFAULT_SKIN_FILE) : 
+		//getUrlFromFilePath(contentPath);
+		//return contentUrl;
+		return getUrlFromFilePath(contentPath);
 	}
 
 	// Проверяем файл на существование и читаемость
@@ -211,6 +212,8 @@ namespace QuestNavigator {
 	// Создаём папки
 	bool buildDirectoryPath(string path)
 	{
+		if (dirExists(path))
+			return true;
 		wstring wPath = widen(path);
 		int res = SHCreateDirectoryEx(NULL, wPath.c_str(), NULL);
 		return res == ERROR_SUCCESS;
@@ -265,7 +268,7 @@ namespace QuestNavigator {
 				return false;
 			}
 		}
-		// Всё разобрано правильно
+		// Всё разобрано правильно.
 
 		// Определяем игру для запуска.
 		// 1. Если игра указана параметром командной строки, запускаем её.
@@ -363,26 +366,7 @@ namespace QuestNavigator {
 			// STUB
 			// Сделать проверку всех файлов на читаемость
 
-			// Основной алгоритм обработки файлов:
-			// 1. Если в корне архива или в корне указанной локальной папки 
-			//    есть папка standalone_content, 
-			//    то корневой папкой игры считается она,
-			//    иначе - корневой папкой игры считается корень архива 
-			//    или указанной локальной папки.
-			// 2. Проверяем наличие и читаемость скина игры.
-			// 3. Проверяем наличие папки "qsplib" на трёх уровнях:
-			// 3.1 - в корневой папке игры;
-			// 3.2 - уровнем выше;
-			// 3.3 - ещё одним уровнем выше.
-			// 4. Если есть файл скина и есть папка "qsplib", то запускается игра.
-			// 5. Иначе, создаётся временная папка, в которую копируются:
-			// 5.1 - файлы оформления игры - .js, .css, картинки;
-			// 5.2 - файл скина (если есть в папке игры - то скин игры, 
-			//                   иначе дефолтный либо один из стандартных, 
-			//                   указанный в config.xml)
-			// 5.3 - папка "qsplib".
-			// 6. Запускается игра со скином из временной папки.
-
+			// Папка для сохранений
 			saveDir = "";
 			// Путь к пользовательской папке "Мои документы"
 			WCHAR wszPath[MAX_PATH];
@@ -411,7 +395,7 @@ namespace QuestNavigator {
 		// Обрабатываем настройки игры
 		if (Configuration::getBool(ecpGameFullscreenAvailable) && 
 			Configuration::getBool(ecpGameStartFullscreen)) {
-			Configuration::setBool(ecpIsFullscreen, true);
+				Configuration::setBool(ecpIsFullscreen, true);
 		}
 		string gameTitle = Configuration::getString(ecpGameTitle);
 		if (gameTitle != "") {
@@ -435,6 +419,7 @@ namespace QuestNavigator {
 		Configuration::setBool(ecpGameResizeable, true);
 		Configuration::setBool(ecpGameFullscreenAvailable, true);
 		Configuration::setBool(ecpGameStartFullscreen, false);
+		Configuration::setString(ecpSkinName, "");
 
 		string configFilePath = Configuration::getString(ecpConfigFilePath);
 		// Если файл не найден, то всё в порядке,
@@ -476,12 +461,168 @@ namespace QuestNavigator {
 		LOAD_XML_ATTRIB("resizeable", ecpGameResizeable);
 		LOAD_XML_ATTRIB("fullscreenAvailable", ecpGameFullscreenAvailable);
 		LOAD_XML_ATTRIB("startFullscreen", ecpGameStartFullscreen);
+		LOAD_XML_ATTRIB("skinName", ecpSkinName);
 
 		return valid;
 	}
 
-	// Возвращаем список файлов
-	bool getFilesList(string directory, string mask, vector<string>& list)
+	// Готовим игру к запуску.
+	bool prepareGameFiles()
+	{
+		// Основной алгоритм обработки файлов:
+		// 1. Если в корне архива или в корне указанной локальной папки 
+		//    есть папка standalone_content, 
+		//    то корневой папкой игры считается она,
+		//    иначе - корневой папкой игры считается корень архива 
+		//    или указанной локальной папки.
+		// 2. Проверяем наличие и читаемость скина игры.
+		// 3. Проверяем наличие папки "qsplib" уровнем выше корневой папки игры.
+		// 4. Если есть файл скина и есть папка "qsplib", то запускается игра.
+		// 5. Иначе, создаётся временная папка, в которую копируются:
+		// 5.1 - файлы оформления игры - .js, .css, картинки;
+		// 5.2 - файл скина (если есть в папке игры - то скин игры, 
+		//                   иначе дефолтный либо один из стандартных, 
+		//                   указанный в config.xml)
+		// 5.3 - папка "qsplib".
+		// 6. Запускается игра со скином из временной папки.
+
+
+		bool bCopyQsplib = false;
+		bool bCopySkin = false;
+		// Если настройка "ContentDir" не задана, 
+		// значит игру не нашли.
+		// Тогда используем "игру" по умолчанию из папки "assets\standalone_content".
+		string contentDir = Configuration::getString(ecpContentDir);
+		string skinFilePath = Configuration::getString(ecpSkinFilePath);
+		string selectedSkin = "default";
+		if (contentDir == "") {
+			bCopyQsplib = true;
+			bCopySkin = true;
+
+			// Запускаем игру по умолчанию
+			contentDir = ASSETS_DIR + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
+			Configuration::setString(ecpGameFilePath, contentDir + PATH_DELIMITER + DEFAULT_GAME_FILE);
+		} else {
+			// Проверяем наличие qsplib.
+			bCopyQsplib = !fileExists(contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR);
+
+			// Проверяем наличие скина.
+			bCopySkin = skinFilePath == "";
+			if (bCopySkin) {
+				// Выясняем, какой скин был указан для игры.
+				string configSkin = Configuration::getString(ecpSkinName);
+				if (configSkin != "") {
+					// Выбираем указанный скин.
+					selectedSkin = configSkin;
+				}
+			}
+		}
+
+		// Если требуется копирование, 
+		// проверяем наличие папки "assets", 
+		// внутри которой лежат необходимые папки шаблонов оформления, 
+		// "qsplib" и файл игры по умолчанию.
+		if (bCopyQsplib || bCopySkin) {
+			if (!dirExists(ASSETS_DIR)) {
+				showError("Не найдена папка \"" + ASSETS_DIR + "\" системных файлов плеера.");
+				return false;
+			}
+
+			// Создаём временную папку для игры.
+			string gameFolder = "";
+			// Путь к папке с данными приложения "Application Data"
+			WCHAR wszPath[MAX_PATH];
+			HRESULT hr = SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, wszPath);
+			if (hr != S_OK) {
+				showError("Не удалось получить путь к папке \"Application Data\".");
+				return false;
+			}
+			gameFolder = getRightPath(narrow(wszPath) + PATH_DELIMITER + GAME_CACHE_DIR + PATH_DELIMITER + md5(contentDir));
+			if (!buildDirectoryPath(gameFolder)) {
+				showError("Не удалось создать временную папку для игры: " + gameFolder);
+				return false;
+			}
+
+			// Копируем qsplib.
+			// true - из базовых файлов, false - из папки игры.
+			string source = bCopyQsplib ? 
+				ASSETS_DIR + PATH_DELIMITER + QSPLIB_DIR : gameFolder + PATH_DELIMITER + QSPLIB_DIR;
+			string dest = gameFolder + PATH_DELIMITER + QSPLIB_DIR;
+			if (!copyFileTree(source, dest)) {
+				showError("Не удалось скопировать папку библиотеки из \"" + source + "\" в \"" + dest + "\".");
+				return false;
+			}
+
+			// Копируем скин.
+			string destSkinFile = gameFolder + PATH_DELIMITER + DEFAULT_SKIN_FILE;
+			if (bCopySkin) {
+				// Копируем из базовых файлов
+				// Заполняем список существующих скинов.
+				vector<string> skinsList;
+				if (!getFoldersList(ASSETS_DIR, skinsList))
+					return false;
+
+				// Ищем указанный скин среди существующих.
+				bool found = false;
+				for (int i = 0; i < (int)skinsList.size(); i++)
+				{
+					if (skinsList[i] == selectedSkin) {
+						found = true;
+						break;
+					}
+				}
+
+				// Если не найден, выходим.
+				if (!found) {
+					showError("Не найден шаблон оформления " + selectedSkin);
+					return false;
+				}
+
+				// Копируем все файлы из папки шаблона
+				string source = ASSETS_DIR + PATH_DELIMITER + selectedSkin;
+				if (!copyFileTree(source, contentDir)) {
+					showError("Не удалось скопировать шаблон оформления из \"" + 
+						source + "\" в \"" + contentDir + "\".");
+					return false;
+				}
+			} else {
+				// Копируем из папки игры
+				if (!copyFile(skinFilePath, destSkinFile)) {
+					showError("Не удалось скопировать файл шаблона оформления из \"" + 
+						skinFilePath + "\" в \"" + destSkinFile + "\".");
+					return false;
+				}
+			}
+			// Обновляем переменную окружения
+			Configuration::setString(ecpSkinFilePath, destSkinFile);
+
+			// Копируем все файлы, которые могут понадобиться браузеру.
+			vector<string> masks;
+			// Картинки - ".jpg", ".jpeg", ".gif", ".bmp", ".png".
+			masks.push_back("*.jpg");
+			masks.push_back("*.jpeg");
+			masks.push_back("*.gif");
+			masks.push_back("*.bmp");
+			masks.push_back("*.png");
+			// Стили и скрипты - ".css", ".js".
+			if (bCopySkin) {
+				masks.push_back("*.css");
+				masks.push_back("*.js");
+			}
+			// Проходим по всем расширениям.
+			for (int i = 0; i < (int)masks.size(); i++) {
+				if (!copyFileTree(contentDir, gameFolder, masks[i])) {
+					showError("Не удалось переместить файлы с маской \"" + masks[i] +
+						"\" из \"" + contentDir + "\" в \"" + gameFolder + "\"");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	// Возвращаем список файлов либо папок
+	bool _getFilesOrFoldersList(string directory, string mask, vector<string>& list, bool bFileMode)
 	{
 		vector<string> result;
 
@@ -496,6 +637,8 @@ namespace QuestNavigator {
 		}
 		LPCWSTR szDir = wDir.c_str();
 
+		string label = bFileMode ? "файла" : "папки";
+
 		// Find the first file in the directory.
 
 		hFind = FindFirstFile(szDir, &ffd);
@@ -507,7 +650,7 @@ namespace QuestNavigator {
 				list = result;
 				return true;
 			} else {
-				showError("Не удалось осуществить поиск файла в папке " + directory + " по заданной маске " + mask);
+				showError("Не удалось осуществить поиск " + label + " в папке " + directory + " по заданной маске " + mask);
 				return false;
 			}
 		} 
@@ -516,7 +659,7 @@ namespace QuestNavigator {
 
 		do
 		{
-			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+			if (!bFileMode == (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 				result.push_back(narrow(ffd.cFileName));
 			}
 		}
@@ -525,7 +668,7 @@ namespace QuestNavigator {
 		dwError = GetLastError();
 		if (dwError != ERROR_NO_MORE_FILES) 
 		{
-			showError("Не удалось осуществить повторный поиск файла в папке " + directory + " по заданной маске " + mask);
+			showError("Не удалось осуществить повторный поиск " + label + " в папке " + directory + " по заданной маске " + mask);
 			return false;
 		}
 
@@ -536,6 +679,72 @@ namespace QuestNavigator {
 		}
 
 		list = result;
+		return true;
+	}
+
+	// Возвращаем список файлов
+	bool getFilesList(string directory, string mask, vector<string>& list)
+	{
+		return _getFilesOrFoldersList(directory, mask, list, true);
+	}
+
+	// Возвращаем список папок
+	bool getFoldersList(string directory, vector<string>& list)
+	{
+		return _getFilesOrFoldersList(directory, "*.*", list, false);
+	}
+
+	// Копируем файл
+	bool copyFile(string from, string to)
+	{
+		wstring wFrom = widen(from);
+		wstring wTo = widen(to);
+
+		BOOL res = CopyFileW(wFrom.c_str(), wTo.c_str(), FALSE);
+		if (res == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	// Копируем дерево файлов
+	bool copyFileTree(string from, string to)
+	{
+		return copyFileTree(from, to, "*.*");
+	}
+	bool copyFileTree(string from, string to, string mask)
+	{
+		// Если папка назначения не существует, создаём.
+		if (!buildDirectoryPath(to)) {
+			showError("Не удалось создать папку \"" + to + "\"");
+			return false;
+		}
+		// Выясняем, какие файлы находятся в папке.
+		vector<string> vecFiles;
+		if (!getFilesList(from, mask, vecFiles))
+			return false;
+		// Копируем все найденные файлы.
+		for (int i = 0; i < (int)vecFiles.size(); i++) {
+			string source = from + PATH_DELIMITER + vecFiles[i];
+			string dest = to + PATH_DELIMITER + vecFiles[i];
+			if (!copyFile(source, dest)) {
+				showError("Не удалось скопировать файл из \"" + source +
+					"\" в \"" + dest + "\".");
+				return false;
+			}
+		}
+		// Получаем список вложенных папок.
+		vector<string> vecFolders;
+		if (!getFoldersList(from, vecFolders))
+			return false;
+		// Проходим по всем вложенным папкам.
+		for (int i = 0; i < (int)vecFolders.size(); i++) {
+			// Для каждой вложенной папки рекурсивно вызываем функцию копирования.
+			string source = from + PATH_DELIMITER + vecFolders[i];
+			string dest = to + PATH_DELIMITER + vecFolders[i];
+			if (!copyFileTree(source, dest, mask))
+				return false;
+		}
 		return true;
 	}
 

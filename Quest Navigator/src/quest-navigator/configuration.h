@@ -35,6 +35,7 @@ namespace QuestNavigator {
 		ecpGameResizeable,
 		ecpGameFullscreenAvailable,
 		ecpGameStartFullscreen,
+		ecpSkinName,
 
 		ecpLast
 	};
