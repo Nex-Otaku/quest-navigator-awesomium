@@ -363,8 +363,15 @@ namespace QuestNavigator {
 				return false;
 			}
 
-			// STUB
-			// Сделать проверку всех файлов на читаемость
+			// Проверяем все файлы на читаемость
+			if (!fileExists(skinFilePath))
+				skinFilePath = "";
+			if (!fileExists(configFilePath))
+				configFilePath = "";
+			if (!fileExists(gameFilePath)) {
+				showError("Не удалось загрузить игру из файла: " + gameFilePath);
+				return false;
+			}
 
 			// Папка для сохранений
 			saveDir = "";
