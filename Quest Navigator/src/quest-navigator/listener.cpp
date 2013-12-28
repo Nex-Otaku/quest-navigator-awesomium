@@ -82,12 +82,6 @@ namespace QuestNavigator {
 
 		initLib();
 
-		// Подключаем пак с данными по умолчанию.
-		// Существование пака не проверяется.
-		// Если нам в параметрах указали путь к файлу - тогда просто не используем пак.
-		//data_source_ = new DataPakSource(ToWebString("assets.pak"));
-		//view_->web_view()->session()->AddDataSource(WSLit("webui"), data_source_);
-
 		// Готовим игру к запуску.
 		if (!prepareGameFiles()) {
 			app_->Quit();

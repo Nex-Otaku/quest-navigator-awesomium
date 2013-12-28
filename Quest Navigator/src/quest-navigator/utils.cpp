@@ -105,14 +105,7 @@ namespace QuestNavigator {
 	// URL к содержимому
 	string getContentUrl()
 	{
-		// Если путь к содержимому не задан явно,
-		// указываем путь по умолчанию для пака "assets.pak".
-		// Файл "assets.pak" ищется в рабочей папке.
 		string contentPath = Configuration::getString(ecpSkinFilePath);
-		//string contentUrl = (contentPath.length() == 0) ?
-		//	"asset://webui/" + backslashToSlash(DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER + DEFAULT_SKIN_FILE) : 
-		//getUrlFromFilePath(contentPath);
-		//return contentUrl;
 		return getUrlFromFilePath(contentPath);
 	}
 
@@ -273,7 +266,7 @@ namespace QuestNavigator {
 		// Определяем игру для запуска.
 		// 1. Если игра указана параметром командной строки, запускаем её.
 		// 2. Если параметр не указан, ищем игру в папке плеера.
-		// 3. Если в папке плеера игра не найдена, игра запускается из assets.pak
+		// 3. Если в папке плеера игра не найдена, игра запускается из assets\standalone_content
 
 		string contentDir = "";
 		string skinFilePath = "";
