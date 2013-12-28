@@ -285,7 +285,7 @@ namespace QuestNavigator {
 			contentDir = getCurrentDir();
 
 			bool bValidDirectory = dirExists(contentPath);
-			bool bValidFile = fileExists(contentPath);
+			bool bValidFile = !bValidDirectory && fileExists(contentPath);
 			if (bValidFile) {
 				// Проверяем расширение файла
 				bool bExtQn = endsWith(contentPath, ".qn");
