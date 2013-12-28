@@ -9,6 +9,6 @@ DEL /Q /S "%OUTDIR%\*.*"
 COPY "%BINDIR%*.exe" "%OUTDIR%"
 COPY "%BINDIR%*.dll" "%OUTDIR%"
 REM Копируем всё кроме .gitignore
-ROBOCOPY "%ADDDIR%" "%OUTDIR%" /XF .gitignore
+ROBOCOPY "%ADDDIR%" "%OUTDIR%" /S /E /XF .gitignore
 
 "%ISSDIR%\iscc" "%SCRIPTDIR%buildinstaller.iss"
