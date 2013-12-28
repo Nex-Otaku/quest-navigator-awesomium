@@ -53,6 +53,10 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [UninstallDelete]
 Type: files; Name: "{app}\awesomium.log"
+; Папка "Program Files(x86)\QSP\QuestNavigator"
+Type: dirifempty; Name: "{app}"
+; Папка "Program Files(x86)\QSP"
+Type: dirifempty; Name: "{app}"
 
 [Registry]
 Root: HKCU; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}\WinSparkle"; Flags: uninsdeletekey
