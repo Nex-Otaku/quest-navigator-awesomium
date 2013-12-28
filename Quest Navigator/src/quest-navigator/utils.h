@@ -79,8 +79,8 @@ namespace QuestNavigator {
 	bool fileExists(string path);
 	// Проверяем папку на существование и читаемость
 	bool dirExists(string path);
-	// Получаем путь к рабочей папке
-	string getCurrentDir();
+	// Получаем путь к папке плеера
+	string getPlayerDir();
 	// Меняем слэши в пути к файлу в зависимости от системы
 	string getRightPath(string path);
 	// Загружаем файл в память

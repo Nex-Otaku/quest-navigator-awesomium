@@ -125,19 +125,26 @@ namespace QuestNavigator {
 			(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 	}
 
-	// Получаем путь к рабочей папке
-	string getCurrentDir()
+	// Получаем путь к папке плеера
+	string getPlayerDir()
 	{
 		TCHAR buffer[MAX_PATH];
 		PTSTR szDir = buffer;
 
-		DWORD res = GetCurrentDirectory((DWORD)MAX_PATH, szDir);
+		DWORD res = GetModuleFileName(NULL, szDir, (DWORD)MAX_PATH);
 		if (res == 0) {
-			showError("Не могу прочесть текущую директорию");
+			showError("Не могу прочесть путь к плееру");
 			return "";
 		}
-		if (res > MAX_PATH) {
-			showError("Путь к текущей директории не помещается в буфер");
+		if (res == MAX_PATH) {
+			showError("Путь к плееру не помещается в буфер");
+			return "";
+		}
+
+		// Удаляем имя исполняемого файла, оставляем только путь к нему, без слэша в конце.
+		res = PathRemoveFileSpec(szDir);
+		if (res == 0) {
+			showError("Ошибка при обработке пути к плееру");
 			return "";
 		}
 
@@ -282,7 +289,6 @@ namespace QuestNavigator {
 			// 2. Это путь к файлу .qsp;
 			// 3. Это путь к папке игры.
 			// Проверяем путь на существование и читаемость.
-			contentDir = getCurrentDir();
 
 			bool bValidDirectory = dirExists(contentPath);
 			bool bValidFile = !bValidDirectory && fileExists(contentPath);
@@ -303,7 +309,6 @@ namespace QuestNavigator {
 					gameFilePath = contentPath;
 					gameFileName = contentPath;
 					// Вычисляем путь к папке игры
-					contentDir = "";
 					if (contentPath.length() > 0) {
 						int pos = contentPath.find_last_of(PATH_DELIMITER);
 						if  (pos != string::npos) {
@@ -495,12 +500,13 @@ namespace QuestNavigator {
 		string contentDir = Configuration::getString(ecpContentDir);
 		string skinFilePath = Configuration::getString(ecpSkinFilePath);
 		string selectedSkin = "default";
+		string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
 		if (contentDir == "") {
 			bCopyQsplib = true;
 			bCopySkin = true;
 
 			// Запускаем игру по умолчанию
-			contentDir = ASSETS_DIR + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
+			contentDir = assetsDir + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
 			Configuration::setString(ecpGameFilePath, contentDir + PATH_DELIMITER + DEFAULT_GAME_FILE);
 		} else {
 			// Проверяем наличие qsplib.
@@ -523,8 +529,8 @@ namespace QuestNavigator {
 		// внутри которой лежат необходимые папки шаблонов оформления, 
 		// "qsplib" и файл игры по умолчанию.
 		if (bCopyQsplib || bCopySkin) {
-			if (!dirExists(ASSETS_DIR)) {
-				showError("Не найдена папка \"" + ASSETS_DIR + "\" системных файлов плеера.");
+			if (!dirExists(assetsDir)) {
+				showError("Не найдена папка \"" + assetsDir + "\" системных файлов плеера.");
 				return false;
 			}
 
@@ -551,7 +557,7 @@ namespace QuestNavigator {
 			// Копируем qsplib.
 			// true - из базовых файлов, false - из папки игры.
 			string source = bCopyQsplib ? 
-				ASSETS_DIR + PATH_DELIMITER + QSPLIB_DIR : gameFolder + PATH_DELIMITER + QSPLIB_DIR;
+				assetsDir + PATH_DELIMITER + QSPLIB_DIR : gameFolder + PATH_DELIMITER + QSPLIB_DIR;
 			string dest = gameFolder + PATH_DELIMITER + QSPLIB_DIR;
 			if (!copyFileTree(source, dest)) {
 				showError("Не удалось скопировать папку библиотеки из \"" + source + "\" в \"" + dest + "\".");
@@ -563,7 +569,7 @@ namespace QuestNavigator {
 			if (bCopySkin) {
 				// Копируем из базовых файлов
 
-				string skinsDir = ASSETS_DIR + PATH_DELIMITER + SKINS_DIR;
+				string skinsDir = assetsDir + PATH_DELIMITER + SKINS_DIR;
 
 				// Заполняем список существующих скинов.
 				vector<string> skinsList;
@@ -625,6 +631,9 @@ namespace QuestNavigator {
 					return false;
 				}
 			}
+
+			// Обновляем путь к папке контента.
+			Configuration::setString(ecpContentDir, contentFolder);
 		}
 		return true;
 	}
