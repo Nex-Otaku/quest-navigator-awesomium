@@ -687,7 +687,7 @@ namespace QuestNavigator {
 
 		do
 		{
-			if (!bFileMode == (bool)(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+			if (!bFileMode == ((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)) {
 				string fileName = narrow(ffd.cFileName);
 				if ((fileName != ".") && (fileName != ".."))
 					result.push_back(fileName);
