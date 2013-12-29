@@ -382,6 +382,14 @@ namespace QuestNavigator {
 			}
 			saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + md5(contentDir));
 		}
+		
+		if (contentDir == "") {
+			// Загружаем конфиг из игры по умолчанию.
+			string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
+			configFilePath = getRightPath(assetsDir + PATH_DELIMITER 
+				+ DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER 
+				+ DEFAULT_CONFIG_FILE);
+		}
 		// Сохраняем конфигурацию
 		Configuration::setString(ecpContentDir, contentDir);
 		Configuration::setString(ecpSkinFilePath, skinFilePath);
@@ -396,16 +404,6 @@ namespace QuestNavigator {
 		bool gameConfigLoaded = loadGameConfig();
 		if (!gameConfigLoaded)
 			return false;
-
-		// Обрабатываем настройки игры
-		if (Configuration::getBool(ecpGameFullscreenAvailable) && 
-			Configuration::getBool(ecpGameStartFullscreen)) {
-				Configuration::setBool(ecpIsFullscreen, true);
-		}
-		string gameTitle = Configuration::getString(ecpGameTitle);
-		if (gameTitle != "") {
-			Configuration::setString(ecpWindowTitle, gameTitle);
-		}
 
 		return true;
 	}
@@ -467,8 +465,21 @@ namespace QuestNavigator {
 		LOAD_XML_ATTRIB("fullscreenAvailable", ecpGameFullscreenAvailable);
 		LOAD_XML_ATTRIB("startFullscreen", ecpGameStartFullscreen);
 		LOAD_XML_ATTRIB("skinName", ecpSkinName);
+		if (!valid) {
+			return false;
+		}
 
-		return valid;
+		// Обрабатываем настройки игры
+		if (Configuration::getBool(ecpGameFullscreenAvailable) && 
+			Configuration::getBool(ecpGameStartFullscreen)) {
+				Configuration::setBool(ecpIsFullscreen, true);
+		}
+		string gameTitle = Configuration::getString(ecpGameTitle);
+		if (gameTitle != "") {
+			Configuration::setString(ecpWindowTitle, gameTitle);
+		}
+
+		return true;
 	}
 
 	// Готовим игру к запуску.
