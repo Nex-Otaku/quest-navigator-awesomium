@@ -6,6 +6,7 @@
 #define MyAppPublisher "QSP"
 #define MyAppURL "http://qsp.su"
 #define MyAppExeName "QuestNavigator.exe"
+#define QnCacheFolder "Quest Navigator Cache"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -35,7 +36,7 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
-Name: associate; Description: "Привязать к расширению файла "".qsp"""; GroupDescription: "Other tasks:"
+Name: associate; Description: "Привязать к расширению файла "".qsp"""; GroupDescription: "Привязка расширений:"
 
 [Files]
 Source: "D:\dev\repos\quest-navigator-awesomium\Quest Navigator\installer\files\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -53,10 +54,11 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [UninstallDelete]
 Type: files; Name: "{app}\awesomium.log"
-; Папка "Program Files(x86)\QSP\QuestNavigator"
+; Папки "Program Files(x86)\QSP\QuestNavigator" и "Program Files(x86)\QSP"
 Type: dirifempty; Name: "{app}"
-; Папка "Program Files(x86)\QSP"
 Type: dirifempty; Name: "{app}\.."
+; Папка с кэшем игр
+Type: filesandordirs; Name: "{userappdata}\{#QnCacheFolder}"
 
 [Registry]
 Root: HKCU; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}\WinSparkle"; Flags: uninsdeletekey
