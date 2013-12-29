@@ -27,7 +27,7 @@ OutputBaseFilename=QuestNavigator-setup-{#MyAppVersion}
 SetupIconFile=D:\dev\QSP\qsp_svn\players\classic\qspgui\misc\icons\logo.ico
 Compression=lzma
 SolidCompression=yes
-;ChangesAssociations=yes
+ChangesAssociations=yes
 
 [Languages]
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
@@ -35,10 +35,10 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
-;Name: associate; Description: "Привязать к расширению файла "".qsp"""; GroupDescription: "Other tasks:"; Flags: unchecked
+Name: associate; Description: "Привязать к расширению файла "".qsp"""; GroupDescription: "Other tasks:"
 
 [Files]
-Source: "D:\dev\repos\quest-navigator-awesomium\Quest Navigator\installer\files\QuestNavigator.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\dev\repos\quest-navigator-awesomium\Quest Navigator\installer\files\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\dev\repos\quest-navigator-awesomium\Quest Navigator\installer\files\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
@@ -56,7 +56,13 @@ Type: files; Name: "{app}\awesomium.log"
 ; Папка "Program Files(x86)\QSP\QuestNavigator"
 Type: dirifempty; Name: "{app}"
 ; Папка "Program Files(x86)\QSP"
-Type: dirifempty; Name: "{app}"
+Type: dirifempty; Name: "{app}\.."
 
 [Registry]
 Root: HKCU; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}\WinSparkle"; Flags: uninsdeletekey
+; Привязка файлов с расширением .qsp
+Root: HKCR; Subkey: ".qsp"; ValueType: string; ValueName: ""; ValueData: "QspGameFile"; Flags: uninsdeletevalue; Tasks: associate
+Root: HKCR; Subkey: "qsp_auto_file"; ValueType: none; ValueName: ""; ValueData: ""; Flags: deletekey; Tasks: associate
+Root: HKCR; Subkey: "QspGameFile"; ValueType: string; ValueName: ""; ValueData: "Файл игры QSP"; Flags: uninsdeletekey; Tasks: associate
+Root: HKCR; Subkey: "QspGameFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: associate
+Root: HKCR; Subkey: "QspGameFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: associate
