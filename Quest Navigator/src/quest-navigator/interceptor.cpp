@@ -27,10 +27,14 @@ ResourceResponse* QnInterceptor::OnRequest(ResourceRequest* request)
 	WebURL url = request->url();
 	string sUrl = ToString(url.spec());
 	string scheme = ToString(url.scheme());
+	// Ссылки на сайты должны открываться
+	// в браузере по умолчанию.
 	if ((scheme == "http") || (scheme == "https")) {
-		// Ссылки на сайты должны открываться
-		// в браузере по умолчанию.
-		app_->openUrlInSystemBrowser(sUrl);
+		// Блокируем запросы, оканчивающиеся на "wpad.dat":
+		// это системные запросы для автоопределения прокси.
+		if (!endsWith(sUrl, "wpad.dat")) {
+			app_->openUrlInSystemBrowser(sUrl);
+		}
 		request->Cancel();
 	}
 	return 0;
