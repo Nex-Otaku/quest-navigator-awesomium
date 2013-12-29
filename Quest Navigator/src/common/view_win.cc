@@ -31,6 +31,11 @@ public:
 		wstring wWindowTitle = widen(Configuration::getString(ecpWindowTitle));
 		LPCWSTR wszTitle = wWindowTitle.c_str();
 
+		// Вычисляем толщину рамок окна
+		bool result = this->calcBorders();
+		if (!result)
+			exit(-1);
+
 		// Create our WinAPI Window
 		DWORD dwWindowStyle = getWindowStyle();
 		HINSTANCE hInstance = GetModuleHandle(0);
@@ -39,8 +44,8 @@ public:
 			dwWindowStyle,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			width + 20,
-			height + 40, 
+			this->getFullWindowWidth(width),
+			this->getFullWindowHeight(height), 
 			NULL,
 			NULL,
 			hInstance,
@@ -152,8 +157,64 @@ public:
 		int line_number,
 		const Awesomium::WebString& source) { }
 
+	int getFullWindowWidth(int viewWidth)
+	{
+		int borderWidth = Configuration::getBool(ecpGameResizeable) ? this->sizeableBorderWidth : this->fixedBorderWidth;
+		return 2*borderWidth + viewWidth;
+	};
+
+	int getFullWindowHeight(int viewHeight)
+	{
+		int borderHeight = Configuration::getBool(ecpGameResizeable) ? this->sizeableBorderHeight : this->fixedBorderHeight;
+		return 2*borderHeight + this->captionHeight + viewHeight;
+	};
+
+protected:
+	// Вычисляем толщину рамки окна.
+	// Требуется для корректного расчёта ширины и высоты окна.
+	// Мы должны задать размер для всего окна,
+	// зная требуемый размер клиентской части.
+	bool calcBorders()
+	{
+		// Высота заголовка окна.
+		int res = GetSystemMetrics(SM_CYCAPTION);
+		bool bError = res == 0;
+		this->captionHeight = res;
+
+		// Высота горизонтальной границы для растягиваемого окна.
+		res = GetSystemMetrics(SM_CXSIZEFRAME);
+		bError = bError || res == 0;
+		this->sizeableBorderHeight = res;
+
+		// Ширина вертикальной границы для растягиваемого окна.
+		res = GetSystemMetrics(SM_CYSIZEFRAME);
+		bError = bError || res == 0;
+		this->sizeableBorderWidth = res;
+
+		// Высота горизонтальной границы для нерастягиваемого окна.
+		res = GetSystemMetrics(SM_CXFIXEDFRAME);
+		bError = bError || res == 0;
+		this->fixedBorderHeight = res;
+
+		// Ширина вертикальной границы для нерастягиваемого окна
+		res = GetSystemMetrics(SM_CYFIXEDFRAME);
+		bError = bError || res == 0;
+		this->fixedBorderWidth = res;
+
+		if (bError) {
+			showError("Ошибка при определении параметров отрисовки");
+			return false;
+		}
+		return true;
+	};
+
 protected:
 	HWND hwnd_;
+	int captionHeight;
+	int sizeableBorderWidth;
+	int sizeableBorderHeight;
+	int fixedBorderWidth;
+	int fixedBorderHeight;
 };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -173,16 +234,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			POINT ptMax = pInfo->ptMaxTrackSize;
 			int minWidth = Configuration::getInt(ecpGameMinWidth);
 			if (minWidth != 0)
-				ptMin.x = minWidth;
+				ptMin.x = view->getFullWindowWidth(minWidth);
 			int minHeight = Configuration::getInt(ecpGameMinHeight);
 			if (minHeight != 0)
-				ptMin.y = minHeight;
+				ptMin.y = view->getFullWindowHeight(minHeight);
 			int maxWidth = Configuration::getInt(ecpGameMaxWidth);
 			if (maxWidth != 0)
-				ptMax.x = maxWidth;
+				ptMax.x = view->getFullWindowWidth(maxWidth);
 			int maxHeight = Configuration::getInt(ecpGameMaxHeight);
 			if (maxHeight != 0)
-				ptMax.y = maxHeight;
+				ptMax.y = view->getFullWindowHeight(maxHeight);
 			pInfo->ptMinTrackSize = ptMin;
 			pInfo->ptMaxTrackSize = ptMax;
 			return 0;
