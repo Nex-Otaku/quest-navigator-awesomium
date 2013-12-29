@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Quest Navigator"
-#define MyAppVersion "0.0.6"
+#define MyAppVersion "0.0.7-test"
 #define MyAppPublisher "QSP"
 #define MyAppURL "http://qsp.su"
 #define MyAppExeName "QuestNavigator.exe"
