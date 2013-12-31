@@ -165,6 +165,43 @@ namespace QuestNavigator {
 		return result;
 	}
 
+	// Преобразовываем относительный путь в абсолютный
+	string relativePathToAbsolute(string relative)
+	{
+		// Если путь не относительный, сразу возвращаем.
+		wstring wRelative = widen(relative);
+		BOOL res = PathIsRelative(wRelative.c_str());
+		if (res == FALSE) {
+			return relative;
+		}
+
+		// Получаем рабочую директорию.
+		TCHAR buffer[MAX_PATH];
+		PTSTR szDir = buffer;
+		DWORD curDirLen = GetCurrentDirectory((DWORD)MAX_PATH, szDir);
+		if (curDirLen == 0) {
+			showError("Не могу прочесть текущую директорию");
+			return "";
+		}
+		if (curDirLen >= MAX_PATH) {
+			showError("Путь к текущей директории не помещается в буфер");
+			return "";
+		}
+
+		// Совмещаем путь к рабочей директории и относительный путь.
+		TCHAR bufferAbsolute[MAX_PATH];
+		PTSTR szAbsolute = bufferAbsolute;
+		PTSTR szCombined = PathCombine(szAbsolute, szDir, wRelative.c_str());
+		if (szCombined == NULL) {
+			showError("Не удалось получить абсолютный путь");
+			return "";
+		}
+		wstring wAbsolute = szCombined;
+		string absolute = narrow(wAbsolute);
+
+		return absolute;
+	}
+
 	// Загружаем файл в память
 	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength)
 	{
@@ -179,11 +216,13 @@ namespace QuestNavigator {
 			CloseHandle(hFile);
 			return false;
 		}
+		// В буфере будет завершающий нулевой байт.
+		int totalBufferLength = dwFileSize + 1;
 		// Выделяем блок памяти
 		char* pFileChunk = NULL;
 		// Может не хватить памяти (если файл слишком большой)
 		try {
-			pFileChunk = new char[dwFileSize];
+			pFileChunk = new char[totalBufferLength];
 		} catch (...) {
 			CloseHandle(hFile);
 			return false;
@@ -202,9 +241,11 @@ namespace QuestNavigator {
 			delete pFileChunk;
 			return false;
 		}
+		// Записываем завершающий нулевой байт в буфер, для корректного чтения.
+		pFileChunk[dwFileSize] = 0;
 		// Возвращаем результат
 		*bufferPtr = pFileChunk;
-		*bufferLength = (int)dwFileSize;
+		*bufferLength = totalBufferLength;
 		// Не забываем освободить память вызовом "delete" после использования!
 		return true;
 	}
@@ -292,6 +333,10 @@ namespace QuestNavigator {
 
 			bool bValidDirectory = dirExists(contentPath);
 			bool bValidFile = !bValidDirectory && fileExists(contentPath);
+			// Путь к файлу игры должен быть абсолютным.
+			if (bValidFile || bValidDirectory) {
+				contentPath = relativePathToAbsolute(contentPath);
+			}
 			if (bValidFile) {
 				// Проверяем расширение файла
 				bool bExtQn = endsWith(contentPath, ".qn");
@@ -439,9 +484,9 @@ namespace QuestNavigator {
 			return false;
 		}
 		// Разбираем XML
-		bool loadOkay = doc.Parse((const char*)buffer, 0, TIXML_ENCODING_UTF8) != 0;
+		doc.Parse((const char*)buffer, 0, TIXML_ENCODING_UTF8);
 		delete buffer;
-		if (!loadOkay)
+		if (doc.Error())
 		{
 			showError("Не удалось загрузить XML-структуру из файла \"" + configFilePath + "\".");
 			return false;

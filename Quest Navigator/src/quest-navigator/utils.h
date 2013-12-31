@@ -83,6 +83,8 @@ namespace QuestNavigator {
 	string getPlayerDir();
 	// Меняем слэши в пути к файлу в зависимости от системы
 	string getRightPath(string path);
+	// Преобразовываем относительный путь в абсолютный
+	string relativePathToAbsolute(string relative);
 	// Загружаем файл в память
 	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength);
 	// Создаём папки
