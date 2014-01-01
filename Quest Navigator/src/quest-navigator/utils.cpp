@@ -153,6 +153,26 @@ namespace QuestNavigator {
 		return dir;
 	}
 
+	// Преобразовываем путь к файлу сохранения.
+	string getRealSaveFile(string file)
+	{
+		// "D:\MySaveDirForCoolGame"
+		string saveDir = Configuration::getString(ecpSaveDir);
+		// "D:\CoolGame\saves\save1.sav"
+		string originalSaveFilePath = getRightPath(file);
+		// "D:\CoolGame\game.qsp"
+		string gameFilePath = getRightPath(Configuration::getString(ecpGameFilePath));
+		// "game.qsp"
+		string gameFileName = Configuration::getString(ecpGameFileName);
+		// "D:\CoolGame\"
+		string gameDir = gameFilePath.substr(0, gameFilePath.length() - gameFileName.length());
+		// "saves\save1.sav"
+		string relativeSavePath = originalSaveFilePath.substr(gameDir.length());
+		// "D:\MySaveDirForCoolGame\saves\save1.sav"
+		string saveFile = getRightPath(saveDir + PATH_DELIMITER + relativeSavePath);
+		return saveFile;
+	}
+
 	// Меняем слэши в пути к файлу в зависимости от системы
 	string getRightPath(string path)
 	{
@@ -562,6 +582,7 @@ namespace QuestNavigator {
 
 			// Запускаем игру по умолчанию
 			contentDir = assetsDir + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
+			Configuration::setString(ecpGameFileName, DEFAULT_GAME_FILE);
 			Configuration::setString(ecpGameFilePath, contentDir + PATH_DELIMITER + DEFAULT_GAME_FILE);
 		} else {
 			// Проверяем наличие qsplib.

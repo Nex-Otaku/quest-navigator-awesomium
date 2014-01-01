@@ -644,7 +644,17 @@ namespace QuestNavigator {
 	{
 		//Контекст библиотеки
 		if (file != 0) {
-			string saveFile = getRightPath(Configuration::getString(ecpSaveDir) + PATH_DELIMITER + fromQsp(file));
+			// Библиотека возвращает асболютный путь к файлу сохранения,
+			// вычисляемый по пути к файлу игры.
+			// Таким образом, если игра запущена из пути "D:\CoolGame\game.qsp",
+			// то при выполнении команды 
+			// OPENGAME 'saves\save1.sav'
+			// сейв будет загружаться из папки игры:
+			// "D:\CoolGame\saves\save1.sav"
+			// Нас это не устраивает, 
+			// нам нужно, чтобы сейвы хранились в отдельном безопасном месте.
+			// Поэтому мы меняем путь, заданный библиотекой, на свой.
+			string saveFile = getRealSaveFile(fromQsp(file));
 			if (fileExists(saveFile)) {
 				QSP_BOOL res = QSPOpenSavedGame(widen(saveFile).c_str(), QSP_FALSE);
 				CheckQspResult(res, "QSPOpenSavedGame");
@@ -663,7 +673,17 @@ namespace QuestNavigator {
 				showError("Не удалось создать папку для сохранения: " + saveDir);
 				return;
 			}
-			string saveFile = getRightPath(saveDir + PATH_DELIMITER + fromQsp(file));
+			// Библиотека возвращает асболютный путь к файлу сохранения,
+			// вычисляемый по пути к файлу игры.
+			// Таким образом, если игра запущена из пути "D:\CoolGame\game.qsp",
+			// то при выполнении команды 
+			// SAVEGAME 'saves\save1.sav'
+			// сейв будет сохраняться в папке игры:
+			// "D:\CoolGame\saves\save1.sav"
+			// Нас это не устраивает, 
+			// нам нужно, чтобы сейвы хранились в отдельном безопасном месте.
+			// Поэтому мы меняем путь, заданный библиотекой, на свой.
+			string saveFile = getRealSaveFile(fromQsp(file));
 			QSP_BOOL res = QSPSaveGame(widen(saveFile).c_str(), QSP_FALSE);
 			CheckQspResult(res, "QSPSaveGame");
 		} else {

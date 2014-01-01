@@ -81,6 +81,8 @@ namespace QuestNavigator {
 	bool dirExists(string path);
 	// Получаем путь к папке плеера
 	string getPlayerDir();
+	// Преобразовываем путь к файлу сохранения
+	string getRealSaveFile(string file);
 	// Меняем слэши в пути к файлу в зависимости от системы
 	string getRightPath(string path);
 	// Преобразовываем относительный путь в абсолютный
