@@ -791,11 +791,24 @@ namespace QuestNavigator {
 	{
 		wstring wFrom = widen(from);
 		wstring wTo = widen(to);
-
+		// Копируем файл на новое место.
 		BOOL res = CopyFileW(wFrom.c_str(), wTo.c_str(), FALSE);
 		if (res == 0) {
 			return false;
 		}
+		// Сбрасываем атрибут "только для чтения" с файла назначения.
+		// Если этого не сделать, 
+		// позже будут сбои при попытке перезаписать этот файл.
+		DWORD dwAttrs = GetFileAttributes(wTo.c_str()); 
+		if (dwAttrs == INVALID_FILE_ATTRIBUTES) {
+			return false;
+		}
+		if ((dwAttrs & FILE_ATTRIBUTE_READONLY) != 0) { 
+			res = SetFileAttributes(wTo.c_str(), dwAttrs ^ FILE_ATTRIBUTE_READONLY); 
+			if (res == 0) {
+				return false;
+			}
+		} 
 		return true;
 	}
 
