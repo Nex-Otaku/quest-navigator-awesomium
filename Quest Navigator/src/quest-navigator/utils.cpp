@@ -584,7 +584,7 @@ namespace QuestNavigator {
 		string selectedSkin = "default";
 		string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
 		// Проверяем наличие qsplib.
-		bCopyQsplib = !fileExists(contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR);
+		bCopyQsplib = !dirExists(contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR);
 
 		// Проверяем наличие скина.
 		bCopySkin = skinFilePath == "";
