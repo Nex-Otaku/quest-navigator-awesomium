@@ -427,16 +427,6 @@ namespace QuestNavigator {
 				}
 				return false;
 			}
-
-			// Проверяем все файлы на читаемость
-			if (!fileExists(skinFilePath))
-				skinFilePath = "";
-			if (!fileExists(configFilePath))
-				configFilePath = "";
-			if (!fileExists(gameFilePath)) {
-				showError("Не удалось загрузить игру из файла: " + gameFilePath);
-				return false;
-			}
 		}
 		// Папка для сохранений
 		saveDir = "";
@@ -450,12 +440,27 @@ namespace QuestNavigator {
 		saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + md5(contentDir));
 		
 		if (contentDir == "") {
-			// Загружаем конфиг из игры по умолчанию.
+			// Запускаем игру по умолчанию
 			string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
 			configFilePath = getRightPath(assetsDir + PATH_DELIMITER 
 				+ DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER 
 				+ DEFAULT_CONFIG_FILE);
+			contentDir = assetsDir + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
+			gameFileName = DEFAULT_GAME_FILE;
+			gameFilePath = contentDir + PATH_DELIMITER + gameFileName;
+			skinFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
 		}
+
+		// Проверяем все файлы на читаемость
+		if (!fileExists(skinFilePath))
+			skinFilePath = "";
+		if (!fileExists(configFilePath))
+			configFilePath = "";
+		if (!fileExists(gameFilePath)) {
+			showError("Не удалось загрузить игру из файла: " + gameFilePath);
+			return false;
+		}
+
 		// Сохраняем конфигурацию
 		Configuration::setString(ecpContentDir, contentDir);
 		Configuration::setString(ecpSkinFilePath, skinFilePath);
@@ -578,27 +583,17 @@ namespace QuestNavigator {
 		string skinFilePath = Configuration::getString(ecpSkinFilePath);
 		string selectedSkin = "default";
 		string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
-		if (contentDir == "") {
-			bCopyQsplib = true;
-			bCopySkin = true;
+		// Проверяем наличие qsplib.
+		bCopyQsplib = !fileExists(contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR);
 
-			// Запускаем игру по умолчанию
-			contentDir = assetsDir + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
-			Configuration::setString(ecpGameFileName, DEFAULT_GAME_FILE);
-			Configuration::setString(ecpGameFilePath, contentDir + PATH_DELIMITER + DEFAULT_GAME_FILE);
-		} else {
-			// Проверяем наличие qsplib.
-			bCopyQsplib = !fileExists(contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR);
-
-			// Проверяем наличие скина.
-			bCopySkin = skinFilePath == "";
-			if (bCopySkin) {
-				// Выясняем, какой скин был указан для игры.
-				string configSkin = Configuration::getString(ecpSkinName);
-				if (configSkin != "") {
-					// Выбираем указанный скин.
-					selectedSkin = configSkin;
-				}
+		// Проверяем наличие скина.
+		bCopySkin = skinFilePath == "";
+		if (bCopySkin) {
+			// Выясняем, какой скин был указан для игры.
+			string configSkin = Configuration::getString(ecpSkinName);
+			if (configSkin != "") {
+				// Выбираем указанный скин.
+				selectedSkin = configSkin;
 			}
 		}
 
