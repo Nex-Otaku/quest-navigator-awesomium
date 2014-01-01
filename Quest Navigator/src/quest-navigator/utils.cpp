@@ -354,6 +354,8 @@ namespace QuestNavigator {
 			bool bValidDirectory = dirExists(contentPath);
 			bool bValidFile = !bValidDirectory && fileExists(contentPath);
 			// Путь к файлу игры должен быть абсолютным.
+			// Если он будет относительным,
+			// библиотека не сможет правильно загрузить QSP-модули.
 			if (bValidFile || bValidDirectory) {
 				contentPath = relativePathToAbsolute(contentPath);
 			}
