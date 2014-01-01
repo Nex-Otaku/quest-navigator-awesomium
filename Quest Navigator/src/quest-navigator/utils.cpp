@@ -415,18 +415,17 @@ namespace QuestNavigator {
 				showError("Не удалось загрузить игру из файла: " + gameFilePath);
 				return false;
 			}
-
-			// Папка для сохранений
-			saveDir = "";
-			// Путь к пользовательской папке "Мои документы"
-			WCHAR wszPath[MAX_PATH];
-			HRESULT hr = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, wszPath);
-			if (hr != S_OK) {
-				showError("Не удалось получить путь к папке \"Мои документы\".");
-				return false;
-			}
-			saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + md5(contentDir));
 		}
+		// Папка для сохранений
+		saveDir = "";
+		// Путь к пользовательской папке "Мои документы"
+		WCHAR wszPath[MAX_PATH];
+		HRESULT hr = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, wszPath);
+		if (hr != S_OK) {
+			showError("Не удалось получить путь к папке \"Мои документы\".");
+			return false;
+		}
+		saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + md5(contentDir));
 		
 		if (contentDir == "") {
 			// Загружаем конфиг из игры по умолчанию.
