@@ -431,6 +431,7 @@ namespace QuestNavigator {
 	{
 		//Контекст библиотеки
 		timerInterval = msecs;
+		startTimer();
 	}
 
 	void QnApplicationListener::SetInputStrText(QSP_CHAR* text)
@@ -1231,7 +1232,6 @@ namespace QuestNavigator {
 
 						// Устанавливаем период выполнения и запускаем таймер
 						SetTimer(500);
-						startTimer();
 
 						//Запускаем счетчик миллисекунд
 						gameStartTime = clock();
@@ -1448,11 +1448,16 @@ namespace QuestNavigator {
 	void QnApplicationListener::startTimer()
 	{
 		// Устанавливаем период выполнения
-		LARGE_INTEGER dueTime;
-		dueTime.QuadPart = -(timerInterval * 10000);
+		__int64         qwDueTime;
+		LARGE_INTEGER   liDueTime;
+		// Отрицательное 64-битное число указывает, 
+		// через сколько наносекунд должен сработать первый вызов таймера.
+		qwDueTime = -(timerInterval * 10000);
+		liDueTime.LowPart  = (DWORD) ( qwDueTime & 0xFFFFFFFF );
+		liDueTime.HighPart = (LONG)  ( qwDueTime >> 32 );
 
 		//Запускаем таймер
-		BOOL res = SetWaitableTimer(getEventHandle(evTimer), &dueTime, (LONG)timerInterval, NULL, NULL, FALSE);
+		BOOL res = SetWaitableTimer(getEventHandle(evTimer), &liDueTime, (LONG)timerInterval, NULL, NULL, FALSE);
 		if (res == 0) {
 			showError("Не удалось установить интервал таймера!");
 		}
