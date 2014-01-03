@@ -167,9 +167,13 @@
     <ClInclude Include="src\quest-navigator\configuration.h" />
     <ClInclude Include="src\quest-navigator\interceptor.h" />
     <ClInclude Include="src\quest-navigator\listener.h" />
+    <ClInclude Include="src\quest-navigator\resource.h" />
     <ClInclude Include="src\quest-navigator\skin.h" />
     <ClInclude Include="src\quest-navigator\sound.h" />
     <ClInclude Include="src\quest-navigator\utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="src\quest-navigator\my.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

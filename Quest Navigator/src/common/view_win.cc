@@ -4,6 +4,7 @@
 #include <vector>
 #include "../quest-navigator/utils.h"
 #include "../quest-navigator/configuration.h"
+#include "../quest-navigator/resource.h"
 
 class ViewWin;
 
@@ -82,6 +83,8 @@ public:
 		if (g_is_initialized)
 			return;
 
+		HICON hMyIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(IDI_LOGO));
+
 		WNDCLASSEX wc;
 
 		wc.cbSize        = sizeof(WNDCLASSEX);
@@ -90,12 +93,12 @@ public:
 		wc.cbClsExtra    = 0;
 		wc.cbWndExtra    = 0;
 		wc.hInstance     = GetModuleHandle(0);
-		wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+		wc.hIcon         = hMyIcon;
 		wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
 		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
 		wc.lpszMenuName  = NULL;
 		wc.lpszClassName = szWindowClass;
-		wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
+		wc.hIconSm       = hMyIcon;
 
 		if(!RegisterClassEx(&wc)) {
 			exit(-1);

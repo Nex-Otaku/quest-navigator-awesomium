@@ -230,5 +230,13 @@
     <ClInclude Include="src\quest-navigator\sound.h">
       <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
+    <ClInclude Include="src\quest-navigator\resource.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="src\quest-navigator\my.rc">
+      <Filter>Файлы ресурсов</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
