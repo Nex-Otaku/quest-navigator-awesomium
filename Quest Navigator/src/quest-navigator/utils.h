@@ -20,6 +20,7 @@ namespace QuestNavigator {
 	static const string SKINS_DIR = "skins";
 	static const string QSPLIB_DIR = "qsplib";
 	static const string GAME_CACHE_DIR = "Quest Navigator Cache";
+	static const string DEFAULT_SKIN_NAME = "default";
 	static const string DEFAULT_SKIN_FILE = "gameAwesomium.html";
 	static const string DEFAULT_CONFIG_FILE = "config.xml";
 	static const string DEFAULT_GAME_FILE = "start.qsp";
@@ -28,6 +29,9 @@ namespace QuestNavigator {
 	static const string QN_COMPANY_NAME = "QSP";
 	static const string QN_APP_NAME = "Quest Navigator";
 	static const string QN_VERSION = "0.0.9-test";
+	
+	static const string OPTION_ENABLE_SOUND_CACHE = "-enable-sound-cache";
+	static const string OPTION_DEFAULT_SKIN = "-default-skin";
 #ifdef _WIN32
 	static const string PATH_DELIMITER = "\\";
 #else

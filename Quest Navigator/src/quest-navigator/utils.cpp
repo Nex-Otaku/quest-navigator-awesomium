@@ -287,6 +287,7 @@ namespace QuestNavigator {
 		// Устанавливаем параметры по умолчанию
 		Configuration::setBool(ecpSoundCacheEnabled, false);
 		Configuration::setInt(ecpSaveSlotMax, 5);
+		Configuration::setString(ecpDefaultSkinName, DEFAULT_SKIN_NAME);
 
 		// Разбираем параметры запуска
 		int argCount = 0;
@@ -317,8 +318,18 @@ namespace QuestNavigator {
 				contentPathSet = true;
 			} else if (isOption) {
 				// Разбираем опции
-				if (param == "-enable-sound-cache") {
+				if (param == OPTION_ENABLE_SOUND_CACHE) {
+					// Кэшировать ли звуковые файлы.
 					Configuration::setBool(ecpSoundCacheEnabled, true);
+				} else if (startsWith(param, OPTION_DEFAULT_SKIN)) {
+					// Какой из стандартных шаблонов выбирать по умолчанию для игры, 
+					// при отсутствии у игры своего шаблона, 
+					// и отсутствии указаний в конфиге игры.
+					if (i + 1 == argCount) {
+						showError("Не указано имя шаблона для опции " + OPTION_DEFAULT_SKIN);
+					}
+					Configuration::setString(ecpDefaultSkinName, params[i + 1]);
+					i++;
 				} else {
 					showError("Неизвестная опция: [" + param + "]");
 					return false;
@@ -581,10 +592,11 @@ namespace QuestNavigator {
 		// Тогда используем "игру" по умолчанию из папки "assets\standalone_content".
 		string contentDir = Configuration::getString(ecpContentDir);
 		string skinFilePath = Configuration::getString(ecpSkinFilePath);
-		string selectedSkin = "default";
+		string selectedSkin = Configuration::getString(ecpDefaultSkinName);
 		string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
 		// Проверяем наличие qsplib.
-		bCopyQsplib = !dirExists(contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR);
+		string gameQsplibDir = contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR;
+		bCopyQsplib = !dirExists(gameQsplibDir);
 
 		// Проверяем наличие скина.
 		bCopySkin = skinFilePath == "";
@@ -630,7 +642,7 @@ namespace QuestNavigator {
 			// Копируем qsplib.
 			// true - из базовых файлов, false - из папки игры.
 			string source = bCopyQsplib ? 
-				assetsDir + PATH_DELIMITER + QSPLIB_DIR : gameFolder + PATH_DELIMITER + QSPLIB_DIR;
+				assetsDir + PATH_DELIMITER + QSPLIB_DIR : gameQsplibDir;
 			string dest = gameFolder + PATH_DELIMITER + QSPLIB_DIR;
 			if (!copyFileTree(source, dest)) {
 				showError("Не удалось скопировать папку библиотеки из \"" + source + "\" в \"" + dest + "\".");
@@ -819,6 +831,10 @@ namespace QuestNavigator {
 	}
 	bool copyFileTree(string from, string to, string mask)
 	{
+		if (from == to) {
+			showError("Нельзя копировать папку в саму себя: \"" + to + "\"");
+			return false;
+		}
 		// Если папка назначения не существует, создаём.
 		if (!buildDirectoryPath(to)) {
 			showError("Не удалось создать папку \"" + to + "\"");

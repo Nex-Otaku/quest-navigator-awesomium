@@ -23,6 +23,7 @@ namespace QuestNavigator {
 		ecpSaveSlotMax,
 		ecpWindowTitle,
 		ecpIsFullscreen,
+		ecpDefaultSkinName,
 
 		// Настройки игры
 		ecpGameWidth,
