@@ -28,7 +28,7 @@ namespace QuestNavigator {
 	static const string QN_WINDOWS_UPDATE_FEED = "http://feeds.feedburner.com/text-games/quest-navigator-windows";
 	static const string QN_COMPANY_NAME = "QSP";
 	static const string QN_APP_NAME = "Quest Navigator";
-	static const string QN_VERSION = "0.0.9";
+	static const string QN_VERSION = "0.0.10-test";
 	
 	static const string OPTION_ENABLE_SOUND_CACHE = "-enable-sound-cache";
 	static const string OPTION_DEFAULT_SKIN = "-default-skin";
