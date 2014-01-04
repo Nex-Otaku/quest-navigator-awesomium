@@ -335,9 +335,12 @@ namespace QuestNavigator {
 		//основное описание
 		string mainDesc = "";
 		bool bMainDescPrepared = false;
+		bool bMainDescNeedScroll = false;
 		if ((QSPIsMainDescChanged() == QSP_TRUE) || Skin::isHtmlModeChanged)
 		{
 			mainDesc = Skin::applyHtmlFixes(fromQsp(QSPGetMainDesc()));
+			bMainDescNeedScroll = startsWith(mainDesc, lastMainDesc);
+			lastMainDesc = mainDesc;
 			bMainDescPrepared = true;
 		}
 
@@ -412,8 +415,10 @@ namespace QuestNavigator {
 			JSObject groupedContent;
 			if (bSkinPrepared)
 				groupedContent.SetProperty(WSLit("skin"), jsSkin);
-			if (bMainDescPrepared)
+			if (bMainDescPrepared) {
 				groupedContent.SetProperty(WSLit("main"), ToWebString(mainDesc));
+				groupedContent.SetProperty(WSLit("scrollmain"), JSValue(bMainDescNeedScroll ? 1 : 0));
+			}
 			if (bActsPrepared)
 				groupedContent.SetProperty(WSLit("acts"), acts);
 			if (bVarsDescPrepared)
@@ -1003,6 +1008,7 @@ namespace QuestNavigator {
 	// ********************************************************************
 
 	string QnApplicationListener::jsExecBuffer = "";
+	string QnApplicationListener::lastMainDesc = "";
 	QnApplicationListener* QnApplicationListener::listener = NULL;
 	vector<ContainerMenuItem> QnApplicationListener::menuList;
 	clock_t QnApplicationListener::gameStartTime = 0;

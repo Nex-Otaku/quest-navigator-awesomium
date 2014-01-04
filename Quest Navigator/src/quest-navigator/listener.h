@@ -150,6 +150,7 @@ namespace QuestNavigator {
 		// ********************************************************************
 
 		static string jsExecBuffer;
+		static string lastMainDesc;
 		static QnApplicationListener* listener;
 		static vector<ContainerMenuItem> menuList;
 		static clock_t gameStartTime;
