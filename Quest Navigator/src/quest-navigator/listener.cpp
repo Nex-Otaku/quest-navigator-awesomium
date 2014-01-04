@@ -25,13 +25,14 @@ namespace QuestNavigator {
 	CRITICAL_SECTION g_csSharedData;
 
 	// Разделяемые данные
-	struct
+	struct SharedData
 	{
 		string str;
 		int num;
 		JSValue jsValue;
 		bool flag;
-	} g_sharedData;
+	};
+	SharedData g_sharedData[evLast];
 
 	// События для синхронизации потоков
 	HANDLE g_eventList[evLast];
@@ -236,7 +237,7 @@ namespace QuestNavigator {
 
 		// Готовим данные для передачи в поток
 		lockData();
-		g_sharedData.str = fileName;
+		g_sharedData[evRunGame].str = fileName;
 		runSyncEvent(evRunGame);
 		unlockData();
 
@@ -290,7 +291,7 @@ namespace QuestNavigator {
 				return;
 
 			lockData();
-			g_sharedData.str = qspCode;
+			g_sharedData[evExecuteCode].str = qspCode;
 			runSyncEvent(evExecuteCode);
 			unlockData();
 		}
@@ -529,7 +530,7 @@ namespace QuestNavigator {
 		// Возвращаем результат в библиотеку
 		string result = "";
 		lockData();
-		result = g_sharedData.str;
+		result = g_sharedData[evInputClosed].str;
 		unlockData();
 		wstring wResult = widen(result);
 		wcsncpy(buffer, wResult.c_str(), maxLen);
@@ -608,7 +609,7 @@ namespace QuestNavigator {
 		// Возвращаем результат
 		int result = -1;
 		lockData();
-		result = g_sharedData.num;
+		result = g_sharedData[evMenuClosed].num;
 		unlockData();
 
 		return result;
@@ -711,8 +712,8 @@ namespace QuestNavigator {
 		string name = "";
 		JSValue arg;
 		lockData();
-		name = g_sharedData.str;
-		arg = g_sharedData.jsValue;
+		name = g_sharedData[evJsCommitted].str;
+		arg = g_sharedData[evJsCommitted].jsValue;
 		unlockData();
 		jsCallApiFromUi(name, arg);
 		runSyncEvent(evJsExecuted);
@@ -743,8 +744,8 @@ namespace QuestNavigator {
 
 		// Отправляем данные в UI-поток.
 		lockData();
-		g_sharedData.str = name;
-		g_sharedData.jsValue = arg;
+		g_sharedData[evJsCommitted].str = name;
+		g_sharedData[evJsCommitted].jsValue = arg;
 		runSyncEvent(evJsCommitted);
 		unlockData();
 
@@ -826,7 +827,7 @@ namespace QuestNavigator {
 		JSValue jsPos = args[0];
 		int pos = jsPos.ToInteger();
 		lockData();
-		g_sharedData.num = pos;
+		g_sharedData[evExecuteAction].num = pos;
 		runSyncEvent(evExecuteAction);
 		unlockData();
 	}
@@ -845,7 +846,7 @@ namespace QuestNavigator {
 			return;
 
 		lockData();
-		g_sharedData.num = pos;
+		g_sharedData[evSelectObject].num = pos;
 		runSyncEvent(evSelectObject);
 		unlockData();
 	}
@@ -896,12 +897,12 @@ namespace QuestNavigator {
 
 		if (mode == 1) {
 			lockData();
-			g_sharedData.num = index;
+			g_sharedData[evLoadSlotSelected].num = index;
 			runSyncEvent(evLoadSlotSelected);
 			unlockData();
 		} else {
 			lockData();
-			g_sharedData.num = index;
+			g_sharedData[evSaveSlotSelected].num = index;
 			runSyncEvent(evSaveSlotSelected);
 			unlockData();
 		}
@@ -930,7 +931,7 @@ namespace QuestNavigator {
 		int pos = jsPos.ToInteger();
 
 		lockData();
-		g_sharedData.num = pos;
+		g_sharedData[evMenuClosed].num = pos;
 		runSyncEvent(evMenuClosed);
 		unlockData();
 	}
@@ -946,7 +947,7 @@ namespace QuestNavigator {
 		string text = ToString(jsText.ToString());
 
 		lockData();
-		g_sharedData.str = text;
+		g_sharedData[evInputClosed].str = text;
 		runSyncEvent(evInputClosed);
 		unlockData();
 	}
@@ -962,7 +963,7 @@ namespace QuestNavigator {
 		bool flag = jsFlag.ToBoolean();
 
 		lockData();
-		g_sharedData.flag = flag;
+		g_sharedData[evMute].flag = flag;
 		runSyncEvent(evMute);
 		unlockData();
 	}
@@ -979,7 +980,7 @@ namespace QuestNavigator {
 		string text = ToString(jsText.ToString());
 
 		lockData();
-		g_sharedData.str = text;
+		g_sharedData[evInputStringChanged].str = text;
 		runSyncEvent(evInputStringChanged);
 		unlockData();
 	}
@@ -1231,7 +1232,7 @@ namespace QuestNavigator {
 						// Запуск игры
 						string path = "";
 						lockData();
-						path = g_sharedData.str;
+						path = g_sharedData[evRunGame].str;
 						unlockData();
 						QSP_BOOL res = QSPLoadGameWorld(widen(path).c_str());
 						CheckQspResult(res, "QSPLoadGameWorld");
@@ -1278,7 +1279,7 @@ namespace QuestNavigator {
 						// Выполнение строки кода
 						string code = "";
 						lockData();
-						code = g_sharedData.str;
+						code = g_sharedData[evExecuteCode].str;
 						unlockData();
 						wstring wCode = widen(code);
 						QSP_BOOL res = QSPExecString(wCode.c_str(), QSP_TRUE);
@@ -1290,7 +1291,7 @@ namespace QuestNavigator {
 						// Выполнение действия
 						int pos = 0;
 						lockData();
-						pos = g_sharedData.num;
+						pos = g_sharedData[evExecuteAction].num;
 						unlockData();
 						QSP_BOOL res = QSPSetSelActionIndex(pos, QSP_FALSE);
 						CheckQspResult(res, "QSPSetSelActionIndex");
@@ -1303,7 +1304,7 @@ namespace QuestNavigator {
 						// Выбор предмета
 						int pos = 0;
 						lockData();
-						pos = g_sharedData.num;
+						pos = g_sharedData[evSelectObject].num;
 						unlockData();
 						QSP_BOOL res = QSPSetSelObjectIndex(pos, QSP_TRUE);
 						CheckQspResult(res, "QSPSetSelObjectIndex");
@@ -1321,7 +1322,7 @@ namespace QuestNavigator {
 						// Включение / выключение звука
 						bool flag = false;
 						lockData();
-						flag = g_sharedData.flag;
+						flag = g_sharedData[evMute].flag;
 						unlockData();
 						SoundManager::mute(flag);
 					}
@@ -1330,7 +1331,7 @@ namespace QuestNavigator {
 					{
 						int index = 0;
 						lockData();
-						index = g_sharedData.num;
+						index = g_sharedData[evLoadSlotSelected].num;
 						unlockData();
 						jsExecBuffer = "";
 
@@ -1355,7 +1356,7 @@ namespace QuestNavigator {
 					{
 						int index = 0;
 						lockData();
-						index = g_sharedData.num;
+						index = g_sharedData[evSaveSlotSelected].num;
 						unlockData();
 						jsExecBuffer = "";
 
@@ -1378,7 +1379,7 @@ namespace QuestNavigator {
 						// Изменился текст в строке ввода
 						string text = "";
 						lockData();
-						text = g_sharedData.str;
+						text = g_sharedData[evInputStringChanged].str;
 						unlockData();
 						QSPSetInputStrText(widen(text).c_str());
 					}
