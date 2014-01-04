@@ -721,7 +721,12 @@ namespace QuestNavigator {
 		if (window.IsObject()) {
 			JSArray args;
 			args.Push(arg);
-			window.ToObject().Invoke(ToWebString(name), args);
+			JSObject windowObject = window.ToObject();
+			windowObject.Invoke(ToWebString(name), args);
+			Error err = windowObject.last_error();
+			if (err != Error::kError_None) {
+				showError("Ошибка при выполнении JS-вызова.");
+			}
 		} else {
 			showError("Не удалось получить доступ к объекту окна.");
 		}
