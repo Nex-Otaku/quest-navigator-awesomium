@@ -497,9 +497,10 @@ namespace QuestNavigator {
 		// Проверяем читаемость файла.
 		// Если файл не существует или не читается, выходим.
 		if (fileName.length() > 0) {
-			string fullPath = getRightPath(Configuration::getString(ecpContentDir) + PATH_DELIMITER + fileName);
-			if (!fileExists(fullPath))
+			if (!fileExists(fileName)) {
+				showError("Оператор VIEW. Не найден файл: " + fileName);
 				return;
+			}
 		}
 
 		// "Пустое" имя файла тоже имеет значение - так мы скрываем картинку
