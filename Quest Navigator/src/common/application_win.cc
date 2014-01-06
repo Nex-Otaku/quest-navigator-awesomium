@@ -30,7 +30,7 @@ public:
 
 		// Main message loop:
 		MSG msg;
-		while (GetMessage(&msg, NULL, 0, 0) && is_running_) {
+		while (is_running_ && GetMessage(&msg, NULL, 0, 0)) {
 			web_core_->Update();
 
 			// Игнорируем нажатия Backspace вне текстовых полей
