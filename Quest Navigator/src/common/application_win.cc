@@ -33,11 +33,12 @@ public:
 		while (is_running_ && GetMessage(&msg, NULL, 0, 0)) {
 			web_core_->Update();
 
-			// Игнорируем нажатия Backspace вне текстовых полей
+			// Игнорируем нажатия Backspace вне текстовых полей.
 			bool bBackSpace = ((msg.message == WM_KEYDOWN) || (msg.message == WM_KEYUP)) &&
 				((msg.wParam == VK_BACK) || (msg.wParam == VK_BROWSER_BACK)) &&
 				!listener()->textInputIsFocused();
 
+			// Переключение в полноэкранный режим по Alt + Enter.
 			bool bFullscreen = (msg.message == WM_SYSKEYDOWN) && (msg.wParam == VK_RETURN);
 			if (bFullscreen) {
 				listener()->toggleFullscreen();
