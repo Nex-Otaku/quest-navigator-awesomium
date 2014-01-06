@@ -723,6 +723,8 @@ namespace QuestNavigator {
 	void QnApplicationListener::jsCallApiFromUi(string name, JSValue arg)
 	{
 		// Контекст UI
+		// Получение ссылки на объект окна выполняется за 0.005 секунд, 
+		// поэтому можно не кэшировать.
 		JSValue window = view_->web_view()->ExecuteJavascriptWithResult(
 			WSLit("window"), WSLit(""));
 		if (window.IsObject()) {
