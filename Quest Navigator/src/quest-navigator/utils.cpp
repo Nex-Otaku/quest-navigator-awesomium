@@ -222,6 +222,22 @@ namespace QuestNavigator {
 		return absolute;
 	}
 
+	// Приводим путь к каноничной форме.
+	string canonicalizePath(string path)
+	{
+		wstring wPathSrc = widen(path);
+		TCHAR buffer[MAX_PATH];
+		PTSTR szCanonicalizedPath = buffer;
+		BOOL res = PathCanonicalize(buffer, wPathSrc.c_str());
+		if (res == FALSE) {
+			showError("Не удалось привести путь к каноническому виду");
+			return "";
+		}
+		wstring wCanonicalizedPath = szCanonicalizedPath;
+		string result = narrow(wCanonicalizedPath);
+		return result;
+	}
+
 	// Загружаем файл в память
 	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength)
 	{
@@ -282,12 +298,13 @@ namespace QuestNavigator {
 
 
 	// Загрузка конфигурации плеера
-	bool initOptions()
+	bool initOptions(string contentPath)
 	{
 		// Устанавливаем параметры по умолчанию
 		Configuration::setBool(ecpSoundCacheEnabled, false);
 		Configuration::setInt(ecpSaveSlotMax, 5);
 		Configuration::setString(ecpDefaultSkinName, DEFAULT_SKIN_NAME);
+		Configuration::setBool(ecpLimitSingleInstance, false);
 
 		// Разбираем параметры запуска
 		int argCount = 0;
@@ -301,8 +318,7 @@ namespace QuestNavigator {
 			params.push_back(trim(narrow(szArgList[i])));
 		}
 		LocalFree(szArgList);
-		bool contentPathSet = false;
-		string contentPath = "";
+		bool contentPathSet = contentPath != "";
 		for (int i = 0; i < argCount; i++) {
 			string param = params[i];
 			// Если мы вызываем программу из командной строки,
@@ -330,6 +346,12 @@ namespace QuestNavigator {
 					}
 					Configuration::setString(ecpDefaultSkinName, params[i + 1]);
 					i++;
+				} else if (param == OPTION_RESTART) {
+					// Убить "старые" окна плеера.
+					// Используется при редактировании игры, 
+					// чтобы запускать обновлённую версию 
+					// без закрытия плеера с предыдущей версией вручную.
+					Configuration::setBool(ecpLimitSingleInstance, true);
 				} else {
 					showError("Неизвестная опция: [" + param + "]");
 					return false;
@@ -462,6 +484,13 @@ namespace QuestNavigator {
 			skinFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
 		}
 
+		// Приводим все пути к каноничной форме.
+		contentDir = canonicalizePath(contentDir);
+		skinFilePath = canonicalizePath(skinFilePath);
+		gameFilePath = canonicalizePath(gameFilePath);
+		configFilePath = canonicalizePath(configFilePath);
+		saveDir = canonicalizePath(saveDir);
+
 		// Проверяем все файлы на читаемость
 		if (!fileExists(skinFilePath))
 			skinFilePath = "";
@@ -593,6 +622,7 @@ namespace QuestNavigator {
 		string contentDir = Configuration::getString(ecpContentDir);
 		string skinFilePath = Configuration::getString(ecpSkinFilePath);
 		string selectedSkin = Configuration::getString(ecpDefaultSkinName);
+		string gameFilePath = Configuration::getString(ecpGameFilePath);
 		string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
 		// Проверяем наличие qsplib.
 		string gameQsplibDir = contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR;
@@ -628,7 +658,7 @@ namespace QuestNavigator {
 				showError("Не удалось получить путь к папке \"Application Data\".");
 				return false;
 			}
-			gameFolder = getRightPath(narrow(wszPath) + PATH_DELIMITER + GAME_CACHE_DIR + PATH_DELIMITER + md5(contentDir));
+			gameFolder = getRightPath(narrow(wszPath) + PATH_DELIMITER + GAME_CACHE_DIR + PATH_DELIMITER + md5(gameFilePath));
 			if (!buildDirectoryPath(gameFolder)) {
 				showError("Не удалось создать временную папку для игры: " + gameFolder);
 				return false;
@@ -721,6 +751,14 @@ namespace QuestNavigator {
 			Configuration::setString(ecpContentDir, contentFolder);
 		}
 		return true;
+	}
+
+	// Получаем идентификатор для мьютекса.
+	string getInstanceMutexId()
+	{
+		string gameFileMd5 = md5(Configuration::getString(ecpGameFilePath));
+		string mutexId = QN_APP_GUID + gameFileMd5;
+		return mutexId;
 	}
 
 	// Возвращаем список файлов либо папок

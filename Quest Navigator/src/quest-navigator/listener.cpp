@@ -2,9 +2,11 @@
 
 #include "../common/application.h"
 #include "../common/view.h"
+#include "../common/view_win.h"
 #include "../common/method_dispatcher.h"
 #include "../deps/qsp/qsp.h"
 #include "../deps/qsp/bindings/default/qsp_default.h"
+#include "../deps/md5/md5.h"
 #include <Awesomium/WebCore.h>
 #include <Awesomium/DataPak.h>
 #include <Awesomium/STLHelpers.h>
@@ -46,7 +48,9 @@ namespace QuestNavigator {
 		gameIsRunning(false),
 		programLoaded(false),
 
-		libThread(NULL)
+		libThread(NULL),
+
+		hInstanceMutex(NULL)
 	{
 		app_->set_listener(this);
 	}
@@ -68,7 +72,7 @@ namespace QuestNavigator {
 	void QnApplicationListener::OnLoaded() {
 		// Контекст UI
 
-		if (!Configuration::init() || !initOptions()) {
+		if (!Configuration::init() || !initOptions("") || !prepareGameFiles() || !registerInstance()) {
 			app_->Quit();
 			return;
 		}
@@ -83,12 +87,6 @@ namespace QuestNavigator {
 
 		initLib();
 
-		// Готовим игру к запуску.
-		if (!prepareGameFiles()) {
-			app_->Quit();
-			return;
-		}
-
 		std::string url = QuestNavigator::getContentUrl();
 		view_->web_view()->LoadURL(WebURL(ToWebString(url)));
 
@@ -102,7 +100,7 @@ namespace QuestNavigator {
 
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnUpdate() {
-		if (checkForSingle(evJsCommitted)) {
+		if (gameIsRunning && checkForSingle(evJsCommitted)) {
 			// Библиотека сообщила потоку UI,
 			// что требуется выполнить JS-запрос.
 			processLibJsCall();
@@ -111,15 +109,20 @@ namespace QuestNavigator {
 
 	// Inherited from Application::Listener
 	void QnApplicationListener::OnShutdown() {
-		if (!programLoaded)
-			return;
+		if (programLoaded) {
+			FreeResources();
 
-		FreeResources();
+			// Завершаем работу апдейтера.
+			#ifdef _WIN32
+			finishUpdate();
+			#endif
+		}
 
-		// Завершаем работу апдейтера
-		#ifdef _WIN32
-		finishUpdate();
-		#endif
+		// Завершаем работу класса конфигурации.
+		Configuration::deinit();
+
+		// Сбрасываем мьютекс.
+		unregisterInstance();
 	}
 
 	void QnApplicationListener::BindMethods(WebView* web_view) {
@@ -199,6 +202,57 @@ namespace QuestNavigator {
 	// ********************************************************************
 	// ********************************************************************
 
+
+	// Устанавливаем мьютекс для управления экземплярами плеера.
+	bool QnApplicationListener::registerInstance()
+	{
+		// Идентификатором мьютекса является:
+		// уникальный ключ приложения + строка пути к запускаемому файлу
+		// Это позволит перезапускать только обновлённые игры.
+		bool single = Configuration::getBool(ecpLimitSingleInstance);
+		string mutexId = getInstanceMutexId();
+		//Configuration::setString(ecpWindowTitle, mutexId);
+		wstring wMutexId = widen(mutexId);
+		hInstanceMutex = CreateMutex(NULL, FALSE, wMutexId.c_str());
+		DWORD dwError = GetLastError();
+		if (hInstanceMutex == NULL) {
+			showError("Ошибка при создании мьютекса");
+			return false;
+		} else if (dwError == ERROR_ALREADY_EXISTS) {
+			// Плеер для указанной игры уже запущен.
+			if (single) {
+				// Сообщаем ему, что игру нужно перезагрузить с диска, 
+				// и молча выходим.
+				string gameFilePath = Configuration::getString(ecpGameFilePath);
+				COPYDATASTRUCT cds;
+				cds.dwData = (ULONG_PTR)eidtRestart;
+				cds.cbData = (DWORD)gameFilePath.length() + 1;
+				cds.lpData = (PVOID)gameFilePath.c_str();
+				HWND hwndSender = view_ != NULL ? ((ViewWin*)(view_))->hwnd() : NULL;
+				HWND hwndReceiver = FindWindow(szWindowClass, NULL);
+				if (hwndReceiver == NULL) {
+					showError("Ошибка при поиске существующего окна плеера");
+					return false;
+				}
+				LRESULT res = SendMessage(hwndReceiver, WM_COPYDATA, (WPARAM)hwndSender, (LPARAM)&cds);
+				if (res != TRUE) {
+					showError("Ошибка при отправке сообщения экземпляру плеера");
+				}
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// Сбрасываем мьютекс для управления экземплярами плеера.
+	void QnApplicationListener::unregisterInstance()
+	{
+		if (hInstanceMutex != NULL) {
+			freeHandle(hInstanceMutex);
+			hInstanceMutex = NULL;
+		}
+	}
+
 	void QnApplicationListener::initLib()
 	{
 		// Контекст UI
@@ -221,8 +275,6 @@ namespace QuestNavigator {
 		}
 		// Останавливаем поток библиотеки
 		StopLibThread();
-		// Завершаем работу класса конфигурации
-		Configuration::deinit();
 	}
 
 	void QnApplicationListener::runGame(string fileName)
@@ -256,6 +308,34 @@ namespace QuestNavigator {
 			waitForSingle(evGameStopped);
 			gameIsRunning = false;
 		}
+	}
+
+	void QnApplicationListener::runNewGame(string contentPath)
+	{
+		// Контекст UI
+
+		// Запускаем игру из нового пути, 
+		// либо полностью перечитываем с диска существующую игру.
+
+		// Для начала, очищаем то, что уже запущено.
+		FreeResources();
+
+		// Заново загружаем конфигурацию, копируем файлы.
+		if (!initOptions(contentPath) || !prepareGameFiles()) {
+			app_->Quit();
+			return;
+		}
+
+		// STUB
+		// Сделать применение размеров окна в зависимости от конфигурации шаблона.
+		//view_ = View::Create(Configuration::getInt(QuestNavigator::ecpGameWidth), Configuration::getInt(ecpGameHeight));
+
+		// Запускаем поток библиотеки.
+		initLib();
+
+		// Перезагружаем шаблон.
+		string url = QuestNavigator::getContentUrl();
+		view_->web_view()->LoadURL(WebURL(ToWebString(url)));
 	}
 
 	JSObject QnApplicationListener::getSaveSlots(bool open)
@@ -307,6 +387,25 @@ namespace QuestNavigator {
 	void QnApplicationListener::toggleFullscreen()
 	{
 		view_->toggleFullscreen();
+	}
+
+	// Обработка команды из другого экземпляра плеера.
+	bool QnApplicationListener::processIpcData(COPYDATASTRUCT* pCds)
+	{
+		eIpcDataType type = (eIpcDataType)pCds->dwData;
+		switch (type) {
+			// Другой экземпляр плеера сообщил,
+			// что нам требуется перечитать игру с диска заново.
+		case eidtRestart:
+			{
+				string message = (char*)pCds->lpData;
+				runNewGame(message);
+			}
+			break;
+		default:
+			return false;
+		}
+		return true;
 	}
 
 	// ********************************************************************
@@ -1158,6 +1257,9 @@ namespace QuestNavigator {
 	// Остановка потока библиотеки. Вызывается только раз при завершении программы.
 	void QnApplicationListener::StopLibThread()
 	{
+		if (libThread == NULL)
+			return;
+
 		if (!checkForSingle(evLibIsReady))
 			return;
 
@@ -1171,6 +1273,7 @@ namespace QuestNavigator {
 		// Закрываем хэндлы событий
 		for (int i = 0; i < (int)evLast; i++) {
 			freeHandle(g_eventList[i]);
+			g_eventList[i] = NULL;
 		}
 		// Высвобождаем структуру критической секции
 		DeleteCriticalSection(&g_csSharedData);

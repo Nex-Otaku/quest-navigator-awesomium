@@ -233,6 +233,9 @@
     <ClInclude Include="src\quest-navigator\resource.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="src\common\view_win.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\quest-navigator\my.rc">

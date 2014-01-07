@@ -164,6 +164,7 @@
     <ClInclude Include="src\common\js_delegate.h" />
     <ClInclude Include="src\common\method_dispatcher.h" />
     <ClInclude Include="src\common\view.h" />
+    <ClInclude Include="src\common\view_win.h" />
     <ClInclude Include="src\quest-navigator\configuration.h" />
     <ClInclude Include="src\quest-navigator\interceptor.h" />
     <ClInclude Include="src\quest-navigator\listener.h" />

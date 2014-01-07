@@ -2,6 +2,7 @@
 #define COMMON_APPLICATION_H_
 
 #include <string>
+#include <Windows.h>
 
 using namespace std;
 
@@ -37,6 +38,9 @@ class Application {
 
 	// Переключение полноэкранного режима
 	virtual void toggleFullscreen() = 0;
+
+	// Обработка команды из другого экземпляра плеера.
+	virtual bool processIpcData(COPYDATASTRUCT* pCds) = 0;
   };
 
   virtual ~Application() {}

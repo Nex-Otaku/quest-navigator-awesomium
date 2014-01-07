@@ -29,14 +29,22 @@ namespace QuestNavigator {
 	static const string QN_COMPANY_NAME = "QSP";
 	static const string QN_APP_NAME = "Quest Navigator";
 	static const string QN_VERSION = "0.0.10-test";
-	
+	static const string QN_APP_GUID = "95b90169-f70d-4269-b982-d9c3038b8348";
+	static const wchar_t szWindowClass[] = L"QnViewWinClass";
+
 	static const string OPTION_ENABLE_SOUND_CACHE = "-enable-sound-cache";
 	static const string OPTION_DEFAULT_SKIN = "-default-skin";
+	static const string OPTION_RESTART = "-restart";
 #ifdef _WIN32
 	static const string PATH_DELIMITER = "\\";
 #else
 	static const string PATH_DELIMITER = "/";
 #endif
+
+	// Тип данных для передачи между экземплярами плеера.
+	enum eIpcDataType {
+		eidtRestart = 0
+	};
 
 	// Утилиты для преобразования строк
 
@@ -91,6 +99,8 @@ namespace QuestNavigator {
 	string getRightPath(string path);
 	// Преобразовываем относительный путь в абсолютный
 	string relativePathToAbsolute(string relative);
+	// Приводим путь к каноничной форме.
+	string canonicalizePath(string path);
 	// Загружаем файл в память
 	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength);
 	// Создаём папки
@@ -108,11 +118,13 @@ namespace QuestNavigator {
 	// Прочее
 
 	// Устанавливаем конфигурацию плеера при старте
-	bool initOptions();
+	bool initOptions(string contentPath);
 	// Загружаем настройки игры из файла config.xml
 	bool loadGameConfig();
 	// Готовим игру к запуску
 	bool prepareGameFiles();
+	// Получаем идентификатор для мьютекса.
+	string getInstanceMutexId();
 
 	// Проверяем наличие апдейта при старте
 	void checkUpdate();

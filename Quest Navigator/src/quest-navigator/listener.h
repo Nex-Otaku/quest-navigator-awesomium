@@ -37,6 +37,9 @@ namespace QuestNavigator {
 
 		HANDLE libThread;
 
+		// Хэндл мьютекса.
+		HANDLE hInstanceMutex;
+
 	public:
 		QnApplicationListener();
 		virtual ~QnApplicationListener();
@@ -58,14 +61,21 @@ namespace QuestNavigator {
 		// ********************************************************************
 		// ********************************************************************
 
+		// Устанавливаем мьютекс для управления экземплярами плеера.
+		bool registerInstance();
+		// Сбрасываем мьютекс для управления экземплярами плеера.
+		void unregisterInstance();
+
 		void initLib();
 		void FreeResources();
 		void runGame(string fileName);
 		void StopGame(bool restart);
+		void runNewGame(string contentPath);
 		JSObject getSaveSlots(bool open);
 		virtual void executeCode(string qspCode);
 		virtual bool textInputIsFocused();
 		virtual void toggleFullscreen();
+		virtual bool processIpcData(COPYDATASTRUCT* pCds);
 
 		// ********************************************************************
 		// ********************************************************************

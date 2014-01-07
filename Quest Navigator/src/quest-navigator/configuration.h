@@ -24,6 +24,7 @@ namespace QuestNavigator {
 		ecpWindowTitle,
 		ecpIsFullscreen,
 		ecpDefaultSkinName,
+		ecpLimitSingleInstance,
 
 		// Настройки игры
 		ecpGameWidth,
