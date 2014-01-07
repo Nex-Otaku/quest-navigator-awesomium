@@ -334,9 +334,8 @@ namespace QuestNavigator {
 			return;
 		}
 
-		// STUB
-		// Сделать применение размеров окна в зависимости от конфигурации шаблона.
-		//view_ = View::Create(Configuration::getInt(QuestNavigator::ecpGameWidth), Configuration::getInt(ecpGameHeight));
+		// Обновляем свойства окна согласно настройкам шаблона.
+		view_->applySkinToWindow();
 
 		// Запускаем поток библиотеки.
 		initLib();

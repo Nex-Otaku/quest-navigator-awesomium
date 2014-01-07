@@ -18,6 +18,7 @@ class View {
   Awesomium::WebView* web_view() { return web_view_; }
 
   virtual void toggleFullscreen() = 0;
+  virtual void applySkinToWindow() = 0;
 
  protected:
   View() { }

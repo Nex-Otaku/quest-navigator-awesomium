@@ -115,9 +115,85 @@ ViewWin* ViewWin::GetFromHandle(HWND handle) {
 	return NULL;
 }
 
+// Переключение в полноэкранный режим и обратно.
 void ViewWin::toggleFullscreen()
 {
 	toggleFullscreenByHwnd(hwnd_);
+}
+
+// Обновляем свойства окна согласно настройкам шаблона.
+void ViewWin::applySkinToWindow()
+{
+	// Обновляем стиль окна.
+	LONG_PTR lpResult = SetWindowLongPtr(hwnd_, GWL_STYLE, getWindowStyle());
+	if (lpResult == 0) {
+		showError("Не удалось обновить стиль окна");
+		return;
+	}
+
+	// Обновляем заголовок окна.
+	wstring wTitle = widen(Configuration::getString(ecpWindowTitle));
+	BOOL res = SetWindowText(hwnd_, wTitle.c_str());
+	if (res == 0) {
+		showError("Не удалось обновить заголовок окна");
+		return;
+	}
+
+	// Вычисляем размер клиентской области окна.
+	RECT r;
+	res = GetClientRect(hwnd_, &r);
+	if (res == 0) {
+		showError("Не удалось запросить размер окна");
+		return;
+	}
+	int currentWidth = r.right - r.left;
+	int currentHeight = r.bottom - r.top;
+
+	// Рассчитываем требуемые размеры.
+	int gameWidth = Configuration::getInt(ecpGameWidth);
+	int gameHeight = Configuration::getInt(ecpGameHeight);
+	int minWidth = Configuration::getInt(ecpGameMinWidth);
+	int minHeight = Configuration::getInt(ecpGameMinHeight);
+	int maxWidth = Configuration::getInt(ecpGameMaxWidth);
+	int maxHeight = Configuration::getInt(ecpGameMaxHeight);
+	bool resizeable = Configuration::getBool(ecpGameResizeable);
+	int width = 0;
+	int height = 0;
+	if (resizeable) {
+		// Для растягиваемого шаблона, 
+		// стараемся сохранить текущие размеры окна 
+		// в рамках заданных шаблоном ограничений.
+		width = currentWidth;
+		height = currentHeight;
+		if ((minWidth != 0) && (width < minWidth))
+			width = minWidth;
+		if ((minHeight != 0) && (height < minHeight))
+			height = minHeight;
+		if ((maxWidth != 0) && (width > maxWidth))
+			width = maxWidth;
+		if ((maxHeight != 0) && (height > maxHeight))
+			height = maxHeight;
+	} else {
+		// Для нерастягиваемого шаблона,
+		// размеры должны быть всегда равны заданным.
+		width = gameWidth;
+		height = gameHeight;
+	}
+	// Учитываем толщину рамок по краям окна.
+	width = getFullWindowWidth(width);
+	height = getFullWindowHeight(height);
+	// Устанавливаем новый размер окна.
+	// Делаем это, даже если размер не изменился, 
+	// так как мог поменяться стиль окна,
+	// а он не обновляется без вызова SetWindowPos().
+	res = SetWindowPos(hwnd_, NULL, 0, 0, width, height, SWP_NOMOVE 
+		| SWP_NOZORDER 
+		| SWP_SHOWWINDOW
+		| SWP_FRAMECHANGED
+		| SWP_NOCOPYBITS);
+	if (res == 0) {
+		showError("Не удалось обновить размер окна");
+	}
 }
 
 // Following methods are inherited from WebViewListener::View

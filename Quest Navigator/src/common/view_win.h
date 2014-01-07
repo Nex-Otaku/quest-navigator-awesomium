@@ -18,7 +18,11 @@ public:
 
 	static ViewWin* GetFromHandle(HWND handle);
 
+	// Переключение в полноэкранный режим и обратно.
 	void toggleFullscreen();
+
+	// Обновляем свойства окна согласно настройкам шаблона.
+	void applySkinToWindow();
 
 	// Following methods are inherited from WebViewListener::View
 
