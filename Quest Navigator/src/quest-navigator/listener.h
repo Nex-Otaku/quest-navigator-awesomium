@@ -66,6 +66,9 @@ namespace QuestNavigator {
 		// Сбрасываем мьютекс для управления экземплярами плеера.
 		void unregisterInstance();
 
+		// Хэндл основного окна плеера.
+		HWND hwnd();
+
 		void initLib();
 		void FreeResources();
 		void runGame(string fileName);

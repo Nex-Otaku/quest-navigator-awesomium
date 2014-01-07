@@ -228,7 +228,7 @@ namespace QuestNavigator {
 				cds.dwData = (ULONG_PTR)eidtRestart;
 				cds.cbData = (DWORD)gameFilePath.length() + 1;
 				cds.lpData = (PVOID)gameFilePath.c_str();
-				HWND hwndSender = view_ != NULL ? ((ViewWin*)(view_))->hwnd() : NULL;
+				HWND hwndSender = hwnd();
 				HWND hwndReceiver = FindWindow(szWindowClass, NULL);
 				if (hwndReceiver == NULL) {
 					showError("Ошибка при поиске существующего окна плеера");
@@ -238,6 +238,8 @@ namespace QuestNavigator {
 				if (res != TRUE) {
 					showError("Ошибка при отправке сообщения экземпляру плеера");
 				}
+				// Переключаемся в окно ранее запущенного плеера.
+				SwitchToThisWindow(hwndReceiver, FALSE);
 				return false;
 			}
 		}
@@ -251,6 +253,12 @@ namespace QuestNavigator {
 			freeHandle(hInstanceMutex);
 			hInstanceMutex = NULL;
 		}
+	}
+
+	// Хэндл основного окна плеера.
+	HWND QnApplicationListener::hwnd()
+	{
+		return view_ != NULL ? ((ViewWin*)(view_))->hwnd() : NULL;
 	}
 
 	void QnApplicationListener::initLib()
@@ -398,7 +406,12 @@ namespace QuestNavigator {
 			// что нам требуется перечитать игру с диска заново.
 		case eidtRestart:
 			{
+				// Получаем путь к игре.
+				// Мы его и так знаем, 
+				// но это на случай, 
+				// если в будущем захочется запустить другую игру вместо уже запущенной.
 				string message = (char*)pCds->lpData;
+				// Перезапускаем игру.
 				runNewGame(message);
 			}
 			break;
