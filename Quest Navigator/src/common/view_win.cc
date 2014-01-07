@@ -32,7 +32,7 @@ ViewWin::ViewWin(int width, int height) {
 	// Вычисляем толщину рамок окна
 	bool result = this->calcBorders();
 	if (!result)
-		exit(1);
+		exit(eecFailToCalcBorders);
 
 	// Create our WinAPI Window
 	DWORD dwWindowStyle = getWindowStyle();
@@ -50,7 +50,7 @@ ViewWin::ViewWin(int width, int height) {
 		NULL);
 
 	if (!hwnd_)
-		exit(1);
+		exit(eecFailToCreateMainWindow);
 
 	g_active_views_.push_back(this);
 
@@ -98,7 +98,7 @@ void ViewWin::PlatformInit() {
 	wc.hIconSm       = hMyIcon;
 
 	if(!RegisterClassEx(&wc)) {
-		exit(1);
+		exit(ecpConfigFilePath);
 	}
 
 	g_is_initialized = true;

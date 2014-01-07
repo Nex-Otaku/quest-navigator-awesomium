@@ -46,6 +46,22 @@ namespace QuestNavigator {
 		eidtRestart = 0
 	};
 
+	// Коды ошибок.
+	enum eErrorCodes {
+		eecUnableEnterCs1 = 1,			// Не удалось войти в критическую секцию (1).
+		eecFailToCreateEvent,			// Не получилось создать событие.
+		eecFailToCreateTimer,			// Не получилось создать таймер.
+		eecFailToSetEvent,				// Не удалось запустить событие синхронизации потоков.
+		eecFailToCloseHandle,			// Не удалось высвободить описатель объекта ядра.
+		eecUnableEnterCs2,				// Не удалось войти в критическую секцию (2).
+		eecLibThreadAlreadyStarted,		// Не удалось запустить поток библиотеки: он уже запущен.
+		eecFailToInitCs,				// Не удалось проинициализировать структуру критической секции.
+		eecFailToBeginLibThread,		// Не получилось создать поток интерпретатора.
+		eecUnableEnterCs3,				// Не удалось войти в критическую секцию (3).
+		eecFailToCalcBorders,			// Не удалось рассчитать толщину рамок окна.
+		eecFailToCreateMainWindow		// Не удалось создать основное окно плеера.
+	};
+
 	// Утилиты для преобразования строк
 
 	// UTF-16 wstring -> UTF-16 WebString

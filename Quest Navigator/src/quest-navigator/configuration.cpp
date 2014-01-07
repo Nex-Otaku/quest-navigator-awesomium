@@ -208,7 +208,7 @@ namespace QuestNavigator {
 			EnterCriticalSection(&csConfigData);
 		} catch (...) {
 			showError("Не удалось войти в критическую секцию.");
-			exit(1);
+			exit(eecUnableEnterCs1);
 		}
 	}
 

@@ -1145,7 +1145,7 @@ namespace QuestNavigator {
 		HANDLE eventHandle = CreateEvent(NULL, FALSE, FALSE, NULL);
 		if (eventHandle == NULL) {
 			showError("Не получилось создать объект ядра \"событие\" для синхронизации потоков.");
-			exit(1);
+			exit(eecFailToCreateEvent);
 		}
 		return eventHandle;
 	}
@@ -1156,7 +1156,7 @@ namespace QuestNavigator {
 		HANDLE timerHandle = CreateWaitableTimer(NULL, FALSE, NULL);
 		if (timerHandle == NULL) {
 			showError("Не получилось создать таймер.");
-			exit(1);
+			exit(eecFailToCreateTimer);
 		}
 		return timerHandle;
 	}
@@ -1173,7 +1173,7 @@ namespace QuestNavigator {
 		BOOL res = SetEvent(getEventHandle(ev));
 		if (res == 0) {
 			showError("Не удалось запустить событие синхронизации потоков.");
-			exit(1);
+			exit(eecFailToSetEvent);
 		}
 	}
 
@@ -1183,7 +1183,7 @@ namespace QuestNavigator {
 		BOOL res = CloseHandle(handle);
 		if (res == 0) {
 			showError("Не удалось высвободить описатель объекта ядра.");
-			exit(1);
+			exit(eecFailToCloseHandle);
 		}
 	}
 
@@ -1194,7 +1194,7 @@ namespace QuestNavigator {
 			EnterCriticalSection(&g_csSharedData);
 		} catch (...) {
 			showError("Не удалось войти в критическую секцию.");
-			exit(1);
+			exit(eecUnableEnterCs2);
 		}
 	}
 
@@ -1236,7 +1236,7 @@ namespace QuestNavigator {
 		if (libThread != NULL)
 		{
 			showError("StartLibThread: failed, libThread is not null");
-			exit(1);
+			exit(eecLibThreadAlreadyStarted);
 			return;
 		}
 
@@ -1254,14 +1254,14 @@ namespace QuestNavigator {
 			InitializeCriticalSection(&g_csSharedData);
 		} catch (...) {
 			showError("Не удалось проинициализировать структуру критической секции.");
-			exit(1);
+			exit(eecFailToInitCs);
 			return;
 		}
 
 		libThread = (HANDLE)_beginthreadex(NULL, 0, &QnApplicationListener::libThreadFunc, this, 0, NULL);
 		if (libThread == NULL) {
 			showError("Не получилось создать поток интерпретатора.");
-			exit(1);
+			exit(eecFailToBeginLibThread);
 			return;
 		}
 	}
