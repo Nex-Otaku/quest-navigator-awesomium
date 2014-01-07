@@ -63,7 +63,7 @@ namespace QuestNavigator {
 			EnterCriticalSection(&csMusicData);
 		} catch (...) {
 			showError("Не удалось войти в критическую секцию.");
-			exit(0);
+			exit(1);
 		}
 	}
 
