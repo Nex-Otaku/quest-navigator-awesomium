@@ -340,9 +340,18 @@ namespace QuestNavigator {
 		// Запускаем поток библиотеки.
 		initLib();
 
-		// Перезагружаем шаблон.
 		string url = QuestNavigator::getContentUrl();
-		view_->web_view()->LoadURL(WebURL(ToWebString(url)));
+		WebURL newUrl(ToWebString(url));
+		WebView* webView = view_->web_view();
+		if (newUrl == webView->url()) {
+			// Очищаем кэш веб-содержимого.
+			webView->session()->ClearCache();
+			// Загружаем страницу заново, игнорируя закэшированные файлы.
+			webView->Reload(true);
+		} else {
+			// Загружаем шаблон.
+			webView->LoadURL(newUrl);
+		}
 	}
 
 	JSObject QnApplicationListener::getSaveSlots(bool open)
