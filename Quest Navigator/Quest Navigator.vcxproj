@@ -39,16 +39,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\build\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\build\lib;$(LibraryPath)</LibraryPath>
     <OutDir>.\build\bin\русских буков тест!</OutDir>
     <TargetName>QuestNavigator</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\bin;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.1.0\build\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\build\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\build\lib;$(LibraryPath)</LibraryPath>
     <OutDir>.\build\bin\русских буков тест!</OutDir>
     <TargetName>QuestNavigator</TargetName>
   </PropertyGroup>
