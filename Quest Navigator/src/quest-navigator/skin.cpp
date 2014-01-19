@@ -434,8 +434,13 @@ namespace QuestNavigator {
 	string Skin::applyHtmlFixes(string text)
 	{
 		// Контекст библиотеки
-		if (getInt(espUseHtml) != 0)
-		{
+		if (getInt(espUseHtml) == 0) {
+			// Если USEHTML = 0, выводим текст "как есть".
+			replaceAll(text, "&", "&amp;");
+			replaceAll(text, "<", "&lt;");
+			replaceAll(text, ">", "&gt;");
+			replaceAll(text, "\n", "<br />");
+		} else {
 			replaceAll(text, "\n", "<br />");
 
 			// THIS IS ONLY FOR LEGACY
@@ -449,10 +454,9 @@ namespace QuestNavigator {
 			replaceAll(text, "&amp;amp;", "&amp;");
 			replaceAll(text, "\\\"", "&quot;");
 			replaceAll(text, "\\'", "&#39;");
-			return text;
 		}
-		else
-			return text;
+
+		return text;
 	}
 
 	string Skin::makeHtmlColor(int color)
