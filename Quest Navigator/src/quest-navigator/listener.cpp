@@ -298,6 +298,8 @@ namespace QuestNavigator {
 		// Готовим данные для передачи в поток
 		lockData();
 		g_sharedData[evRunGame].str = fileName;
+		// Передаём настройку из конфига в скин.
+		g_sharedData[evRunGame].num = Configuration::getBool(ecpGameIsStandalone) ? 1 : 0;
 		runSyncEvent(evRunGame);
 		unlockData();
 
@@ -1358,14 +1360,18 @@ namespace QuestNavigator {
 					{
 						// Запуск игры
 						string path = "";
+						int isStandalone = 0;
 						lockData();
 						path = g_sharedData[evRunGame].str;
+						isStandalone = g_sharedData[evRunGame].num;
 						unlockData();
 						QSP_BOOL res = QSPLoadGameWorld(widen(path).c_str());
 						CheckQspResult(res, "QSPLoadGameWorld");
 						// Очищаем скин
 						Skin::resetUpdate();
 						Skin::resetSettings();
+						// Передаём настройку из конфига в скин.
+						Skin::setInt(espIsStandalone, isStandalone);
 						// Очищаем буфер JS-команд, передаваемых из игры
 						jsExecBuffer = "";
 

@@ -18,6 +18,7 @@ namespace QuestNavigator {
 		"useHtml",
 		"disableScroll",
 		"viewAlwaysShow",
+		"isStandalone",
 
 		"showActs",
 		"showVars",
@@ -41,6 +42,7 @@ namespace QuestNavigator {
 	};
 
 	ConfigValue Skin::_paramList[espLast];
+	ConfigValue Skin::_defaultList[espLast];
 
 	string Skin::getString(eSkinParam param)
 	{
@@ -60,23 +62,23 @@ namespace QuestNavigator {
 	}
 	string Skin::getDefaultString(eSkinParam param)
 	{
-		return _paramList[param].getString();
+		return _defaultList[param].getString();
 	}
 	void Skin::setDefaultString(eSkinParam param, string value)
 	{
-		_paramList[param].setString(value);
+		_defaultList[param].setString(value);
 	}
 	int Skin::getDefaultInt(eSkinParam param)
 	{
-		return _paramList[param].getInt();
+		return _defaultList[param].getInt();
 	}
 	void Skin::setDefaultInt(eSkinParam param, int value)
 	{
-		_paramList[param].setInt(value);
+		_defaultList[param].setInt(value);
 	}
 	eConfigValueType Skin::getType(eSkinParam param)
 	{
-		return _paramList[param].getType();
+		return _defaultList[param].getType();
 	}
 
 
@@ -111,6 +113,7 @@ namespace QuestNavigator {
 		setDefaultInt(espUseHtml, 0);
 		setDefaultInt(espDisableScroll, 0);
 		setDefaultInt(espViewAlwaysShow, 0);
+		setDefaultInt(espIsStandalone, 0);
 
 		setDefaultInt(espShowActs, 1);
 		setDefaultInt(espShowVars, 1);
@@ -140,8 +143,10 @@ namespace QuestNavigator {
 			eSkinParam eIterator = (eSkinParam)i;
 			if (getType(eIterator) == ecvString) {
 				setString(eIterator, getDefaultString(eIterator));
-			} else {
+			} else if (getType(eIterator) == ecvInt) {
 				setInt(eIterator, getDefaultInt(eIterator));
+			} else {
+				showError("Не инициализировано значение");
 			}
 		}
 
@@ -215,8 +220,10 @@ namespace QuestNavigator {
 	{
 		if (getType(param) == ecvString) {
 			setString(param, getNewStrValue(getString(param), name, getDefaultString(param)));
-		} else {
+		} else if (getType(param) == ecvInt) {
 			setInt(param, getNewNumValue(getInt(param), name, getDefaultInt(param)));
+		} else {
+			showError("Не инициализировано значение");
 		}
 	}
 
@@ -320,6 +327,7 @@ namespace QuestNavigator {
 			case espUseHtml:
 			case espDisableScroll:
 			case espViewAlwaysShow:
+			case espIsStandalone:
 			case espShowActs:
 			case espShowVars:
 			case espShowObjs:

@@ -29,6 +29,7 @@ namespace QuestNavigator {
 		//useHtml
 		//disableScroll
 		//viewAlwaysShow
+		//isStandalone
 
 		//showActs
 		//showVars
@@ -60,6 +61,7 @@ namespace QuestNavigator {
 		espUseHtml,
 		espDisableScroll,
 		espViewAlwaysShow,
+		espIsStandalone,
 
 		espShowActs,
 		espShowVars,

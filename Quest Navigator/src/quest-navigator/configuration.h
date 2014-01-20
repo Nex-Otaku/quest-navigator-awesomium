@@ -38,6 +38,7 @@ namespace QuestNavigator {
 		ecpGameFullscreenAvailable,
 		ecpGameStartFullscreen,
 		ecpSkinName,
+		ecpGameIsStandalone,
 
 		ecpLast
 	};
