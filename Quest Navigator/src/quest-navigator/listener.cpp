@@ -184,6 +184,10 @@ namespace QuestNavigator {
 				WSLit("runInputString"),
 				JSDelegate(this, &QnApplicationListener::runInputString));
 
+			method_dispatcher_.Bind(app_object,
+				WSLit("openGameFile"),
+				JSDelegate(this, &QnApplicationListener::openGameFile));
+
 			// Привязываем колбэк для обработки вызовов alert
 			method_dispatcher_.Bind(app_object,
 				WSLit("alert"),
@@ -1115,6 +1119,18 @@ namespace QuestNavigator {
 		// Контекст UI
 		// Нажали Enter в строке ввода
 		runSyncEvent(evInputStringEntered);
+	}
+
+	void QnApplicationListener::openGameFile(WebView* caller, const JSArray& args)
+	{
+		// Контекст UI
+		// Вызываем диалог открытия файла с диска.
+		string filePath = openGameFileDialog(hwnd());
+		if (filePath == "")
+			return;
+
+		// Запускаем выбранную игру.
+		runNewGame(filePath);
 	}
 
 	// ********************************************************************

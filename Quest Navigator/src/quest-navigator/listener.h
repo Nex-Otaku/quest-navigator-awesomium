@@ -152,6 +152,7 @@ namespace QuestNavigator {
 		void setMute(WebView* caller, const JSArray& args);
 		void setInputString(WebView* caller, const JSArray& args);
 		void runInputString(WebView* caller, const JSArray& args);
+		void openGameFile(WebView* caller, const JSArray& args);
 
 		// ********************************************************************
 		// Вспомогательные обработчики для отладки

@@ -130,6 +130,8 @@ namespace QuestNavigator {
 	// Копируем дерево файлов
 	bool copyFileTree(string from, string to);
 	bool copyFileTree(string from, string to, string mask);
+	// Диалог для открытия файла игры с диска.
+	string openGameFileDialog(HWND hWnd);
 
 	// Прочее
 
