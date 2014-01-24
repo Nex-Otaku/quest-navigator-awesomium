@@ -74,6 +74,7 @@ namespace QuestNavigator {
 		void runGame(string fileName);
 		void StopGame(bool restart);
 		void runNewGame(string contentPath);
+		bool isGameRunning();
 		JSObject getSaveSlots(bool open);
 		virtual void executeCode(string qspCode);
 		virtual bool textInputIsFocused();

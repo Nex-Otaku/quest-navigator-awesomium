@@ -360,6 +360,11 @@ namespace QuestNavigator {
 		}
 	}
 
+	bool QnApplicationListener::isGameRunning()
+	{
+		return gameIsRunning;
+	}
+
 	JSObject QnApplicationListener::getSaveSlots(bool open)
 	{
 		//Контекст UI

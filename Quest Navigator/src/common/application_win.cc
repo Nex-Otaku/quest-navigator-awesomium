@@ -3,10 +3,14 @@
 #include <Awesomium/WebCore.h>
 #include <string>
 #include "../quest-navigator/utils.h"
+#include "../quest-navigator/configuration.h"
+#include "../quest-navigator/listener.h"
 
 using namespace Awesomium;
 using namespace std;
 using namespace QuestNavigator;
+
+#define KEYSTATE_PRESSED 0x8000
 
 class ApplicationWin : public Application {
 	bool is_running_;
@@ -42,6 +46,19 @@ public:
 			bool bFullscreen = (msg.message == WM_SYSKEYDOWN) && (msg.wParam == VK_RETURN);
 			if (bFullscreen) {
 				listener()->toggleFullscreen();
+			}
+
+			// Если нажата комбинация Ctrl+F5, 
+			// выполняем полную перезагрузку игры.
+			if ((msg.message == WM_KEYDOWN) && (msg.wParam == VK_F5)) {
+				SHORT keyState = GetKeyState(VK_CONTROL);
+				if (keyState & KEYSTATE_PRESSED) {
+					QnApplicationListener* pListener = QnApplicationListener::listener;
+					// Перезапускаем, если игра запущена.
+					if (pListener->isGameRunning()) {
+						pListener->runNewGame(Configuration::getString(ecpGameFilePath));
+					}
+				}
 			}
 
 			if (!bBackSpace && !bFullscreen) {
