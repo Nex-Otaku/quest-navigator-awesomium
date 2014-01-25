@@ -138,7 +138,7 @@ namespace QuestNavigator {
 		static JSObject getJsSkin();
 		static bool isSomethingChanged();
 		static void showWindow(int type, int isShow);
-		static string applyHtmlFixes(string text);
+		static string applyHtmlFixes(string text, bool forceHtml = false);
 		static string makeHtmlColor(int color);
 	};
 

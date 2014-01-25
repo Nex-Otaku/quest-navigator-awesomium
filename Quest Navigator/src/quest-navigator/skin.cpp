@@ -343,7 +343,7 @@ namespace QuestNavigator {
 			case espObjsListSelItemFormat:
 			case espObjsListItemFormat:
 				{
-					strValue = applyHtmlFixes(strValue);
+					strValue = applyHtmlFixes(strValue, true);
 				}
 				break;
 				// Цвета
@@ -439,10 +439,10 @@ namespace QuestNavigator {
 		}
 	}
 
-	string Skin::applyHtmlFixes(string text)
+	string Skin::applyHtmlFixes(string text, bool forceHtml)
 	{
 		// Контекст библиотеки
-		if (getInt(espUseHtml) == 0) {
+		if (!forceHtml && (getInt(espUseHtml) == 0)) {
 			// Если USEHTML = 0, выводим текст "как есть".
 			replaceAll(text, "&", "&amp;");
 			replaceAll(text, "<", "&lt;");
