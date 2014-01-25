@@ -332,6 +332,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		break;
 	case WM_QUIT:
 		break;
+	case WM_ACTIVATE:
+		{
+			// Устанавливаем фокус ввода на окно браузера.
+			// Это нужно, чтобы работал скролл мышкой.
+			// К сожалению, при запуске плеера не срабатывает,
+			// работает только при переключении в окно.
+			view->web_view()->Focus();
+			return 0;
+		}
+		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
