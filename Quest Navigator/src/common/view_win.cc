@@ -37,7 +37,9 @@ ViewWin::ViewWin(int width, int height) {
 	// Create our WinAPI Window
 	DWORD dwWindowStyle = getWindowStyle();
 	HINSTANCE hInstance = GetModuleHandle(0);
-	hwnd_ = CreateWindow(szWindowClass,
+	hwnd_ = CreateWindowEx(
+		WS_EX_ACCEPTFILES,
+		szWindowClass,
 		wszTitle,
 		dwWindowStyle,
 		CW_USEDEFAULT,
@@ -325,6 +327,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			// что сообщение не прерывает обработку модальных диалогов и пр.
 			bool success = QnApplicationListener::listener->processIpcData((COPYDATASTRUCT*)lParam);
 			return success ? TRUE : FALSE;
+		}
+		break;
+	case WM_DROPFILES:
+		{
+			// Перетащили файл на окно плеера.
+			HDROP hDropInfo = (HDROP)wParam;
+			// Считаем, сколько всего файлов.
+			UINT filesCount = DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0);
+			if (filesCount < 1) {
+				showError("Не обнаружены перетаскиваемые файлы");
+				DragFinish(hDropInfo);
+				return 0;
+			}
+			if (filesCount > 1) {
+				showError("Запуск более чем одного файла невозможен");
+				DragFinish(hDropInfo);
+				return 0;
+			}
+			// Сохраняем имя файла.
+			wchar_t dropMsg[MAX_PATH];
+			UINT res = DragQueryFile(hDropInfo, 0, (LPWSTR)dropMsg, sizeof(dropMsg));
+			if (res == 0) {
+				showError("Не удалось прочесть имя перетаскиваемого файла");
+				DragFinish(hDropInfo);
+				return 0;
+			}
+			// Завершаем перетаскивание.
+			DragFinish(hDropInfo);
+			// Преобразовываем имя файла в нормальный формат.
+			wstring wFile = dropMsg;
+			string file = narrow(wFile);
+			// Запускаем файл.
+			QnApplicationListener::listener->runNewGame(file);
 		}
 		break;
 	case WM_DESTROY:
