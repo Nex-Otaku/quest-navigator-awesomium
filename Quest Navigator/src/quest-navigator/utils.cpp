@@ -748,9 +748,6 @@ namespace QuestNavigator {
 					return false;
 				}
 			}
-
-			// Обновляем путь к папке контента.
-			Configuration::setString(ecpContentDir, contentFolder);
 		}
 		return true;
 	}

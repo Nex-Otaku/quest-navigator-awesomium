@@ -152,7 +152,7 @@ namespace QuestNavigator {
 		if (checkPlayingFileSetVolume(file, true, volume))
 			return;
 
-		string fullPath = getRightPath(Configuration::getString(ecpContentDir) + PATH_DELIMITER + file);
+		string fullPath = getRightPath(file);
 		// Проверяем существование и читаемость
 		if (!fileExists(fullPath)) {
 			showError("Не удалось открыть звуковой файл: " + file);
