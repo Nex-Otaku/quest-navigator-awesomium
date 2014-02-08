@@ -760,6 +760,35 @@ namespace QuestNavigator {
 		return mutexId;
 	}
 
+	// Выводим текст в консоль.
+	void writeConsole(HWND hWnd, string text)
+	{
+		// Мы передаём текст в другое приложение,
+		// специально созданное для отображения лога.
+
+		// Правильнее передавать текст в стандартный поток вывода,
+		// но это не получилось. 
+		// Может быть, в будущем будет исправлено.
+
+		// Преобразовываем текст в виндовый формат.
+		wstring wText = widen(text);
+		// Заполняем структуру для передачи данных.
+		COPYDATASTRUCT cds;
+		cds.dwData = (ULONG_PTR)eidtLog;
+		cds.cbData = ((DWORD)wText.length() + 1)*sizeof(wchar_t);
+		cds.lpData = (PVOID)wText.c_str();
+		HWND hwndSender = hWnd;
+		HWND hwndReceiver = FindWindow(szLogWindowClass, NULL);
+		if (hwndReceiver == NULL) {
+			// Нет окна для логирования - просто выходим.
+			return;
+		}
+		LRESULT res = SendMessage(hwndReceiver, WM_COPYDATA, (WPARAM)hwndSender, (LPARAM)&cds);
+		if (res != TRUE) {
+			showError("Ошибка при отправке сообщения окну логирования");
+		}
+	}
+
 	// Возвращаем список файлов либо папок
 	bool _getFilesOrFoldersList(string directory, string mask, vector<string>& list, bool bFileMode)
 	{
@@ -1089,6 +1118,15 @@ namespace QuestNavigator {
 			}
 		}
 		return decoded;
+	}
+
+	// Преобразовываем целое число в строку.
+	string intToString(int value)
+	{
+		char buff[100];
+		sprintf(buff, "%d", value);
+		string sInteger = buff;
+		return sInteger;
 	}
 
 	DWORD getWindowStyle() {

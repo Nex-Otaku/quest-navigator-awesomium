@@ -233,7 +233,16 @@ void ViewWin::OnShowCreatedWebView(Awesomium::WebView* caller,
 void ViewWin::OnAddConsoleMessage(Awesomium::WebView* caller,
 	const Awesomium::WebString& message,
 	int line_number,
-	const Awesomium::WebString& source) { }
+	const Awesomium::WebString& source) 
+{
+	// Возникла ошибка при выполнении яваскрипта,
+	// либо просто вывод в консоль.
+	string msg = ToString(message);
+	string src = decodeUrl(ToString(source));
+	writeConsole(hwnd(), "Файл: " + src + "\r\n"
+						+ "Строка: " + intToString(line_number) + "\r\n"
+						+ "Сообщение: " + msg + "\r\n\r\n");
+}
 
 int ViewWin::getFullWindowWidth(int viewWidth)
 {

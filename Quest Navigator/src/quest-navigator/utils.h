@@ -31,6 +31,7 @@ namespace QuestNavigator {
 	static const string QN_VERSION = "0.0.15-test";
 	static const string QN_APP_GUID = "95b90169-f70d-4269-b982-d9c3038b8348";
 	static const wchar_t szWindowClass[] = L"QnViewWinClass";
+	static const wchar_t szLogWindowClass[] = L"QnLogWinClass";
 
 	static const string OPTION_ENABLE_SOUND_CACHE = "-enable-sound-cache";
 	static const string OPTION_DEFAULT_SKIN = "-default-skin";
@@ -41,9 +42,10 @@ namespace QuestNavigator {
 	static const string PATH_DELIMITER = "/";
 #endif
 
-	// Тип данных для передачи между экземплярами плеера.
+	// Тип данных для передачи между экземплярами плеера, а также вспомогательными окнами.
 	enum eIpcDataType {
-		eidtRestart = 0
+		eidtRestart = 1,
+		eidtLog
 	};
 
 	// Коды ошибок.
@@ -96,6 +98,8 @@ namespace QuestNavigator {
 	string unescapeHtml(string text);
 	// Обратное преобразование URL в "сырой" вид
 	string decodeUrl(string url);
+	// Преобразовываем целое число в строку.
+	string intToString(int value);
 
 	// Утилиты для работы с файловой системой
 
@@ -143,6 +147,8 @@ namespace QuestNavigator {
 	bool prepareGameFiles();
 	// Получаем идентификатор для мьютекса.
 	string getInstanceMutexId();
+	// Выводим текст в консоль.
+	void writeConsole(HWND hWnd, string text);
 
 	// Проверяем наличие апдейта при старте
 	void checkUpdate();
