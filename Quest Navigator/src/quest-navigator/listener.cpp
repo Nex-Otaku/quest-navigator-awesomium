@@ -488,7 +488,7 @@ namespace QuestNavigator {
 				QSP_CHAR* pDesc;
 				QSPGetActionData(i, &pImgPath, &pDesc);
 				JSObject act;
-				string imgPath = fromQsp(pImgPath);
+				string imgPath = getRightPath(fromQsp(pImgPath));
 				string desc = Skin::applyHtmlFixes(fromQsp(pDesc));
 				act.SetProperty(WSLit("image"), ToWebString(imgPath));
 				act.SetProperty(WSLit("desc"), ToWebString(desc));
@@ -510,7 +510,7 @@ namespace QuestNavigator {
 				QSP_CHAR* pDesc;
 				QSPGetObjectData(i, &pImgPath, &pDesc);
 				JSObject obj;
-				string imgPath = fromQsp(pImgPath);
+				string imgPath = getRightPath(fromQsp(pImgPath));
 				string desc = Skin::applyHtmlFixes(fromQsp(pDesc));
 				int selected = (i == nSelectedObject) ? 1 : 0;
 				obj.SetProperty(WSLit("image"), ToWebString(imgPath));
