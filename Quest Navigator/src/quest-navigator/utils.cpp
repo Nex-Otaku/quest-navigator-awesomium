@@ -319,6 +319,7 @@ namespace QuestNavigator {
 		}
 		LocalFree(szArgList);
 		bool contentPathSet = contentPath != "";
+		bool contentPathFound = false;
 		for (int i = 0; i < argCount; i++) {
 			string param = params[i];
 			// Если мы вызываем программу из командной строки,
@@ -326,12 +327,19 @@ namespace QuestNavigator {
 			if (endsWith(param, ".exe"))
 				continue;
 			bool isOption = startsWith(param, "-");
-			if (!contentPathSet && !isOption) {
-				// Нам передали путь к файлу в командной строке.
-				// Просто сохраняем его, проверять будем позже,
-				// когда убедимся что строка параметров разобрана правильно.
-				contentPath = param;
-				contentPathSet = true;
+			// Нам передали путь к файлу игры в командной строке.
+			// Просто сохраняем его, проверять будем позже,
+			// когда убедимся что строка параметров разобрана правильно.
+			if (!contentPathFound && !isOption) {
+				// Если нам заранее известен путь к файлу игры, 
+				// то мы игнорируем путь, указанный в командной строке.
+				// Типичная ситуация - выбор произвольной игры в "Полке игр".
+				// При запуске плеера указана одна игра, а нам теперь нужна другая.
+				if (!contentPathSet) {
+					contentPath = param;
+					contentPathSet = true;
+				}
+				contentPathFound = true;
 			} else if (isOption) {
 				// Разбираем опции
 				if (param == OPTION_ENABLE_SOUND_CACHE) {
