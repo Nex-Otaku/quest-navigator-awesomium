@@ -317,6 +317,23 @@ namespace QuestNavigator {
 		unlockData();
 
 		gameIsRunning = true;
+
+		// Если плеер не запущен в режиме "standalone",
+		// и запущена игра не по умолчанию,
+		// то записываем время последнего запуска в БД.
+		if (!Configuration::getBool(ecpGameIsStandalone)
+			&& !Configuration::getBool(ecpRunningDefaultGame)) {
+			GamestockEntry game;
+			// Пока что запускаем только локальные игры.
+			game.web = false;
+			game.local_file = Configuration::getString(ecpGameFilePath);
+			game.title = Configuration::getString(ecpGameTitle);
+			game.hash = Configuration::getString(ecpGameHash);
+			game.cache = Configuration::getString(ecpCacheDir);
+			game.saves = Configuration::getString(ecpSaveDir);
+			game.last_run = (int)time(0);
+			Gamestock::updateGame(game);
+		}
 	}
 
 	void QnApplicationListener::StopGame(bool restart)
@@ -1191,20 +1208,12 @@ namespace QuestNavigator {
 		JSValue jsHash = args[0];
 		string hash = ToString(jsHash.ToString());
 
-		// Загружаем карту по играм.
-		// Вывод ошибки выполняется внутри вызова, нам остаётся просто выйти.
-		map<string, GamestockEntry> mapLocalGames;
-		if (!Gamestock::getLocalGames(mapLocalGames))
-			return;
-
-		// Ищем игру в списке по хэшу.
-		map<string, GamestockEntry>::iterator it = mapLocalGames.find(hash);
-		if (it == mapLocalGames.end()) {
+		// Ищем игру по указанному хэшу.
+		GamestockEntry game;
+		if (!Gamestock::getLocalGame(hash, game)) {
 			showError("Не найдена игра с указанным хэшем");
 			return;
 		}
-		// Игра найдена.
-		GamestockEntry game = it->second;
 
 		//STUB
 		// Сделать обновление времени последнего запуска.

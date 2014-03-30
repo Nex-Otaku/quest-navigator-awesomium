@@ -16,6 +16,8 @@ namespace QuestNavigator {
 		ecpContentDir = 0,
 		ecpSkinFilePath,
 		ecpGameFilePath,
+		ecpGameHash,
+		ecpCacheDir,
 		ecpGameFileName,
 		ecpConfigFilePath,
 		ecpSaveDir,
@@ -25,6 +27,7 @@ namespace QuestNavigator {
 		ecpIsFullscreen,
 		ecpDefaultSkinName,
 		ecpLimitSingleInstance,
+		ecpRunningDefaultGame,
 
 		// Настройки игры
 		ecpGameWidth,

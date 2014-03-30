@@ -305,6 +305,7 @@ namespace QuestNavigator {
 		Configuration::setInt(ecpSaveSlotMax, 5);
 		Configuration::setString(ecpDefaultSkinName, DEFAULT_SKIN_NAME);
 		Configuration::setBool(ecpLimitSingleInstance, false);
+		Configuration::setString(ecpCacheDir, "");
 
 		// Разбираем параметры запуска
 		int argCount = 0;
@@ -384,6 +385,7 @@ namespace QuestNavigator {
 		string configFilePath = "";
 		string saveDir = "";
 		string windowTitle = QN_APP_NAME + " " + QN_VERSION;
+		bool runningDefaultGame = false;
 		if (contentPathSet) {
 			// Нам передали путь к игре.
 			// Всего три варианта:
@@ -469,19 +471,10 @@ namespace QuestNavigator {
 				return false;
 			}
 		}
-		// Папка для сохранений
-		saveDir = "";
-		// Путь к пользовательской папке "Мои документы"
-		WCHAR wszPath[MAX_PATH];
-		HRESULT hr = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, wszPath);
-		if (hr != S_OK) {
-			showError("Не удалось получить путь к папке \"Мои документы\".");
-			return false;
-		}
-		saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + md5(contentDir));
 		
 		if (contentDir == "") {
 			// Запускаем игру по умолчанию
+			runningDefaultGame = true;
 			string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
 			configFilePath = getRightPath(assetsDir + PATH_DELIMITER 
 				+ DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER 
@@ -492,10 +485,26 @@ namespace QuestNavigator {
 			skinFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
 		}
 
+		// Приводим путь к файлу игры в каноничную форму.
+		gameFilePath = canonicalizePath(gameFilePath);
+		
+		// Считаем уникальный хэш игры.
+		string gameHash = md5(gameFilePath);
+
+		// Папка для сохранений
+		saveDir = "";
+		// Путь к пользовательской папке "Мои документы"
+		WCHAR wszPath[MAX_PATH];
+		HRESULT hr = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, wszPath);
+		if (hr != S_OK) {
+			showError("Не удалось получить путь к папке \"Мои документы\".");
+			return false;
+		}
+		saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + gameHash);
+
 		// Приводим все пути к каноничной форме.
 		contentDir = canonicalizePath(contentDir);
 		skinFilePath = canonicalizePath(skinFilePath);
-		gameFilePath = canonicalizePath(gameFilePath);
 		configFilePath = canonicalizePath(configFilePath);
 		saveDir = canonicalizePath(saveDir);
 
@@ -513,11 +522,13 @@ namespace QuestNavigator {
 		Configuration::setString(ecpContentDir, contentDir);
 		Configuration::setString(ecpSkinFilePath, skinFilePath);
 		Configuration::setString(ecpGameFilePath, gameFilePath);
+		Configuration::setString(ecpGameHash, gameHash);
 		Configuration::setString(ecpGameFileName, gameFileName);
 		Configuration::setString(ecpConfigFilePath, configFilePath);
 		Configuration::setString(ecpSaveDir, saveDir);
 		Configuration::setString(ecpWindowTitle, windowTitle);
 		Configuration::setBool(ecpIsFullscreen, false);
+		Configuration::setBool(ecpRunningDefaultGame, runningDefaultGame);
 
 		// Загружаем настройки игры из файла config.xml
 		bool gameConfigLoaded = loadGameConfig();
@@ -633,6 +644,7 @@ namespace QuestNavigator {
 		string skinFilePath = Configuration::getString(ecpSkinFilePath);
 		string selectedSkin = Configuration::getString(ecpDefaultSkinName);
 		string gameFilePath = Configuration::getString(ecpGameFilePath);
+		string gameHash = Configuration::getString(ecpGameHash);
 		string assetsDir = getPlayerDir() + PATH_DELIMITER + ASSETS_DIR;
 		// Проверяем наличие qsplib.
 		string gameQsplibDir = contentDir + PATH_DELIMITER + ".." + PATH_DELIMITER + QSPLIB_DIR;
@@ -659,8 +671,6 @@ namespace QuestNavigator {
 				return false;
 			}
 
-			// Создаём временную папку для игры.
-			string gameFolder = "";
 			// Путь к папке с данными приложения "Application Data"
 			WCHAR wszPath[MAX_PATH];
 			HRESULT hr = SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, wszPath);
@@ -668,11 +678,14 @@ namespace QuestNavigator {
 				showError("Не удалось получить путь к папке \"Application Data\".");
 				return false;
 			}
-			gameFolder = getRightPath(narrow(wszPath) + PATH_DELIMITER + GAME_CACHE_DIR + PATH_DELIMITER + md5(gameFilePath));
+			// Создаём временную папку для игры.
+			string gameFolder = getRightPath(narrow(wszPath) + PATH_DELIMITER + GAME_CACHE_DIR + PATH_DELIMITER + gameHash);
+			gameFolder = canonicalizePath(gameFolder);
 			if (!buildDirectoryPath(gameFolder)) {
 				showError("Не удалось создать временную папку для игры: " + gameFolder);
 				return false;
 			}
+			Configuration::setString(ecpCacheDir, gameFolder);
 			string contentFolder = gameFolder + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
 			if (!buildDirectoryPath(contentFolder)) {
 				showError("Не удалось создать папку для содержимого игры: " + contentFolder);
@@ -765,7 +778,7 @@ namespace QuestNavigator {
 	// Получаем идентификатор для мьютекса.
 	string getInstanceMutexId()
 	{
-		string gameFileMd5 = md5(Configuration::getString(ecpGameFilePath));
+		string gameFileMd5 = Configuration::getString(ecpGameHash);
 		string mutexId = QN_APP_GUID + gameFileMd5;
 		return mutexId;
 	}

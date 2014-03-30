@@ -18,6 +18,23 @@ namespace QuestNavigator {
 		string cache;
 		string saves;
 		int last_run;
+
+		// Перевод значений в строки для SQL-запросов.
+		string idVal();
+		string webVal();
+		string localFileVal();
+		string titleVal();
+		string hashVal();
+		string cacheVal();
+		string savesVal();
+		string lastRunVal();
+
+		// Представление полей в виде VALUES(...),
+		// для вставки в БД.
+		string sqlInsertValues();
+		// Представление полей в виде SET field = value, ...
+		// для вставки в БД.
+		string sqlUpdateValues();
 	};
 
 	class Gamestock {
@@ -35,7 +52,13 @@ namespace QuestNavigator {
 	public:
 		static bool getLocalGames(vector<GamestockEntry> &vec);
 		static bool getLocalGames(map<string, GamestockEntry> &map);
+		static bool getLocalGame(string hash, GamestockEntry &game);
 		static bool addGame(GamestockEntry game);
+		static bool updateGame(GamestockEntry game);
+
+		static string escape(int num);
+		static string escape(bool flag);
+		static string escape(string text);
 
 		// Колбэки для SQLite.
 		static int cbSelectLocalGames(void *data, int argc, char **argv, char **azColName);
