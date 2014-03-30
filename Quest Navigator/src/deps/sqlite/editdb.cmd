@@ -1,0 +1,1 @@
+sqlite3 d:\qn.db

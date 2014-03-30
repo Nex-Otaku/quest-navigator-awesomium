@@ -63,9 +63,9 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;$(ProjectDir)src\deps\sqlite;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -90,9 +90,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;$(ProjectDir)src\deps\sqlite;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>"$(SolutionDir)installer\make_install.cmd" "$(TargetDir)"</Command>
@@ -153,6 +153,7 @@
     <ClCompile Include="src\deps\tinyxml\tinyxmlparser.cpp" />
     <ClCompile Include="src\main.cc" />
     <ClCompile Include="src\quest-navigator\configuration.cpp" />
+    <ClCompile Include="src\quest-navigator\gamestock.cpp" />
     <ClCompile Include="src\quest-navigator\interceptor.cpp" />
     <ClCompile Include="src\quest-navigator\listener.cpp" />
     <ClCompile Include="src\quest-navigator\skin.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="src\common\view.h" />
     <ClInclude Include="src\common\view_win.h" />
     <ClInclude Include="src\quest-navigator\configuration.h" />
+    <ClInclude Include="src\quest-navigator\gamestock.h" />
     <ClInclude Include="src\quest-navigator\interceptor.h" />
     <ClInclude Include="src\quest-navigator\listener.h" />
     <ClInclude Include="src\quest-navigator\resource.h" />

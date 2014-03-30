@@ -198,6 +198,9 @@
     <ClCompile Include="src\deps\tinyxml\tinystr.cpp">
       <Filter>Файлы исходного кода\xml</Filter>
     </ClCompile>
+    <ClCompile Include="src\quest-navigator\gamestock.cpp">
+      <Filter>Файлы исходного кода\special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\application.h">
@@ -235,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="src\common\view_win.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quest-navigator\gamestock.h">
+      <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
