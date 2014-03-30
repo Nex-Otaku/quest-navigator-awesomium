@@ -12,11 +12,12 @@ namespace QuestNavigator {
 		GamestockEntry game;
 		game.id = stoi(argv[0]);
 		game.web = stoi(argv[1]) == 1;
-		game.title = argv[2];
-		game.hash = argv[3];
-		game.cache = argv[4];
-		game.saves = argv[5];
-		game.last_run = stoi(argv[6]);
+		game.local_file = argv[2];
+		game.title = argv[3];
+		game.hash = argv[4];
+		game.cache = argv[5];
+		game.saves = argv[6];
+		game.last_run = stoi(argv[7]);
 		vecLocalGames.push_back(game);
 		mapLocalGames[game.hash] = game;
 		return 0;
@@ -40,6 +41,7 @@ namespace QuestNavigator {
 			string sql = "CREATE TABLE IF NOT EXISTS games ("; 
 			sql += "\"id\" INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,";
 			sql += "\"web\" INTEGER NOT NULL DEFAULT (0),";
+			sql += "\"local_file\" TEXT,";
 			sql += "\"title\" TEXT,";
 			sql += "\"hash\" TEXT,";
 			sql += "\"cache\" TEXT,";

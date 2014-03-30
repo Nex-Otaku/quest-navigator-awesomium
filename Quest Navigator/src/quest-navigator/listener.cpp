@@ -14,6 +14,7 @@
 #include "configuration.h"
 #include "skin.h"
 #include "sound.h"
+#include "gamestock.h"
 #include <process.h>
 #include <algorithm>
 
@@ -187,6 +188,14 @@ namespace QuestNavigator {
 			method_dispatcher_.Bind(app_object,
 				WSLit("openGameFile"),
 				JSDelegate(this, &QnApplicationListener::openGameFile));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("listLocalGames"),
+				JSDelegate(this, &QnApplicationListener::listLocalGames));
+
+			method_dispatcher_.Bind(app_object,
+				WSLit("selectLocalGameInGamestock"),
+				JSDelegate(this, &QnApplicationListener::selectLocalGameInGamestock));
 
 			// Привязываем колбэк для обработки вызовов alert
 			method_dispatcher_.Bind(app_object,
@@ -891,6 +900,11 @@ namespace QuestNavigator {
 		// Контекст UI
 		jsCallApiFromUi("qspShowSaveSlotsDialog", content);
 	}
+	void QnApplicationListener::qspFillLocalGamesList(JSArray games)
+	{
+		// Контекст UI
+		jsCallApiFromUi("qspFillLocalGamesList", games);
+	}
 	void QnApplicationListener::qspSetGroupedContent(JSObject content)
 	{
 		// Контекст библиотеки
@@ -1136,6 +1150,67 @@ namespace QuestNavigator {
 
 		// Запускаем выбранную игру.
 		runNewGame(filePath);
+	}
+
+	void QnApplicationListener::listLocalGames(WebView* caller, const JSArray& args)
+	{
+		// Контекст UI
+
+		// Возвращаем список игр локальной полки.
+		vector<GamestockEntry> vecLocalGames;
+
+		// Загружаем список игр.
+		// Вывод ошибки выполняется внутри вызова, нам остаётся просто выйти.
+		if (!Gamestock::getLocalGames(vecLocalGames))
+			return;
+
+		// Список загружен, формируем контейнер для передачи в JS.
+		JSArray jsLocalGames;
+		for (int i = 0; i < vecLocalGames.size(); i++)
+		{
+			GamestockEntry game = vecLocalGames[i];
+			JSObject jsLocalGame;
+			jsLocalGame.SetProperty(ToWebString("hash"), ToWebString(game.hash));
+			jsLocalGame.SetProperty(ToWebString("title"), ToWebString(game.title));
+			jsLocalGame.SetProperty(ToWebString("local_file"), ToWebString(game.local_file));
+			jsLocalGames.Push(jsLocalGame);
+		}
+
+		// Передаём список игр в JS.
+		qspFillLocalGamesList(jsLocalGames);
+	}
+
+	void QnApplicationListener::selectLocalGameInGamestock(WebView* caller, const JSArray& args)
+	{
+		// Контекст UI
+		// Выбор игры для запуска.
+		if (args.size() < 1) {
+			showError("Не указан параметр для selectLocalGameInGamestock!");
+			return;
+		}
+		JSValue jsHash = args[0];
+		string hash = ToString(jsHash.ToString());
+
+		// Загружаем карту по играм.
+		// Вывод ошибки выполняется внутри вызова, нам остаётся просто выйти.
+		map<string, GamestockEntry> mapLocalGames;
+		if (!Gamestock::getLocalGames(mapLocalGames))
+			return;
+
+		// Ищем игру в списке по хэшу.
+		map<string, GamestockEntry>::iterator it = mapLocalGames.find(hash);
+		if (it == mapLocalGames.end()) {
+			showError("Не найдена игра с указанным хэшем");
+			return;
+		}
+		// Игра найдена.
+		GamestockEntry game = it->second;
+
+		//STUB
+		// Сделать обновление времени последнего запуска.
+
+		// Запускаем выбранную игру.
+		runNewGame(game.local_file);
 	}
 
 	// ********************************************************************

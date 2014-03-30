@@ -11,6 +11,7 @@ namespace QuestNavigator {
 	struct GamestockEntry {
 		int id;
 		bool web;
+		string local_file;
 		string title;
 		string hash;
 		string cache;
