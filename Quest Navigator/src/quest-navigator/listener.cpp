@@ -1166,7 +1166,7 @@ namespace QuestNavigator {
 
 		// Список загружен, формируем контейнер для передачи в JS.
 		JSArray jsLocalGames;
-		for (int i = 0; i < vecLocalGames.size(); i++)
+		for (int i = 0; i < (int)vecLocalGames.size(); i++)
 		{
 			GamestockEntry game = vecLocalGames[i];
 			JSObject jsLocalGame;
