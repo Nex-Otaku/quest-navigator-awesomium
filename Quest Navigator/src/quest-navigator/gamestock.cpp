@@ -1,4 +1,5 @@
 #include "gamestock.h"
+#include "configuration.h"
 #include "utils.h"
 
 namespace QuestNavigator {
@@ -183,7 +184,8 @@ namespace QuestNavigator {
 	bool Gamestock::openDb()
 	{
 		// Открываем соединение.
-		if (sqlite3_open("D:\\qn.db", &pDb)) {
+		string dbPath = Configuration::getString(ecpAppDataDir) + PATH_DELIMITER + "qn.db";
+		if (sqlite3_open(dbPath.c_str(), &pDb)) {
 			string sqliteErr = sqlite3_errmsg(pDb);
 			showError("Ошибка открытия/создания БД: " + sqliteErr);
 			return false;

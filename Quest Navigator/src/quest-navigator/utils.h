@@ -19,7 +19,8 @@ namespace QuestNavigator {
 	static const string ASSETS_DIR = "assets";
 	static const string SKINS_DIR = "skins";
 	static const string QSPLIB_DIR = "qsplib";
-	static const string GAME_CACHE_DIR = "Quest Navigator Cache";
+	static const string APP_DATA_DIR = "Quest Navigator Data";
+	static const string GAME_CACHE_DIR = "Cached Games";
 	static const string DEFAULT_SKIN_NAME = "default";
 	static const string DEFAULT_SKIN_FILE = "gameAwesomium.html";
 	static const string DEFAULT_CONFIG_FILE = "config.xml";

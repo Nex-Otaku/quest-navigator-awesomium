@@ -21,6 +21,7 @@ namespace QuestNavigator {
 		ecpGameFileName,
 		ecpConfigFilePath,
 		ecpSaveDir,
+		ecpAppDataDir,
 		ecpSoundCacheEnabled,
 		ecpSaveSlotMax,
 		ecpWindowTitle,

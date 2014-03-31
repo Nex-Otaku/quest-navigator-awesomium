@@ -502,11 +502,21 @@ namespace QuestNavigator {
 		}
 		saveDir = getRightPath(narrow(wszPath) + PATH_DELIMITER + DEFAULT_SAVE_REL_PATH + PATH_DELIMITER + gameHash);
 
+		// Папка с данными приложения.
+		// В ней находится БД, а также кэшированные игры.
+		hr = SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, wszPath);
+		if (hr != S_OK) {
+			showError("Не удалось получить путь к папке \"Application Data\".");
+			return false;
+		}
+		string appDataDir = narrow(wszPath) + PATH_DELIMITER + APP_DATA_DIR;
+
 		// Приводим все пути к каноничной форме.
 		contentDir = canonicalizePath(contentDir);
 		skinFilePath = canonicalizePath(skinFilePath);
 		configFilePath = canonicalizePath(configFilePath);
 		saveDir = canonicalizePath(saveDir);
+		appDataDir = canonicalizePath(appDataDir);
 
 		// Проверяем все файлы на читаемость
 		if (!fileExists(skinFilePath))
@@ -526,6 +536,7 @@ namespace QuestNavigator {
 		Configuration::setString(ecpGameFileName, gameFileName);
 		Configuration::setString(ecpConfigFilePath, configFilePath);
 		Configuration::setString(ecpSaveDir, saveDir);
+		Configuration::setString(ecpAppDataDir, appDataDir);
 		Configuration::setString(ecpWindowTitle, windowTitle);
 		Configuration::setBool(ecpIsFullscreen, false);
 		Configuration::setBool(ecpRunningDefaultGame, runningDefaultGame);
@@ -634,6 +645,16 @@ namespace QuestNavigator {
 		// 5.3 - папка "qsplib".
 		// 6. Запускается игра со скином из временной папки.
 
+		// Если плеер запущен не в режиме standalone,
+		// то нам потребуется папка данных.
+		string appDataDir = Configuration::getString(ecpAppDataDir);
+		// Если папка ещё не существует, создаём.
+		if (!Configuration::getBool(ecpGameIsStandalone)) {
+			if (!buildDirectoryPath(appDataDir)) {
+				showError("Не удалось создать папку данных для плеера: " + appDataDir);
+				return false;
+			}
+		}
 
 		bool bCopyQsplib = false;
 		bool bCopySkin = false;
@@ -671,15 +692,8 @@ namespace QuestNavigator {
 				return false;
 			}
 
-			// Путь к папке с данными приложения "Application Data"
-			WCHAR wszPath[MAX_PATH];
-			HRESULT hr = SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, wszPath);
-			if (hr != S_OK) {
-				showError("Не удалось получить путь к папке \"Application Data\".");
-				return false;
-			}
 			// Создаём временную папку для игры.
-			string gameFolder = getRightPath(narrow(wszPath) + PATH_DELIMITER + GAME_CACHE_DIR + PATH_DELIMITER + gameHash);
+			string gameFolder = getRightPath(appDataDir + PATH_DELIMITER + GAME_CACHE_DIR + PATH_DELIMITER + gameHash);
 			gameFolder = canonicalizePath(gameFolder);
 			if (!buildDirectoryPath(gameFolder)) {
 				showError("Не удалось создать временную папку для игры: " + gameFolder);
