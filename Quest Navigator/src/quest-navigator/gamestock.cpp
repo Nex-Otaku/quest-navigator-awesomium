@@ -55,12 +55,12 @@ namespace QuestNavigator {
 	string GamestockEntry::sqlUpdateValues()
 	{
 		string values = "SET web = " + webVal() + ", ";
-		values += "SET local_file = " + localFileVal() + ", ";
-		values += "SET title = " + titleVal() + ", ";
-		values += "SET hash = " + hashVal() + ", ";
-		values += "SET cache = " + cacheVal() + ", ";
-		values += "SET saves = " + savesVal() + ", ";
-		values += "SET last_run = " + lastRunVal();
+		values += "local_file = " + localFileVal() + ", ";
+		values += "title = " + titleVal() + ", ";
+		values += "hash = " + hashVal() + ", ";
+		values += "cache = " + cacheVal() + ", ";
+		values += "saves = " + savesVal() + ", ";
+		values += "last_run = " + lastRunVal();
 		return values;
 	}
 
@@ -104,7 +104,9 @@ namespace QuestNavigator {
 			return false;
 
 		// Читаем список локальных игр.
-		string sql = "SELECT * FROM games WHERE web = " + escape(0) + " ORDER BY last_run DESC;";
+		string sql = "SELECT id, web, local_file, title, hash, cache, saves, last_run";
+		sql += " FROM games";
+		sql += " WHERE web = " + escape(0) + " ORDER BY last_run DESC;";
 		// Обработка результатов SELECT идёт в cbSelectLocalGames.
 		if (!execSql(sql, cbSelectLocalGames))
 			return false;
@@ -160,7 +162,7 @@ namespace QuestNavigator {
 
 			// Обновляем игру.
 			string sql = "UPDATE games ";
-			sql += game.sqlUpdateValues() + " WHERE id = " + game.idVal() + ";";
+			sql += game.sqlUpdateValues() + " WHERE id = " + test.idVal() + ";";
 			if (!execSql(sql, 0))
 				return false;
 
@@ -205,7 +207,7 @@ namespace QuestNavigator {
 		sql += "\"web\" INTEGER NOT NULL DEFAULT (0),";
 		sql += "\"local_file\" TEXT,";
 		sql += "\"title\" TEXT,";
-		sql += "\"hash\" TEXT,";
+		sql += "\"hash\" TEXT UNIQUE,";
 		sql += "\"cache\" TEXT,";
 		sql += "\"saves\" TEXT,";
 		sql += "\"last_run\" INTEGER);";
