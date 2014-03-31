@@ -190,6 +190,10 @@ namespace QuestNavigator {
 				JSDelegate(this, &QnApplicationListener::openGameFile));
 
 			method_dispatcher_.Bind(app_object,
+				WSLit("runDefaultGame"),
+				JSDelegate(this, &QnApplicationListener::runDefaultGame));
+
+			method_dispatcher_.Bind(app_object,
 				WSLit("listLocalGames"),
 				JSDelegate(this, &QnApplicationListener::listLocalGames));
 
@@ -1167,6 +1171,14 @@ namespace QuestNavigator {
 
 		// Запускаем выбранную игру.
 		runNewGame(filePath);
+	}
+
+	void QnApplicationListener::runDefaultGame(WebView* caller, const JSArray& args)
+	{
+		// Контекст UI
+
+		// Запускаем игру по умолчанию.
+		runNewGame("");
 	}
 
 	void QnApplicationListener::listLocalGames(WebView* caller, const JSArray& args)

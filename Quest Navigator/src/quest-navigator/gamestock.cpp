@@ -103,6 +103,10 @@ namespace QuestNavigator {
 		if (!openDb())
 			return false;
 
+		// Очищаем контейнеры.
+		vecLocalGames.clear();
+		mapLocalGames.clear();
+
 		// Читаем список локальных игр.
 		string sql = "SELECT id, web, local_file, title, hash, cache, saves, last_run";
 		sql += " FROM games";

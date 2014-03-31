@@ -155,6 +155,7 @@ namespace QuestNavigator {
 		void setInputString(WebView* caller, const JSArray& args);
 		void runInputString(WebView* caller, const JSArray& args);
 		void openGameFile(WebView* caller, const JSArray& args);
+		void runDefaultGame(WebView* caller, const JSArray& args);
 		void listLocalGames(WebView* caller, const JSArray& args);
 		void selectLocalGameInGamestock(WebView* caller, const JSArray& args);
 
