@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<link type="text/css" href="skins/game.css" rel="stylesheet" />
+<script type="text/javascript" src="../qsplib/js/core.js"></script>
+<script type="text/javascript" src="../qsplib/js/coreAwesomium.js"></script>
+<script type="text/javascript" src="../qsplib/js/QspLibAwesomium.js"></script>
+<script type="text/javascript" src="../qsplib/js/api.js"></script>
+
+<script type="text/javascript" src="../standalone_content/skins/js/game.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	qspInitApi();
+    });
+</script>
+</head>
+<body>
+<div id="qsp-back-image"></div>
+<!-- Описание основное и дополнительное, действия, инвентарь -->
+<div id="skin-page">
+
+<div id="skin-top-menu-wrapper">
+	<div id="skin-top-menu-row">
+		<div id="skin-user1">
+			<div id="skin-user1-inner">
+				<a class="qsp-skin-button" onclick="javascript:skinToggleInv();">
+					<div id="skin-inv-toggle"></div>
+					<div id="skin-inv-caption">Инвентарь</div>
+				</a>
+			</div>
+		</div>
+		<div id="skin-user2">
+			<a id="qsp-user-system" class="qsp-skin-button" onclick="javascript:qspShowSystemMenu();">
+				<img src="../standalone_content/skins/gfx/button_sys-40x40.png">
+			</a>
+		</div>
+	</div>
+</div>
+
+<div id="skin-right-column">
+	<div id="qsp-wrapper-objs">
+		<div id="qsp-scroller-objs">
+			<div id="qsp-inv">
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="skin-left-column">
+	<div id="skin-wrapper-main-outer">
+		<div id="qsp-wrapper-main">
+			<div id="qsp-scroller-main">
+				<div id="qsp-view">
+				</div>
+				<div id="qsp-vars">
+				</div>
+				<div id="qsp-main">
+				<!--Загрузка игры...-->
+				</div>
+				<!-- Действия идут сразу после основного описания, так удобнее всего -->
+				<div id="qsp-acts"> 
+				</div>
+				<!-- Полка игр -->
+				<div id="skin-gamestock">
+					<div id="skin-gamestock-title">Полка игр:</div>
+					<!-- Контейнер для списка локальных игр -->
+					<div id="qsp-localgames-container"></div>
+					<div id="skin-gamestock-browse"><a href="#" class="qsp-browsefile-button">Загрузить с диска</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="qsp-input-line">
+		<input type="text">
+	</div>
+</div>
+
+</div>
+
+    
+    <!-- Диалоги -->
+    <!-- Отрисовываются поверх всего, поэтому идут последними -->
+    <div id="qsp-dialog-msg">
+        <div class="qsp-skin-overlay"></div>
+        <div id="qsp-dialog-msg-container">
+            <div id="qsp-wrapper-msg">
+                <div id="qsp-scroller-msg" >
+                    <div id="qsp-dialog-msg-content">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    </div>
+                </div>
+            </div>
+			<div id="qsp-dialog-msg-bottom-block">
+				<div id="qsp-dialog-msg-bottom-wrapper">
+					<div id="qsp-dialog-msg-bottom-container">
+	<div id="qsp-button-msg-ok" class="qsp-skin-button" onclick="javascript:qspCloseMsg();">
+		<div class='np-action-outer'><div class='np-action-inner'>OK</div></div>
+		<!--<img src="../standalone_content/skins/gfx/ok_button-84x47.png">-->
+    </div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+    
+    <div id="qsp-dialog-input">
+        <div class="qsp-skin-overlay"></div>
+		<div id="qsp-dialog-input-container">
+            <div id="qsp-dialog-input-content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            </div>
+            <center>
+                <div id="qsp-dialog-input-bottom-block">
+                    <input type="text" name="qsp-dialog-input-text" id="qsp-dialog-input-text" />
+                    <div id="qsp-dialog-input-bottom-wrapper-dummy">
+                    <div id="qsp-dialog-input-bottom-wrapper">
+                        <div id="qsp-dialog-input-bottom-container">
+							<div id="qsp-button-input-ok" class="qsp-skin-button" onclick="javascript:qspCloseInput(true);">
+								<div class='np-action-outer'><div class='np-action-inner'>OK</div></div>
+								<!--<img src="../standalone_content/skins/gfx/ok_button-84x47.png" data-pressed="../standalone_content/skins/gfx/ok_button_pressed-84x47.png">-->
+							</div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </center>
+        </div>
+    </div>
+    
+    <div id="qsp-dialog-system-menu">
+        <div class="qsp-skin-overlay"></div>
+        <div id="qsp-dialog-system-menu-container">
+			<div class="qsp-skin-system-menu-row">
+				<div class="qsp-skin-system-menu-cell">
+					<center>
+						<a onclick="javascript:qspLoadGame();">Загрузить</a>
+					</center>
+				</div>
+            </div>
+			<div class="qsp-skin-system-menu-row">
+				<div class="qsp-skin-system-menu-cell">
+					<center>
+						<a onclick="javascript:qspSaveGame();">Сохранить</a>
+					</center>
+				</div>
+            </div>
+			<div class="qsp-skin-system-menu-row">
+				<div class="qsp-skin-system-menu-cell">
+					<center>
+						<a onclick="javascript:qspRestartGame();">Заново</a>
+					</center>
+				</div>
+            </div>
+			<div class="qsp-skin-system-menu-row">
+				<div class="qsp-skin-system-menu-cell">
+					<center>
+						<a onclick="javascript:qspDefaultGame();">Другие игры</a>
+					</center>
+				</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="qsp-dialog-save-slots">
+        <div class="qsp-skin-overlay"></div>
+	<div id="qsp-dialog-save-slots-wrapper1" class="not-qsp-skin-dialog">
+            <div id="qsp-dialog-save-slots-wrapper2">
+                <div id="qsp-dialog-save-slots-container"></div>
+            </div>
+        </div>
+    </div>
+    
+<div id="qsp-dialog-user-menu" class="contextMenu">
+    </div>
+    
+    <div id="qsp-dialog-view">
+        <div class="qsp-skin-overlay"></div>
+		<div id="qsp-dialog-view-image-container"></div>
+    </div>
+    
+    <div id="qsp-dialog-error">
+        <div class="qsp-skin-overlay"></div>
+		<div id="qsp-dialog-error-container">
+			<div id="qsp-dialog-error-background"></div>
+			<div id="qsp-dialog-error-top-row">
+				<div id="qsp-dialog-error-content">
+					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+				</div>
+			</div>
+			<div id="qsp-dialog-error-bottom-row">
+				<div id="qsp-dialog-error-bottom-wrapper">
+					<div id="qsp-button-error-ok" class="qsp-skin-button" onclick="javascript:qspCloseError();">
+						<div class='np-action-outer'><div class='np-action-inner'>OK</div></div>
+						<!--<img src="../standalone_content/skins/gfx/ok_button-84x47.png" data-pressed="../standalone_content/skins/gfx/ok_button_pressed-84x47.png">-->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    <div id="qsp-android-refresh-bugfix"></div>
+</body>
+</html>

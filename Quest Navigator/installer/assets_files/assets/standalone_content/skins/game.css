@@ -1,0 +1,405 @@
+/*
+ * Настройки скина QSP для тестирования
+ *
+ * Скин растягиваемый!
+ * 
+ */
+
+/* Запрещаем выделять текст и перетаскивать картинки */
+div,p,span {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+    /* Без этого флага на iOS текст масштабируется при повороте экрана */
+    -webkit-text-size-adjust: none;
+}
+
+div {
+	/* Отключаем "сглаживание" для бэкграундных картинок, чтобы не было артефактов,
+	   когда при использовании border-image или repeat-x браузер делает интерполяцию по внешним краям */
+	image-rendering: optimizeSpeed;             /* FUCK SMOOTHING, GIVE ME SPEED  */
+ 	image-rendering: -moz-crisp-edges;          /* Firefox                        */
+ 	image-rendering: -o-crisp-edges;            /* Opera                          */
+ 	image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+ 	image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+ 	-ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */	
+}
+
+img { -webkit-user-drag: none; }
+
+a, .qsp-skin-button, .qsp-action, .qsp-save-slot-enabled { -webkit-tap-highlight-color: rgba(0,0,0,0); cursor:pointer; }
+
+/* Кнопка на первой странице - в IE почему-то показывается рамка */
+.qsp-skin-button img{ border:none; }
+
+body { margin:0;	padding:0; }
+
+/* Все диалоги находятся поверх любых элементов оформления. */
+#qsp-dialog-msg,
+#qsp-dialog-input,
+#qsp-dialog-system-menu,
+#qsp-dialog-save-slots,
+#qsp-dialog-view,
+#qsp-dialog-error {
+	z-index:500;
+	position:fixed;
+	top:0;
+	left:0;
+	bottom:0;
+	right:0;
+}
+ 
+/* кастомное оформление */
+
+#skin-page { position:fixed; left:0px; top:0px; width:100%; height:100%; }
+#skin-left-column { position:absolute; left:0px; top:0px; width:100%; height:100%; }
+body.vars-visible #skin-left-column, body.objs-visible #skin-left-column { width:70%; }
+#skin-right-column { position:absolute; right:0px; top:0px; width:30%; height:100%; overflow:hidden; }
+
+
+/* стили для поддержки строки ввода */
+#qsp-input-line { 
+	position:absolute;
+	bottom:0;
+	height:27px;
+	width:100%; 
+}
+#qsp-input-line input{ 
+	width:100%; 
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+#qsp-wrapper-main { 
+	position: absolute; 
+}
+#skin-wrapper-main-outer {
+	position: absolute;
+	width:100%;
+	top:0;
+	bottom:0px;
+}
+body.input-visible #skin-wrapper-main-outer {
+	bottom:27px;
+}
+
+
+#qsp-back-image { position:absolute; left:0px; top:0px; width:100%; height:100%; overflow:hidden; }
+
+#qsp-wrapper-main { height:100%; width:100%; word-wrap: break-word; }
+#qsp-wrapper-objs { position:absolute; left:0px; top:0px; height:100%; width:100%; }
+
+#qsp-wrapper-msg { position:absolute; overflow:hidden; }
+#qsp-system-menu-button { position:absolute; left:0px; top:0px; }
+#qsp-system-menu-button img { float:left; }
+
+
+.qsp-skin-overlay { position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background: #5c5c5c; opacity: .70;filter:Alpha(Opacity=70); -webkit-tap-highlight-color: rgba(0,0,0,0); }
+
+.qsp-skin-action-overlay { position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+
+.qsp-skin-dialog { position: absolute; }
+
+/* Обложка */
+#qsp-cover-wrapper { text-align:center; width:320px; padding-top:11px; position:relative; left:50%; margin-left:-160px; }
+#qsp-cover-wrapper a img{ margin-top:3px; }
+
+
+
+.pressed.qsp-action {
+color:#BB0000; 
+}
+
+.pressed.qsp-save-slot-enabled div { color:#BB0000; }
+
+/* Блоки с цветом по умолчанию */
+#qsp-dialog-msg-container,
+#qsp-button-msg-ok,
+#qsp-dialog-error-container,
+#qsp-button-error-ok,
+#qsp-dialog-input-container,
+#qsp-button-input-ok,
+#qsp-dialog-system-menu-container,
+#qsp-dialog-save-slots-wrapper1,
+#qsp-dialog-user-menu
+{ 
+	border:solid black 1px; 
+	background-color:#E5E5E5;
+}
+
+/* MSG */
+#qsp-dialog-msg { }
+#qsp-dialog-msg-content { text-align:justify; padding-right:12px; }
+#qsp-dialog-msg-container { 
+	position: absolute; 
+	left:50%; 
+	top:50%; 
+	width:240px; 
+	height:198px; 
+	margin-top:-99px; 
+	margin-left:-120px; 
+}
+#qsp-button-msg-ok { 
+	position:static; 
+	clear:both; 
+	padding: 2px 10px;
+}
+#qsp-wrapper-msg { float:left; width:auto; height:110px; margin-left:20px; margin-right:20px; margin-top:20px;}
+#qsp-dialog-msg-bottom-block { position:absolute; bottom:0; width:100%; overflow:hidden; }
+#qsp-dialog-msg-bottom-wrapper { float:left;
+	position:relative;
+	left:50%;
+	top:0px;
+	height:100%;
+ }
+#qsp-dialog-msg-bottom-container { float:left;
+	position:relative;
+	left:-50%;
+	top:0px;
+	width:auto;
+	height:100%;
+	padding:10px;
+}
+
+
+/* ERROR */
+#qsp-dialog-error-container { 
+	position: absolute; 
+	left:50%; 
+	top:50%; 
+	width:240px; 
+	height:198px; 
+	margin-top:-99px; 
+	margin-left:-120px; 
+	display:table;
+}
+#qsp-dialog-error-top-row, 
+#qsp-dialog-error-bottom-row {
+	display:table-row;
+}
+#qsp-dialog-error-content,
+#qsp-dialog-error-bottom-wrapper { 
+	display:table-cell;
+}
+#qsp-dialog-error-bottom-wrapper { 
+	text-align:center;
+}
+#qsp-dialog-error-content {
+	padding:0.5em;
+}
+#qsp-dialog-error-background  { position: absolute; }
+#qsp-button-error-ok {
+	padding: 2px 10px;
+	display:inline-block;
+	text-align:center;
+}
+
+/* SYSTEM MENU */
+#qsp-dialog-system-menu-background, #qsp-dialog-system-menu-container { position: fixed;  left:50%; top:50%; width:199px; height:199px; margin-top:-100px; margin-left:-100px; }
+
+#qsp-dialog-system-menu-container { padding:0px; display: table; }
+#qsp-dialog-system-menu-container .qsp-skin-system-menu-row { display: table-row; }
+#qsp-dialog-system-menu-container .qsp-skin-system-menu-cell { display: table-cell; vertical-align:middle; font-size:17px; }
+#qsp-dialog-system-menu-container a { text-decoration:none; color:#000; }
+
+/* VIEW */
+/* VIEW_ALWAYS_SHOW = 0, диалог */
+#qsp-dialog-view-image-container {
+    position: fixed;
+    top:10px;
+    bottom:10px;
+    left:10px;
+    right:10px;
+}
+#qsp-dialog-view-image-container img {
+    max-width:100%;
+    max-height:100%;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;    
+}
+/* VIEW_ALWAYS_SHOW = 1, окно "встроено" в описание */
+#qsp-view {
+	text-align:center;
+}
+#qsp-view img {
+    max-width:100%;
+}
+
+/* SAVE SLOTS */
+/* 
+ * выравниваем по центру вертикально и горизонтально, отнимая половину фиксированной ширины и высоты в margin
+ * высота и ширина самого диалога нам известны заранее, а размеры экрана могут быть любыми
+ */
+#qsp-dialog-save-slots-wrapper1 { 
+position: absolute; left:50%; top:50%; width:199px; height:199px; margin-top:-100px; margin-left:-100px; overflow:hidden; 
+background-image:url("gfx/system_menu_back-199x199.png");
+background-size:199px 199px;
+-webkit-background-size:199px 199px;
+}
+body.retina #qsp-dialog-save-slots-wrapper1 { 
+	background-image:url("gfx/system_menu_back-199x199@2x.png") !important;
+}
+/*
+ * выравниваем список слотов горизонтально по центру, учитывая что ширина списка может варьироваться
+ * http://www.tightcss.com/centering/center_variable_width.htm
+ */
+#qsp-dialog-save-slots-wrapper2 { float:left;
+	position:relative;
+	left:50%;
+	top:0px;
+	margin:0px;
+	padding:0px;
+ }
+#qsp-dialog-save-slots-container { float:left;
+	position:relative;
+	left:-50%;
+	top:6px;
+	width:auto;
+	margin:0px;
+	padding:0px;
+}
+
+.qsp-save-slot-enabled, .qsp-save-slot-disabled { float:left; clear:both; margin-top:14px; font-size:17px; width:100%; padding:0px; }
+.qsp-save-slot-enabled div, .qsp-save-slot-disabled div { padding-left:30px; padding-right:30px; padding-top:0px; padding-bottom:0px; margin:0px; }
+
+.qsp-save-slot-disabled { color:#555; }
+
+/* INPUT DIALOG */
+/* Этот диалог растягивается, и зависит от размеров картинки бэкграунда, указанных в qsp-dialog-input-container */
+#qsp-dialog-input-container { 
+	position: absolute; left:50%; top:50%; width:240px; height:198px; margin-top:-99px; margin-left:-120px; 
+	background-size:240px 198px;
+	-webkit-background-size:240px 198px;
+}
+#qsp-dialog-input-content, #qsp-dialog-input-text, #qsp-button-input-ok { position:static; clear:both; }
+#qsp-dialog-input-content { padding-left:20px; padding-right:20px; padding-top:15px;}
+#qsp-dialog-input-bottom-block { position:absolute; bottom:0; width:100%; overflow:hidden; }
+#qsp-dialog-input-bottom-wrapper { float:left;
+	position:relative;
+	left:50%;
+	top:0px;
+	height:100%;
+ }
+#qsp-dialog-input-bottom-container { 
+	position:relative;
+	left:-50%;
+	top:0px;
+	width:auto;
+	height:100%;
+	padding-top:5px;
+	padding-bottom:10px;
+}
+#qsp-button-input-ok {
+	padding: 2px 10px;
+}
+
+/* MAIN DESC AND VARS DESC */
+#qsp-main, #qsp-vars,
+#skin-gamestock 
+{ padding-left:12px; padding-right:12px; padding-top:0.5em; text-align:justify; }
+/* ACTS */
+#qsp-acts { padding-left:12px; padding-right:12px;  padding-top:30px; }
+/* DEFAULT TEXT COLOR */
+body { color:#FFF; background-color:#000; font-size:30px;}
+
+
+
+#skin-user1 { 
+	display:none;
+}
+#skin-user2 { 
+	position:fixed; 
+	right:0px; 
+	bottom:0px; 
+	width:40px; 
+	height:40px;
+	overflow:hidden;
+	z-index:1;
+}
+
+#skin-inv-toggle {
+	display:inline-block;
+	width:40px;
+	height:40px;
+	overflow:hidden;
+	background-image:url("gfx/inv-arrow-down-40x40.png");
+}
+#skin-inv-toggle.open {
+	background-image:url("gfx/inv-arrow-up-40x40.png") !important;
+}
+
+/* Вёрстка для смартфонов в портретном режиме.
+ Также применяется к любому десктопному окну шириной менее 480 пикселов, 
+ чтобы удобней было тестировать мобильные шаблоны.
+ */
+@media screen and (max-width: 480px){
+	body.objs-visible #skin-user1 { 
+		display:table-cell; 
+	}
+	#skin-user1-inner {
+		height:40px;
+	}
+	#skin-user1 a {
+		display:inline-block;
+		line-height:40px;
+		height:40px;
+	}
+	#skin-inv-caption { 
+		display:inline-block;
+		vertical-align:top;
+		padding-right:0.5em;
+	}
+	#skin-user2 { 
+		position:static !important;
+		display:table-cell; 
+		text-align:right;
+	}
+	#qsp-user-system {
+		display:block;
+		height:40px;
+	}
+	#skin-top-menu-wrapper {
+		display:table;
+		width:100%;
+	}
+	#skin-top-menu-row {
+		display:table-row;
+	}
+	#qsp-inv {
+		display:none;
+	}
+	#skin-page { 
+		position:relative; 
+	}
+	#skin-left-column { 
+		position:relative;
+		width:100% !important;
+	}
+	#skin-right-column { 
+		position:relative;
+		width:100% !important;
+		overflow:auto;
+	}
+	#qsp-input-line { 
+		position:relative;
+	}
+	#qsp-wrapper-main { 
+		position: relative; 
+	}
+	#skin-wrapper-main-outer {
+		position: relative;
+	}
+	
+	#qsp-wrapper-objs { 
+		position:relative; 
+		height: auto !important;
+	}
+}
