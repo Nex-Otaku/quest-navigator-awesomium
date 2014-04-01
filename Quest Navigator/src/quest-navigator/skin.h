@@ -59,6 +59,7 @@ namespace QuestNavigator {
 		espHideScrollObjs,
 
 		espUseHtml,
+		espNoSave,
 		espDisableScroll,
 		espViewAlwaysShow,
 		espIsStandalone,

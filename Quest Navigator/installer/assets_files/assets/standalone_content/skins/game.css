@@ -270,7 +270,7 @@ body.retina #qsp-dialog-save-slots-wrapper1 {
 .qsp-save-slot-enabled, .qsp-save-slot-disabled { float:left; clear:both; margin-top:14px; font-size:17px; width:100%; padding:0px; }
 .qsp-save-slot-enabled div, .qsp-save-slot-disabled div { padding-left:30px; padding-right:30px; padding-top:0px; padding-bottom:0px; margin:0px; }
 
-.qsp-save-slot-disabled { color:#555; }
+.qsp-save-slot-disabled { color:#555; cursor: default; }
 
 /* INPUT DIALOG */
 /* Этот диалог растягивается, и зависит от размеров картинки бэкграунда, указанных в qsp-dialog-input-container */
@@ -402,4 +402,9 @@ body { color:#FFF; background-color:#000; font-size:30px;}
 		position:relative; 
 		height: auto !important;
 	}
+}
+
+a.disabled {
+	cursor: default;
+	color: #555 !important;
 }

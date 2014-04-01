@@ -16,6 +16,7 @@ namespace QuestNavigator {
 		"hideScrollObjs",
 
 		"useHtml",
+		"noSave",
 		"disableScroll",
 		"viewAlwaysShow",
 		"isStandalone",
@@ -111,6 +112,7 @@ namespace QuestNavigator {
 		setDefaultInt(espHideScrollObjs, 0);
 
 		setDefaultInt(espUseHtml, 0);
+		setDefaultInt(espNoSave, 0);
 		setDefaultInt(espDisableScroll, 0);
 		setDefaultInt(espViewAlwaysShow, 0);
 		setDefaultInt(espIsStandalone, 0);
@@ -241,6 +243,7 @@ namespace QuestNavigator {
 		loadValue(espFontColor, "FCOLOR");
 		loadValue(espFontName, "FNAME");
 		loadValue(espFontSize, "FSIZE");
+		loadValue(espNoSave, "NOSAVE");
 		if (isChanged) isBaseVarsChanged = true;
 		// -----------
 		isChanged = false;
@@ -325,6 +328,7 @@ namespace QuestNavigator {
 			case espHideScrollVars:
 			case espHideScrollObjs:
 			case espUseHtml:
+			case espNoSave:
 			case espDisableScroll:
 			case espViewAlwaysShow:
 			case espIsStandalone:
