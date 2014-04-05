@@ -6,7 +6,7 @@
 #define MyAppPublisher "QSP"
 #define MyAppURL "http://qsp.su"
 #define MyAppExeName "QuestNavigator.exe"
-#define QnCacheFolder "Quest Navigator Cache"
+#define QnCacheFolder "Quest Navigator Data"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
