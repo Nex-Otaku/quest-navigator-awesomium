@@ -91,6 +91,8 @@ namespace QuestNavigator {
 	// Заменяем все вхождения подстроки в строке
 	string replaceAll(string source, char pattern, char replacement);
 	void replaceAll(string &s, const string &search, const string &replace);
+	// Заменяем "&" на "&amp;", не трогая "HTML entities".
+	void replaceAmp(string &s);
 	// Переводим все символы в верхний регистр
 	string toUpper(string str);
 	// Переводим все символы в нижний регистр

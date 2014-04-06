@@ -1110,6 +1110,75 @@ namespace QuestNavigator {
 			s.insert(pos, replace);
 		}
 	}
+	// Заменяем "&" на "&amp;", не трогая "HTML entities".
+	void replaceAmp(string &s)
+	{
+		// /&(?:[a-z\d]+|#\d+|#x[a-f\d]+);/i
+		// 1. Находим "&".
+		// 2. Проверяем следующий символ. 
+		// Это должен быть строчный символ латинского алфавита, либо решётка.
+		// 3. Проверяем остальные символы, пока не встретится ";".
+		// 4. Если последовательность символов не удовлетворяет условиям, заменяем "&" на "&amp;".
+		string az = "abcdefghijklmnopqrstuvwxyz";
+		string digits = "0123456789";
+		string validFirstEntityChar = az + "#";
+		string validMainEntityChar = az + digits;
+		size_t last_pos = 0;
+		size_t pos = 0;
+		size_t t = 0;
+		size_t len = s.length();
+		bool entityPossible = false;
+		string replaced = "";
+		while (pos < len) {
+			last_pos = pos;
+			pos = s.find('&', pos);
+			if (pos != string::npos) {
+				// Возможна замена.
+				// Для HTML-entity, в запасе после "&" должно оставаться минимум два символа.
+				entityPossible = pos < (len - 2);
+				if (entityPossible) {
+					// Первым символом после "&" 
+					// должен быть строчный символ латинского алфавита, либо решётка.
+					entityPossible = validFirstEntityChar.find(s[pos + 1]) != string::npos;
+					if (entityPossible) {
+						// После этого допускаются цифры и символы латинского алфавита 
+						// в произвольном количестве.
+						t = s.find_first_not_of(validMainEntityChar, pos + 2);
+						entityPossible = t != string::npos;
+						if (entityPossible) {
+							// Следующим символом должен быть ";".
+							entityPossible = s[t] == ';';
+						}
+					}
+				}
+				// Мы определили, 
+				// находится ли в строке 
+				// правильная последовательность HTML-entity.
+
+				// Записываем часть от last_pos до вхождения "&".
+				replaced += s.substr(last_pos, pos - last_pos);
+
+				// Работаем с проанализированным куском.
+				if (!entityPossible) {
+					// Это не HTML-entity.
+					// Выполняем замену.
+					replaced += "&amp;";
+					pos = pos + 1;
+				} else {
+					// Это HTML-entity.
+					// Записываем кусок "как есть".
+					replaced += s.substr(pos, t - pos);
+					pos += t - pos;
+				}
+			} else {
+				// Заменять нечего.
+				// Записываем оставшийся кусок.
+				replaced += s.substr(last_pos, len - last_pos);
+				break;
+			}
+		}
+		s = replaced;
+	}
 	// Переводим все символы в верхний регистр
 	string toUpper(string str)
 	{

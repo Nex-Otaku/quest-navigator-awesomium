@@ -458,12 +458,8 @@ namespace QuestNavigator {
 			// THIS IS ONLY FOR LEGACY
 			// В Байтовском AeroQSP неправильно эскейпились кавычки и апострофы, и не эскейпились амперсанды(&).
 			// Для совместимости с играми, написанными под Байтовский AeroQSP, делаем замену.
-			replaceAll(text, "&", "&amp;");
-			replaceAll(text, "&amp;quot;", "&quot;");
-			replaceAll(text, "&amp;nbsp;", "&nbsp;");
-			replaceAll(text, "&amp;lt;", "&lt;");
-			replaceAll(text, "&amp;gt;", "&gt;");
-			replaceAll(text, "&amp;amp;", "&amp;");
+			// Специальная функция для правильной замены "&" на "&amp;"
+			replaceAmp(text);
 			replaceAll(text, "\\\"", "&quot;");
 			replaceAll(text, "\\'", "&#39;");
 		}
