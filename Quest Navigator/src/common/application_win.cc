@@ -48,6 +48,11 @@ public:
 				listener()->toggleFullscreen();
 			}
 
+			// Закрываем окно по Alt + F4.
+			if ((msg.message == WM_SYSKEYDOWN) && (msg.wParam == VK_F4)) {
+				this->Quit();
+			}
+
 			// Если нажата комбинация Ctrl+F5, 
 			// выполняем полную перезагрузку игры.
 			if ((msg.message == WM_KEYDOWN) && (msg.wParam == VK_F5)) {
