@@ -59,6 +59,9 @@ ViewWin::ViewWin(int width, int height) {
 	web_view_->set_parent_window(hwnd_);
 
 	ShowWindow(hwnd_, SW_SHOWNORMAL);
+	if (Configuration::getBool(ecpIsFullscreen)) {
+		setFullscreenByHwnd(hwnd_, Configuration::getBool(ecpIsFullscreen));
+	}
 	UpdateWindow(hwnd_);
 
 	SetTimer (hwnd_, 0, 15, NULL );

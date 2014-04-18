@@ -166,6 +166,8 @@ namespace QuestNavigator {
 	DWORD getWindowStyle();
 	// Переключение полноэкранного режима
 	void toggleFullscreenByHwnd(HWND hWnd);
+	// Установка полноэкранного режима.
+	void setFullscreenByHwnd(HWND hWnd, bool fullscreen);
 }
 
 

@@ -1243,12 +1243,16 @@ namespace QuestNavigator {
 			WS_MINIMIZEBOX);
 	}
 
+	// Переключение полноэкранного режима.
 	WINDOWPLACEMENT wpc;
-
 	void toggleFullscreenByHwnd(HWND hWnd) {
-		if (Configuration::getBool(ecpIsFullscreen)) {
+		setFullscreenByHwnd(hWnd, !Configuration::getBool(ecpIsFullscreen));
+	}
+	// Установка полноэкранного режима.
+	void setFullscreenByHwnd(HWND hWnd, bool fullscreen) {
+		if (!fullscreen) {
 			// Из всего экрана в оконное                                      
-			// Устанавливаем стили окнного режима
+			// Устанавливаем стили оконного режима
 			SetWindowLong(hWnd, GWL_STYLE, getWindowStyle());
 			// Загружаем парметры предыдущего оконного режима
 			SetWindowPlacement(hWnd, &wpc);
