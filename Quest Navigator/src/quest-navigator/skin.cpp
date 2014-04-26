@@ -33,13 +33,7 @@ namespace QuestNavigator {
 		"varsDescTextFormat",
 		"actsListItemFormat",
 		"objsListSelItemFormat",
-		"objsListItemFormat",
-
-		"backColor",
-		"linkColor",
-		"fontColor",
-		"fontName",
-		"fontSize",
+		"objsListItemFormat"
 	};
 
 	ConfigValue Skin::_paramList[espLast];
@@ -85,7 +79,6 @@ namespace QuestNavigator {
 
 	bool Skin::firstUpdate;
 	bool Skin::isChanged;
-	bool Skin::isMainBackChanged;
 	bool Skin::isActionsStyleChanged;
 	bool Skin::isHtmlModeChanged;
 	bool Skin::isBaseVarsChanged;
@@ -130,12 +123,6 @@ namespace QuestNavigator {
 		setDefaultString(espActsListItemFormat, "<table><tr><td><img src='%IMAGE%'/></td><td style='width:100%);'>%TEXT%</td></tr></table>");
 		setDefaultString(espObjsListSelItemFormat, "<table><tr><td><img src='%IMAGE%'/></td><td style='width:100%);color:#0000FF);'>%TEXT%</td></tr></table>");
 		setDefaultString(espObjsListItemFormat, "<table><tr><td><img src='%IMAGE%'/></td><td style='width:100%);'>%TEXT%</td></tr></table>");
-
-		setDefaultInt(espBackColor, 0xE5E5E5);
-		setDefaultInt(espLinkColor, 0xFF0000);
-		setDefaultInt(espFontColor, 0x000000);
-		setDefaultString(espFontName, "_sans");
-		setDefaultInt(espFontSize, 18);
 	}
 
 	// Устанавливаем значения по умолчанию
@@ -160,7 +147,6 @@ namespace QuestNavigator {
 	{
 		firstUpdate = false;
 		isChanged = false;
-		isMainBackChanged = false;
 		isActionsStyleChanged = false;
 		isHtmlModeChanged = false;
 		isBaseVarsChanged = false;
@@ -239,16 +225,8 @@ namespace QuestNavigator {
 		loadValue(espHideScrollObjs, "HIDE_OBJS_SCROLL");
 		loadValue(espHideScrollAny, "HIDE_ALL_SCROLL");
 		loadValue(espHideScrollArrows, "HIDE_SCROLL_ARROWS");
-		loadValue(espLinkColor, "LCOLOR");
-		loadValue(espFontColor, "FCOLOR");
-		loadValue(espFontName, "FNAME");
-		loadValue(espFontSize, "FSIZE");
 		loadValue(espNoSave, "NOSAVE");
 		if (isChanged) isBaseVarsChanged = true;
-		// -----------
-		isChanged = false;
-		loadValue(espBackColor, "BCOLOR");
-		if (isChanged) isMainBackChanged = true;
 		// -----------
 		isChanged = false;
 		loadValue(espUseHtml, "USEHTML");
@@ -350,21 +328,6 @@ namespace QuestNavigator {
 					strValue = applyHtmlFixes(strValue, true);
 				}
 				break;
-				// Цвета
-			case espBackColor:
-			case espLinkColor:
-			case espFontColor:
-				{
-					bResultIsString = true;
-					strValue = makeHtmlColor(numValue);
-				}
-				break;
-				// Строка
-			case espFontName:
-				break;
-				// Целочисленный параметр
-			case espFontSize:
-				break;
 			default:
 				{
 					showError("Неизвестный параметр оформления.");
@@ -387,7 +350,6 @@ namespace QuestNavigator {
 	{
 		return firstUpdate ||
 			isChanged ||
-			isMainBackChanged ||
 			isActionsStyleChanged ||
 			isHtmlModeChanged ||
 			isBaseVarsChanged ||
@@ -466,15 +428,5 @@ namespace QuestNavigator {
 		replaceAll(text, "\n", "<br />");
 
 		return text;
-	}
-
-	string Skin::makeHtmlColor(int color)
-	{
-		// ABGR -> RGB
-		int reversedColor = ((color & 0xFF) << 16) | (color & 0xFF00) | ((color & 0xFF0000) >> 16);
-		char buff[8]; // 7 символов + 1 нулевой байт, обозначающий конец строки
-		sprintf(buff, "#%06X", reversedColor);
-		string sColor = buff;
-		return sColor;
 	}
 }

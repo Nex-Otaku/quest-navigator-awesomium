@@ -15,7 +15,7 @@ namespace QuestNavigator {
 	// В этом классе хранятся настройки оформления
 	enum eSkinParam
 	{
-		// Вопросами помечны кандидаты на выпиливание.
+		// Вопросами помечены кандидаты на выпиливание.
 		// Сейчас они будут передаваться в JS с дефолтными значениями,
 		// в дальнейшем от них нужно будет избавиться.
 
@@ -45,12 +45,6 @@ namespace QuestNavigator {
 		//objsListSelItemFormat
 		//objsListItemFormat
 
-		//backColor ? 
-		//linkColor ? 
-		//fontColor ?
-		//fontName ?
-		//fontSize ?
-
 		espHideScrollAny = 0,
 		espHideScrollArrows,
 		espHideScrollMain,
@@ -78,12 +72,6 @@ namespace QuestNavigator {
 		espObjsListSelItemFormat,
 		espObjsListItemFormat,
 
-		espBackColor,
-		espLinkColor,
-		espFontColor,
-		espFontName,
-		espFontSize,
-
 		espLast
 	};
 
@@ -97,7 +85,6 @@ namespace QuestNavigator {
 		static bool firstUpdate;
 	public:
 		static bool isChanged;
-		static bool isMainBackChanged;
 		static bool isActionsStyleChanged;
 		static bool isHtmlModeChanged;
 		static bool isBaseVarsChanged;
@@ -140,7 +127,6 @@ namespace QuestNavigator {
 		static bool isSomethingChanged();
 		static void showWindow(int type, int isShow);
 		static string applyHtmlFixes(string text, bool forceHtml = false);
-		static string makeHtmlColor(int color);
 	};
 
 
