@@ -62,7 +62,8 @@ namespace QuestNavigator {
 		eecFailToBeginLibThread,		// Не получилось создать поток интерпретатора.
 		eecUnableEnterCs3,				// Не удалось войти в критическую секцию (3).
 		eecFailToCalcBorders,			// Не удалось рассчитать толщину рамок окна.
-		eecFailToCreateMainWindow		// Не удалось создать основное окно плеера.
+		eecFailToCreateMainWindow,		// Не удалось создать основное окно плеера.
+		eecFailToLoadFrame				// Не удалось загрузить страницу в WebView.
 	};
 
 	// Утилиты для преобразования строк

@@ -78,6 +78,11 @@ namespace QuestNavigator {
 			return;
 		}
 
+		// Проверяем обновления
+		#ifdef _WIN32
+		checkUpdate();
+		#endif
+
 		view_ = View::Create(Configuration::getInt(QuestNavigator::ecpGameWidth), Configuration::getInt(ecpGameHeight));
 
 		// Перехватчик запросов, выполняющихся при нажатии на ссылку.
@@ -88,13 +93,10 @@ namespace QuestNavigator {
 
 		initLib();
 
+		// Загружаем страницу с HTML, CSS и JS. 
+		// По завершению загрузки будет вызван обработчик onFinishLoadingFrame.
 		std::string url = QuestNavigator::getContentUrl();
 		view_->web_view()->LoadURL(WebURL(ToWebString(url)));
-
-		// Проверяем обновления
-		#ifdef _WIN32
-		checkUpdate();
-		#endif
 
 		programLoaded = true;
 	}
@@ -125,6 +127,43 @@ namespace QuestNavigator {
 		// Сбрасываем мьютекс.
 		unregisterInstance();
 	}
+
+	/// This event occurs when the page begins loading a frame.
+	void QnApplicationListener::OnBeginLoadingFrame(Awesomium::WebView* caller,
+		int64 frame_id,
+		bool is_main_frame,
+		const Awesomium::WebURL& url,
+		bool is_error_page) {
+			// Ничего не делаем.
+	};
+	/// This event occurs when a frame fails to load. See error_desc
+	/// for additional information.
+	void QnApplicationListener::OnFailLoadingFrame(Awesomium::WebView* caller,
+		int64 frame_id,
+		bool is_main_frame,
+		const Awesomium::WebURL& url,
+		int error_code,
+		const Awesomium::WebString& error_desc) {
+			// Выводим сообщение об ошибке и закрываем плеер.
+			string error = "Код ошибки Awesomium: " + intToString(error_code) 
+				+ ". Ошибка Awesomium: " + ToString(error_desc);
+			showError("Ошибка при загрузке страницы. " + error);
+			exit(eecFailToLoadFrame);
+	};
+	/// This event occurs when the page finishes loading a frame.
+	/// The main frame always finishes loading last for a given page load.
+	void QnApplicationListener::OnFinishLoadingFrame(Awesomium::WebView* caller,
+		int64 frame_id,
+		bool is_main_frame,
+		const Awesomium::WebURL& url) {
+			// Ничего не делаем.
+	};
+	/// This event occurs when the DOM has finished parsing and the
+	/// window object is available for JavaScript execution.
+	void QnApplicationListener::OnDocumentReady(Awesomium::WebView* caller,
+		const Awesomium::WebURL& url) {
+			// Ничего не делаем.
+	};
 
 	void QnApplicationListener::BindMethods(WebView* web_view) {
 		// Создаём глобальный JS-объект "QspLib"

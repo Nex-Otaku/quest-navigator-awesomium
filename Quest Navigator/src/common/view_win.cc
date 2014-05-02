@@ -25,6 +25,7 @@ ViewWin::ViewWin(int width, int height) {
 		Awesomium::kWebViewType_Window);
 
 	web_view_->set_view_listener(this);
+	web_view_->set_load_listener(QnApplicationListener::listener);
 
 	wstring wWindowTitle = widen(Configuration::getString(ecpWindowTitle));
 	LPCWSTR wszTitle = wWindowTitle.c_str();
