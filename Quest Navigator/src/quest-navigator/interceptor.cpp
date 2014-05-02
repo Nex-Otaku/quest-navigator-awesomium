@@ -71,6 +71,10 @@ bool QnInterceptor::OnFilterNavigation(int origin_process_id,
 	string sUrl = ToString(url.spec());
 	string sUrlUpper = toUpper(sUrl);
 	if (startsWith(sUrlUpper, "EXEC:")) {
+		// К сожалению, Awesomium вырезает символы перевода строки из запроса.
+		// Без костылей с этим ничего сделать нельзя.
+		// Поэтому многострочный код "EXEC:" нельзя использовать в Навигаторе.
+
 		// Выполняем код EXEC
 		string code = unescapeHtml(decodeUrl(sUrl.substr(5)));
 		app_->listener()->executeCode(code);
