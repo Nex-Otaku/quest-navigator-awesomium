@@ -80,7 +80,9 @@ namespace QuestNavigator {
 
 		// Проверяем обновления
 		#ifdef _WIN32
-		checkUpdate();
+		if (!Configuration::getBool(ecpGameIsStandalone)) {
+			checkUpdate();
+		}
 		#endif
 
 		view_ = View::Create(Configuration::getInt(QuestNavigator::ecpGameWidth), Configuration::getInt(ecpGameHeight));
@@ -117,7 +119,9 @@ namespace QuestNavigator {
 
 			// Завершаем работу апдейтера.
 			#ifdef _WIN32
-			finishUpdate();
+			if (!Configuration::getBool(ecpGameIsStandalone)) {
+				finishUpdate();
+			}
 			#endif
 		}
 
