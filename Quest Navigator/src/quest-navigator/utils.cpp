@@ -645,11 +645,14 @@ namespace QuestNavigator {
 		// 5.3 - папка "qsplib".
 		// 6. Запускается игра со скином из временной папки.
 
+		// В режиме "standalone" ничего не копируем, всё уже должно быть на своих местах.
+		bool bStandalone = Configuration::getBool(ecpGameIsStandalone);
+
 		// Если плеер запущен не в режиме standalone,
 		// то нам потребуется папка данных.
 		string appDataDir = Configuration::getString(ecpAppDataDir);
 		// Если папка ещё не существует, создаём.
-		if (!Configuration::getBool(ecpGameIsStandalone)) {
+		if (!bStandalone) {
 			if (!buildDirectoryPath(appDataDir)) {
 				showError("Не удалось создать папку данных для плеера: " + appDataDir);
 				return false;
@@ -682,11 +685,20 @@ namespace QuestNavigator {
 			}
 		}
 
-		// Если требуется копирование, 
-		// проверяем наличие папки "assets", 
-		// внутри которой лежат необходимые папки шаблонов оформления, 
-		// "qsplib" и файл игры по умолчанию.
+		// Требуется копирование.
 		if (bCopyQsplib || bCopySkin) {
+			// Если в игре включен режим "standalone",
+			// то выводим ошибку и завершаем работу.
+			if (bStandalone) {
+				string error = "Ошибка: при включенном режиме \"standalone\" отсутствует " 
+					+ (bCopyQsplib ? "папка \"" + QSPLIB_DIR + "\"." : "шаблон оформления.");
+				showError(error);
+				return false;
+			}
+
+			// Проверяем наличие папки "assets", 
+			// внутри которой лежат необходимые папки шаблонов оформления, 
+			// "qsplib" и файл игры по умолчанию.
 			if (!dirExists(assetsDir)) {
 				showError("Не найдена папка \"" + assetsDir + "\" системных файлов плеера.");
 				return false;
