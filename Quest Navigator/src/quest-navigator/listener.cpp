@@ -95,6 +95,10 @@ namespace QuestNavigator {
 
 		initLib();
 
+		// Привязываем обработку событий загрузки HTML-фреймов.
+		// Интерфейс Awesomium::WebViewListener::Load.
+		view_->web_view()->set_load_listener(this);
+
 		// Загружаем страницу с HTML, CSS и JS. 
 		// По завершению загрузки будет вызван обработчик onFinishLoadingFrame.
 		std::string url = QuestNavigator::getContentUrl();
@@ -148,11 +152,11 @@ namespace QuestNavigator {
 		const Awesomium::WebURL& url,
 		int error_code,
 		const Awesomium::WebString& error_desc) {
-			// Выводим сообщение об ошибке и закрываем плеер.
-			string error = "Код ошибки Awesomium: " + intToString(error_code) 
-				+ ". Ошибка Awesomium: " + ToString(error_desc);
-			showError("Ошибка при загрузке страницы. " + error);
-			exit(eecFailToLoadFrame);
+			// Ничего не делаем.
+			// Хотелось бы здесь выводить сообщение об ошибке и закрывать плеер,
+			// но Awesomium выдаёт здесь ошибку при выполнении ссылок "EXEC:",
+			// несмотря на то, 
+			// что навигация отменяется в перехватчике запросов QnInterceptor::OnFilterNavigation.
 	};
 	/// This event occurs when the page finishes loading a frame.
 	/// The main frame always finishes loading last for a given page load.

@@ -1191,6 +1191,56 @@ namespace QuestNavigator {
 		}
 		s = replaced;
 	}
+	// Заменяем переводы строк, но только вне HTML-тегов.
+	void replaceNewlines(string &s)
+	{
+		// 1. Ищем открывающую скобку тега.
+		// 2. Если не найдена, делаем замену по всей оставшейся строке. Выход из цикла.
+		// 3. Если найдена, делаем замену по строке до скобки.
+		// 4. Ищем закрывающую скобку.
+		// 5. Если закрывающая скобка не найдена, выходим из цикла.
+		// 6. Позиция устанавливается на следующий символ после закрывающей скобки.
+		// 7. Переход на п. 1.
+		string startTag = "<";
+		string endTag = ">";
+		size_t last_pos = 0;
+		size_t pos = 0;
+		size_t len = s.length();
+		string replaced = "";
+		string token = "";
+		while (pos < len) {
+			last_pos = pos;
+			// Ищем открывающую скобку.
+			pos = s.find(startTag, pos);
+			bool bTag = pos != string::npos;
+			// Определяем, до какого символа делать замену.
+			token = bTag ? s.substr(last_pos, pos - last_pos) : s.substr(last_pos);
+			// Выполняем замену.
+			replaceAll(token, "\r\n", "<br />");
+			replaceAll(token, "\r", "<br />");
+			replaceAll(token, "\n", "<br />");
+			// Записываем обработанную часть текста.
+			replaced += token;
+			// Если тег не найден, прерываем цикл.
+			if (!bTag)
+				break;
+			// Ищем закрывающую скобку.
+			last_pos = pos;
+			pos = s.find(endTag, pos);
+			if (pos != string::npos) {
+				// Устанавливаем позицию на следующий за закрывающей скобкой символ.
+				pos++;
+				// Записываем тело тега.
+				replaced += s.substr(last_pos, pos - last_pos);
+			} else {
+				// Заменять нечего.
+				// Записываем оставшийся кусок.
+				replaced += s.substr(last_pos);
+				break;
+			}
+		}
+		s = replaced;
+	}
 	// Переводим все символы в верхний регистр
 	string toUpper(string str)
 	{

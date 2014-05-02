@@ -62,8 +62,7 @@ namespace QuestNavigator {
 		eecFailToBeginLibThread,		// Не получилось создать поток интерпретатора.
 		eecUnableEnterCs3,				// Не удалось войти в критическую секцию (3).
 		eecFailToCalcBorders,			// Не удалось рассчитать толщину рамок окна.
-		eecFailToCreateMainWindow,		// Не удалось создать основное окно плеера.
-		eecFailToLoadFrame				// Не удалось загрузить страницу в WebView.
+		eecFailToCreateMainWindow		// Не удалось создать основное окно плеера.
 	};
 
 	// Утилиты для преобразования строк
@@ -94,6 +93,8 @@ namespace QuestNavigator {
 	void replaceAll(string &s, const string &search, const string &replace);
 	// Заменяем "&" на "&amp;", не трогая "HTML entities".
 	void replaceAmp(string &s);
+	// Заменяем переводы строк, но только вне HTML-тегов.
+	void replaceNewlines(string &s);
 	// Переводим все символы в верхний регистр
 	string toUpper(string str);
 	// Переводим все символы в нижний регистр
