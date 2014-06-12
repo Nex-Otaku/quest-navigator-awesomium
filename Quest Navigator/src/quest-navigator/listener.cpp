@@ -793,14 +793,6 @@ namespace QuestNavigator {
 	{
 		//Контекст библиотеки
 
-		// Обновляем скин
-		Skin::updateMenuDialog();
-		// Если что-то изменилось, то передаем в яваскрипт
-		if (Skin::isSomethingChanged())
-		{
-			RefreshInt(QSP_TRUE);
-		}
-
 		JSArray jsMenuList;
 		for (int i = 0; i < (int)menuList.size(); i++) {
 			JSObject jsMenuItem;

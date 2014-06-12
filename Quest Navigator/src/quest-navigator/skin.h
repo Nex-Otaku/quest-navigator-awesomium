@@ -37,13 +37,9 @@ namespace QuestNavigator {
 		//showInput
 
 		//msgTextFormat
-		//menuListItemFormat
 		//inputTextFormat
 		//mainDescTextFormat
 		//varsDescTextFormat
-		//actsListItemFormat
-		//objsListSelItemFormat
-		//objsListItemFormat
 
 		espHideScrollAny = 0,
 		espHideScrollArrows,
@@ -64,13 +60,9 @@ namespace QuestNavigator {
 		espShowInput,
 
 		espMsgTextFormat,
-		espMenuListItemFormat,
 		espInputTextFormat,
 		espMainDescTextFormat,
 		espVarsDescTextFormat,
-		espActsListItemFormat,
-		espObjsListSelItemFormat,
-		espObjsListItemFormat,
 
 		espLast
 	};
@@ -122,7 +114,6 @@ namespace QuestNavigator {
 		static void updateMainScreen();
 		static void updateInputDialog();
 		static void updateMsgDialog();
-		static void updateMenuDialog();
 		static JSObject getJsSkin();
 		static bool isSomethingChanged();
 		static void showWindow(int type, int isShow);

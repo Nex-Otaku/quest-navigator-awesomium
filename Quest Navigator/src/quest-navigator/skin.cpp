@@ -27,13 +27,9 @@ namespace QuestNavigator {
 		"showInput",
 
 		"msgTextFormat",
-		"menuListItemFormat",
 		"inputTextFormat",
 		"mainDescTextFormat",
 		"varsDescTextFormat",
-		"actsListItemFormat",
-		"objsListSelItemFormat",
-		"objsListItemFormat"
 	};
 
 	ConfigValue Skin::_paramList[espLast];
@@ -116,13 +112,9 @@ namespace QuestNavigator {
 		setDefaultInt(espShowInput, 1);
 
 		setDefaultString(espMsgTextFormat, "%TEXT%");
-		setDefaultString(espMenuListItemFormat, "<table><tr><td><img src='%IMAGE%'/></td><td style='width:100%);'>%TEXT%</td></tr></table>");
 		setDefaultString(espInputTextFormat, "%TEXT%");
 		setDefaultString(espMainDescTextFormat, "%TEXT%");
 		setDefaultString(espVarsDescTextFormat, "%TEXT%");
-		setDefaultString(espActsListItemFormat, "<table><tr><td><img src='%IMAGE%'/></td><td style='width:100%);'>%TEXT%</td></tr></table>");
-		setDefaultString(espObjsListSelItemFormat, "<table><tr><td><img src='%IMAGE%'/></td><td style='width:100%);color:#0000FF);'>%TEXT%</td></tr></table>");
-		setDefaultString(espObjsListItemFormat, "<table><tr><td><img src='%IMAGE%'/></td><td style='width:100%);'>%TEXT%</td></tr></table>");
 	}
 
 	// Устанавливаем значения по умолчанию
@@ -246,17 +238,6 @@ namespace QuestNavigator {
 		isChanged = false;
 		loadValue(espVarsDescTextFormat, "STAT_FORMAT");
 		if (isChanged) isVarsDescChanged = true;
-		// ----------------------
-		// Forced
-		isChanged = false;
-		loadValue(espActsListItemFormat, "ACTION_FORMAT");
-		if (isChanged) isActsListChanged = true;
-		// ----------------------
-		// Forced
-		isChanged = false;
-		loadValue(espObjsListItemFormat, "OBJECT_FORMAT");
-		loadValue(espObjsListSelItemFormat, "SEL_OBJECT_FORMAT");
-		if (isChanged) isObjsListChanged = true;
 		// Others
 		loadValue(espViewAlwaysShow, "ALWAYS_SHOW_VIEW");
 	}
@@ -269,11 +250,6 @@ namespace QuestNavigator {
 	void Skin::updateMsgDialog()
 	{
 		loadValue(espMsgTextFormat, "MSG_FORMAT");
-	}
-
-	void Skin::updateMenuDialog()
-	{
-		loadValue(espMenuListItemFormat, "MENU_FORMAT");
 	}
 
 	JSObject Skin::getJsSkin()
@@ -317,13 +293,9 @@ namespace QuestNavigator {
 				break;
 				// Строки с HTML-содержимым
 			case espMsgTextFormat:
-			case espMenuListItemFormat:
 			case espInputTextFormat:
 			case espMainDescTextFormat:
 			case espVarsDescTextFormat:
-			case espActsListItemFormat:
-			case espObjsListSelItemFormat:
-			case espObjsListItemFormat:
 				{
 					strValue = applyHtmlFixes(strValue, true);
 				}
