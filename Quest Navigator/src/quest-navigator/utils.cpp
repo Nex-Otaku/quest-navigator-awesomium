@@ -444,19 +444,9 @@ namespace QuestNavigator {
 
 				// Вычисляем пути к необходимым файлам
 				skinFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
-				// Ищем все QSP-файлы в корне указанной папки
-				vector<string> gameFileList;
-				if (!getFilesList(contentDir, "*.qsp", gameFileList))
+				// Определяем файл игры (*.qsp) в указанной папке.
+				if (!findGameFile(contentDir, gameFileName))
 					return false;
-				int count = (int)gameFileList.size();
-				if (count == 0) {
-					showError("Не найден файл игры в папке " + contentDir);
-					return false;
-				} else if (count > 1) {
-					showError("В корневой папке игры должен находиться только один файл с расширением .qsp");
-					return false;
-				}
-				gameFileName = gameFileList[0];
 				gameFilePath = getRightPath(contentDir + PATH_DELIMITER + gameFileName);
 				configFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_CONFIG_FILE);
 			} else {
@@ -480,7 +470,9 @@ namespace QuestNavigator {
 				+ DEFAULT_CONTENT_REL_PATH + PATH_DELIMITER 
 				+ DEFAULT_CONFIG_FILE);
 			contentDir = assetsDir + PATH_DELIMITER + DEFAULT_CONTENT_REL_PATH;
-			gameFileName = DEFAULT_GAME_FILE;
+			// Определяем файл игры (*.qsp) в указанной папке.
+			if (!findGameFile(contentDir, gameFileName))
+				return false;
 			gameFilePath = contentDir + PATH_DELIMITER + gameFileName;
 			skinFilePath = getRightPath(contentDir + PATH_DELIMITER + DEFAULT_SKIN_FILE);
 		}
@@ -1029,6 +1021,25 @@ namespace QuestNavigator {
 		wstring wFilePath = ofn.lpstrFile;
 		filePath = narrow(wFilePath);
 		return filePath;
+	}
+
+	// Ищем первый файл "*.qsp" в папке.
+	bool findGameFile(string dir, string &gameFileName) {
+		// Ищем все QSP-файлы в корне указанной папки
+		vector<string> gameFileList;
+		if (!getFilesList(dir, "*.qsp", gameFileList))
+			return false;
+		int count = (int)gameFileList.size();
+		if (count == 0) {
+			showError("Не найден файл игры в папке " + dir);
+			return false;
+		}
+		else if (count > 1) {
+			showError("В корневой папке игры должен находиться только один файл с расширением \"*.qsp\". Папка: " + dir);
+			return false;
+		}
+		gameFileName = gameFileList[0];
+		return true;
 	}
 
 	// Проверяем наличие апдейта при старте

@@ -24,7 +24,6 @@ namespace QuestNavigator {
 	static const string DEFAULT_SKIN_NAME = "default";
 	static const string DEFAULT_SKIN_FILE = "gameAwesomium.html";
 	static const string DEFAULT_CONFIG_FILE = "config.xml";
-	static const string DEFAULT_GAME_FILE = "start.qsp";
 	static const string DEFAULT_SAVE_REL_PATH = "Сохранения игр Quest Navigator";
 	static const string QN_WINDOWS_UPDATE_FEED = "http://feeds.feedburner.com/text-games/quest-navigator-windows";
 	static const string QN_COMPANY_NAME = "QSP";
@@ -141,6 +140,8 @@ namespace QuestNavigator {
 	bool copyFileTree(string from, string to, string mask);
 	// Диалог для открытия файла игры с диска.
 	string openGameFileDialog(HWND hWnd);
+	// Ищем первый файл "*.qsp" в папке.
+	bool findGameFile(string dir, string &gameFileName);
 
 	// Прочее
 
