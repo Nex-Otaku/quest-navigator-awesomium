@@ -91,7 +91,10 @@ namespace QuestNavigator {
 		resource_interceptor_.setApp(app_);
 		app_->web_core()->set_resource_interceptor(&resource_interceptor_);
 
-		BindMethods(view_->web_view());
+		if (!BindMethods(view_->web_view())) {
+			app_->Quit();
+			return;
+		}
 
 		initLib();
 
@@ -173,7 +176,7 @@ namespace QuestNavigator {
 			// Ничего не делаем.
 	};
 
-	void QnApplicationListener::BindMethods(WebView* web_view) {
+	bool QnApplicationListener::BindMethods(WebView* web_view) {
 		// Создаём глобальный JS-объект "QspLib"
 		JSValue result = web_view->CreateGlobalJavascriptObject(WSLit("QspLibAwesomium"));
 		if (result.IsObject()) {
@@ -252,6 +255,9 @@ namespace QuestNavigator {
 			method_dispatcher_.Bind(app_object,
 				WSLit("alert"),
 				JSDelegate(this, &QnApplicationListener::alert));
+		} else {
+			showError("Не удалось создать JS-объект QspLibAwesomium");
+			return false;
 		}
 
 		// Привязываем обработчик колбэков к WebView
