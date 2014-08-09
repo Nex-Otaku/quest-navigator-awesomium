@@ -34,6 +34,7 @@ namespace QuestNavigator {
 
 		bool gameIsRunning;
 		bool programLoaded;
+		bool jsLibObjectCreated;
 
 		HANDLE libThread;
 

@@ -48,6 +48,7 @@ namespace QuestNavigator {
 
 		gameIsRunning(false),
 		programLoaded(false),
+		jsLibObjectCreated(false),
 
 		libThread(NULL),
 
@@ -91,11 +92,6 @@ namespace QuestNavigator {
 		resource_interceptor_.setApp(app_);
 		app_->web_core()->set_resource_interceptor(&resource_interceptor_);
 
-		if (!BindMethods(view_->web_view())) {
-			app_->Quit();
-			return;
-		}
-
 		initLib();
 
 		// Привязываем обработку событий загрузки HTML-фреймов.
@@ -103,6 +99,7 @@ namespace QuestNavigator {
 		view_->web_view()->set_load_listener(this);
 
 		// Загружаем страницу с HTML, CSS и JS. 
+		// В обработчике onDocumentReady привяжем глобальный JS-объект для библиотеки.
 		// По завершению загрузки будет вызван обработчик onFinishLoadingFrame.
 		std::string url = QuestNavigator::getContentUrl();
 		view_->web_view()->LoadURL(WebURL(ToWebString(url)));
@@ -173,7 +170,16 @@ namespace QuestNavigator {
 	/// window object is available for JavaScript execution.
 	void QnApplicationListener::OnDocumentReady(Awesomium::WebView* caller,
 		const Awesomium::WebURL& url) {
-			// Ничего не делаем.
+		// Привязываем глобальный JS-объект для вызова методов Навигатора из JS.
+		// Делаем это только при первом вызове обработчика, 
+		// т.к. после создания объект будет присутствовать на всех страницах.
+		if (jsLibObjectCreated)
+			return;
+		if (!BindMethods(view_->web_view())) {
+			app_->Quit();
+			return;
+		}
+		jsLibObjectCreated = true;
 	};
 
 	bool QnApplicationListener::BindMethods(WebView* web_view) {
