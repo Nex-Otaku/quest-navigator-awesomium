@@ -272,6 +272,7 @@ namespace QuestNavigator {
 
 		// Привязываем обработчик колбэков к WebView
 		web_view->set_js_method_handler(&method_dispatcher_);
+		return true;
 	}
 
 	// ********************************************************************
