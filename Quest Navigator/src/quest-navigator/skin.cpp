@@ -8,7 +8,7 @@ namespace QuestNavigator {
 
 	// Имена, под которыми параметры будут использоваться в JS
 	const char *jsParamNames[] = {
-		"hideScrollAny = 0",
+		"hideScrollAny",
 		"hideScrollArrows",
 		"hideScrollMain",
 		"hideScrollActs",
