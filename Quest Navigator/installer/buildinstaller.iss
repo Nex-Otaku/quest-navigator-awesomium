@@ -52,6 +52,11 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Fil
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[InstallDelete]
+; Папка с кэшем игр - очищаем при переустановке. 
+; Могли измениться шаблоны оформления, поэтому нужно кэшировать игры заново.
+Type: filesandordirs; Name: "{userappdata}\{#QnCacheFolder}"
+
 [UninstallDelete]
 Type: files; Name: "{app}\awesomium.log"
 ; Папки "Program Files(x86)\QSP\QuestNavigator" и "Program Files(x86)\QSP"
