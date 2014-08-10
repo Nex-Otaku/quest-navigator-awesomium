@@ -171,6 +171,9 @@ namespace QuestNavigator {
 		// ********************************************************************
 		// ********************************************************************
 
+		// Вспомогательная функция.
+		void doRestartGame();
+
 		void restartGame(WebView* caller, const JSArray& args);
 		void executeAction(WebView* caller, const JSArray& args);
 		void selectObject(WebView* caller, const JSArray& args);

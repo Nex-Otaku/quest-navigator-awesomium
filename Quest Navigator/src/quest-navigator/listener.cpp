@@ -164,7 +164,11 @@ namespace QuestNavigator {
 		int64 frame_id,
 		bool is_main_frame,
 		const Awesomium::WebURL& url) {
-			// Ничего не делаем.
+		// Перезапускаем игру.
+		// Мы могли бы делать это из JS,
+		// но методы колбэков не успевают привязаться и вызов "QspLib.restartGame" просто не срабатывает.
+		// Видимо баг Awesomium.
+		doRestartGame();
 	};
 	/// This event occurs when the DOM has finished parsing and the
 	/// window object is available for JavaScript execution.
@@ -1022,13 +1026,17 @@ namespace QuestNavigator {
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************
-
-	void QnApplicationListener::restartGame(WebView* caller, const JSArray& args)
+	void QnApplicationListener::doRestartGame()
 	{
 		// Контекст UI
 		string gameFile = Configuration::getString(ecpGameFilePath);
 		StopGame(true);
 		runGame(gameFile);
+	}
+	void QnApplicationListener::restartGame(WebView* caller, const JSArray& args)
+	{
+		// Контекст UI
+		doRestartGame();
 	}
 
 	void QnApplicationListener::executeAction(WebView* caller, const JSArray& args)
