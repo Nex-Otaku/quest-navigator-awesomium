@@ -67,12 +67,12 @@ namespace QuestNavigator {
 
 	string Gamestock::escape(int num)
 	{
-		return intToString(num);
+		return escape(intToString(num));
 	}
 
 	string Gamestock::escape(bool flag)
 	{
-		return intToString(flag ? 1 : 0);
+		return escape(intToString(flag ? 1 : 0));
 	}
 
 	string Gamestock::escape(string text)
@@ -136,6 +136,39 @@ namespace QuestNavigator {
 		map = mapLocalGames;
 		return true;
 	}
+
+	// Удаляем из списка все игры, которые были удалены с диска.
+	bool Gamestock::deleteBrokenGames()
+	{
+		if (!readLocalGames())
+			return false;
+
+		// Список игр прочитан.
+		// Проходим по списку и удаляем из списка и кэша все игры, 
+		// которые загружены не из сети, а с локальных дисков,
+		// и в данный момент недоступны.
+		for (int i = 0; i < (int)vecLocalGames.size(); i++) {
+			GamestockEntry game = vecLocalGames[i];
+			if ((game.web == false) && !fileExists(game.local_file)) {
+				if (!deleteGame(game)) {
+					showError("Ошибка при удалении игры: " + game.hash);
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	// Возвращаем список игр, позаботившись об удалении "потерянных" игр.
+	bool Gamestock::getLocalGamesWithCheck(vector<GamestockEntry> &vec)
+	{
+		if (!deleteBrokenGames())
+			return false;
+		if (!getLocalGames(vec))
+			return false;
+		return true;
+	}
 	
 	bool Gamestock::addGame(GamestockEntry game)
 	{
@@ -158,7 +191,7 @@ namespace QuestNavigator {
 	{
 		GamestockEntry test;
 		// Если игра есть в списке, обновляем поля.
-		// Ели нет, добавляем в список.
+		// Если нет, добавляем в список.
 		bool gameExists = getLocalGame(game.hash, test);
 		if (gameExists) {
 			// Открываем соединение.
@@ -176,6 +209,36 @@ namespace QuestNavigator {
 			return true;
 		} else {
 			if (!addGame(game))
+				return false;
+		}
+		return true;
+	}
+
+	bool Gamestock::deleteGame(GamestockEntry game)
+	{
+		GamestockEntry test;
+		// Если игра есть в БД, удаляем её.
+		// Также очищаем папку кэша игры.
+		// При этом сейвы остаются на прежнем месте.
+		// Если игра вернётся в своё расположение,
+		// сохранения будут снова доступны.
+		bool gameExists = getLocalGame(game.hash, test);
+		if (gameExists) {
+			// Открываем соединение.
+			if (!openDb())
+				return false;
+
+			// Удаляем запись игры в БД.
+			string sql = "DELETE FROM games WHERE id = " + test.idVal() + ";";
+			if (!execSql(sql, 0)) {
+				return false;
+			}
+
+			// Закрываем соединение.
+			closeDb();
+
+			// Очищаем папку кэша игры.
+			if (!deleteDirectory(game.cache))
 				return false;
 		}
 		return true;

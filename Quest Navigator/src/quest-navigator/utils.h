@@ -129,6 +129,8 @@ namespace QuestNavigator {
 	bool loadFileToBuffer(string path, void** bufferPtr, int* bufferLength);
 	// Создаём папки
 	bool buildDirectoryPath(string path);
+	// Удаляем папку и всё её содержимое.
+	bool deleteDirectory(string path);
 	// Возвращаем список файлов
 	bool getFilesList(string directory, string mask, vector<string>& list);
 	// Возвращаем список папок

@@ -1248,7 +1248,7 @@ namespace QuestNavigator {
 
 		// Загружаем список игр.
 		// Вывод ошибки выполняется внутри вызова, нам остаётся просто выйти.
-		if (!Gamestock::getLocalGames(vecLocalGames))
+		if (!Gamestock::getLocalGamesWithCheck(vecLocalGames))
 			return;
 
 		// Список загружен, формируем контейнер для передачи в JS.

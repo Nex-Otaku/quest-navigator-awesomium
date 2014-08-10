@@ -51,10 +51,13 @@ namespace QuestNavigator {
 		static bool prepareGamesTable();
 	public:
 		static bool getLocalGames(vector<GamestockEntry> &vec);
+		static bool getLocalGamesWithCheck(vector<GamestockEntry> &vec);
 		static bool getLocalGames(map<string, GamestockEntry> &map);
 		static bool getLocalGame(string hash, GamestockEntry &game);
 		static bool addGame(GamestockEntry game);
 		static bool updateGame(GamestockEntry game);
+		static bool deleteGame(GamestockEntry game);
+		static bool deleteBrokenGames();
 
 		static string escape(int num);
 		static string escape(bool flag);

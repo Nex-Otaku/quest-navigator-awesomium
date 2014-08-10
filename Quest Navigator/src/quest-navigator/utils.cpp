@@ -296,6 +296,34 @@ namespace QuestNavigator {
 		return res == ERROR_SUCCESS;
 	}
 
+	// Удаляем папку со всем содержимым.
+	bool deleteDirectory(string path)
+	{
+		if (!dirExists(path))
+			return true;
+		wstring wPath = widen(path);
+
+		// Making the directory name double null terminated.
+		int nFolderPathLen = (int)wPath.length();
+		WCHAR *pszFrom = new WCHAR[nFolderPathLen + 2];
+		wcscpy(pszFrom, wPath.c_str());
+		pszFrom[nFolderPathLen] = 0;
+		pszFrom[++nFolderPathLen] = 0;
+		SHFILEOPSTRUCT stSHFileOpStruct = { 0 };
+		// Delete operation.
+		stSHFileOpStruct.wFunc = FO_DELETE;
+		// Folder name as double null terminated string.
+		stSHFileOpStruct.pFrom = pszFrom;
+		// Do not prompt the user.
+		stSHFileOpStruct.fFlags = FOF_NOCONFIRMATION | FOF_SILENT;
+		// Will read this to check for any operation is aborted.
+		stSHFileOpStruct.fAnyOperationsAborted = FALSE;
+		int nFileDeleteOprnRet = SHFileOperation(&stSHFileOpStruct);
+		delete[] pszFrom;
+
+		return (0 == nFileDeleteOprnRet) && (stSHFileOpStruct.fAnyOperationsAborted == FALSE);
+	}
+
 
 	// Загрузка конфигурации плеера
 	bool initOptions(string contentPath)
