@@ -280,6 +280,7 @@ namespace QuestNavigator {
 	// Ожидаем события
 	bool waitForSingle(HANDLE handle);
 	bool waitForSingle(eSyncEvent ev);
+	bool waitForSingleLib(eSyncEvent ev);
 	bool checkForSingle(eSyncEvent ev);
 
 }

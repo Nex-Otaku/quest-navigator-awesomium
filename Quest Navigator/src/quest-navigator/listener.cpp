@@ -404,9 +404,7 @@ namespace QuestNavigator {
 		//Контекст UI
 		if (gameIsRunning)
 		{
-			if (!checkForSingle(evLibIsReady))
-				return;
-
+			// Мы должны иметь возможность остановить игру в любой момент.
 			runSyncEvent(evStopGame);
 			waitForSingle(evGameStopped);
 			gameIsRunning = false;
@@ -685,7 +683,7 @@ namespace QuestNavigator {
 		qspMsg(ToWebString(msgValue));
 
 		// Ждём закрытия диалога
-		waitForSingle(evMsgClosed);
+		waitForSingleLib(evMsgClosed);
 	}
 
 	void QnApplicationListener::PlayFile(QSP_CHAR* file, int volume)
@@ -746,7 +744,7 @@ namespace QuestNavigator {
 		qspInput(ToWebString(promptValue));
 
 		// Ждём закрытия диалога
-		waitForSingle(evInputClosed);
+		waitForSingleLib(evInputClosed);
 
 		// Возвращаем результат в библиотеку
 		string result = "";
@@ -817,7 +815,7 @@ namespace QuestNavigator {
 		qspMenu(jsMenuList);
 
 		// Ждём закрытия диалога
-		waitForSingle(evMenuClosed);
+		waitForSingleLib(evMenuClosed);
 
 		// Возвращаем результат
 		int result = -1;
@@ -965,7 +963,7 @@ namespace QuestNavigator {
 		unlockData();
 
 		// Дожидаемся ответа, что JS-запрос выполнен.
-		waitForSingle(evJsExecuted);
+		waitForSingleLib(evJsExecuted);
 	}
 	void QnApplicationListener::qspShowSaveSlotsDialog(JSObject content)
 	{
@@ -1397,8 +1395,49 @@ namespace QuestNavigator {
 	{
 		return waitForSingle(getEventHandle(ev));
 	}
+	bool waitForSingleLib(eSyncEvent ev)
+	{
+		// Контекст библиотеки.
+		// Мы должны иметь возможность в любой момент остановить игру либо поток библиотеки.
+		// Поэтому при ожидании в библиотеке единичного события синхронизации,
+		// такого как например закрытие диалога,
+		// мы вместо "waitForSingle" вызываем "waitForSingleLib".
+		// Эта функция дополнительно проверяет на наличие события, 
+		// указывающего, что мы должны остановить игру либо поток библиотеки.
+
+		// События для синхронизации потоков
+		HANDLE eventList[3];
+		eSyncEvent syncEvents[3];
+		syncEvents[0] = evShutdown;
+		syncEvents[1] = evStopGame;
+		syncEvents[2] = ev;
+		for (int i = 0; i < 3; i++) {
+			eventList[i] = getEventHandle(syncEvents[i]);
+		}
+
+		DWORD res = WaitForMultipleObjects((DWORD)3, eventList, FALSE, INFINITE);
+		if ((res < WAIT_OBJECT_0) || (res > (WAIT_OBJECT_0 + 3 - 1))) {
+			showError("Не удалось дождаться единичного события синхронизации библиотеки.");
+		} else {
+			// Если событие было "evShutdown" или "evStopGame",
+			// вызываем их заново.
+			// Это необходимо, так как вызов "WaitForMultipleObjects" их уже сбросил.
+			for (int i = 0; i < 3; i++) {
+				if (eventList[i])
+				break;
+			}
+			eSyncEvent breakingEvent = syncEvents[res];
+			if (breakingEvent != ev) {
+				runSyncEvent(breakingEvent);
+			}
+		}
+		return true;
+	}
 	bool checkForSingle(eSyncEvent ev)
 	{
+		// Проверяем, доступен ли объект синхронизации.
+		// Если недоступен, сразу возвращаем "false".
+		// Для ожидания объекта следует использовать "waitForSingle".
 		HANDLE handle = getEventHandle(ev);
 		DWORD res = WaitForSingleObject(handle, 0);
 		if ((res == WAIT_ABANDONED) || (res == WAIT_FAILED)) {
@@ -1449,9 +1488,6 @@ namespace QuestNavigator {
 	void QnApplicationListener::StopLibThread()
 	{
 		if (libThread == NULL)
-			return;
-
-		if (!checkForSingle(evLibIsReady))
 			return;
 
 		// Сообщаем потоку библиотеки, что нужно завершить работу
@@ -1518,7 +1554,7 @@ namespace QuestNavigator {
 			// Ожидаем любое из событий синхронизации
 			DWORD res = WaitForMultipleObjects((DWORD)evLastUi, g_eventList, FALSE, INFINITE);
 			if ((res < WAIT_OBJECT_0) || (res > (WAIT_OBJECT_0 + evLast - 1))) {
-				showError("Не удалось дождаться события синхронизации.");
+				showError("Не удалось дождаться множественного события синхронизации библиотеки.");
 				bShutdown = true;
 			} else {
 				eSyncEvent ev = (eSyncEvent)res;
@@ -1694,7 +1730,6 @@ namespace QuestNavigator {
 				default:
 					{
 						showError("Необработанное событие синхронизации!");
-						bShutdown = true;
 					}
 					break;
 				}
@@ -1753,7 +1788,7 @@ namespace QuestNavigator {
 			qspError(jsErrorContainer);
 
 			// Ждём закрытия диалога
-			waitForSingle(evErrorClosed);
+			waitForSingleLib(evErrorClosed);
 		}
 	}
 
