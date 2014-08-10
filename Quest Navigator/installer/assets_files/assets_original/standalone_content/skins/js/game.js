@@ -1,9 +1,6 @@
 /* Функции скина для игры */
 
-//var skin
-
 function qspSkinOnInitApi() {
-//QspLib.alert('asd');
 	// Для мобильников в портретном режиме отключаем обычные скроллы.
 	// Потестить на девайсах, может и не пригодится.
 	if ($(window).width() <= 480) {
@@ -26,24 +23,6 @@ function qspSkinOnInitApi() {
 		}
 		*/
 	}
-
-	
-	
-	
-//****************************************************************************************	
-//****************************************************************************************	
-//****************************************************************************************	
-	// // Закрываем инвентарь по клику
-	// setTimeout( function() { // Delay for Mozilla
-			// $("#qsp-inv").bind('click', qspHandlerInvClick);
-			// $("#qsp-wrapper-objs").bind('click', qspHandlerInvClick);
-			// $("#qsp-user2 .qsp-skin-overlay").bind('click', qspHandlerInvClick);
-	// }, 0);
-//****************************************************************************************	
-//****************************************************************************************	
-//****************************************************************************************	
-	
-	
 }
 
 
@@ -70,8 +49,6 @@ function qspSkinOnDeviceSet() {
 }
 
 function qspSkinOnSetGroupedContent() {
-    skinRefreshBugfix();
-	
 	// При первом вызове список пуст.
 	// После первого заполнения список уже не пуст, 
 	// поэтому вызов выполняться не будет.
@@ -101,28 +78,11 @@ var skinInv = false;
 var skinMusic = true;
 var skinStage = "";
 
-//var qspHandlerInvClick = function() { skinHideInv(); };
-
 function skinToggleMusic() {
 	skinMusic = !skinMusic;
 	skinSetMusicButton();
 	QspLib.setMute(!skinMusic);
 }
-
-// function skinHideInv() {
-	// // прячем инвентарь
-	// if (skinInv) {
-		// skinInv = false;
-		// skinMoveInv();
-		// skinHideScrolls(true);
-	// }
-// }
-
-// function skinShowInv() {
-	// skinInv = true;
-	// skinMoveInv();
-	// skinHideScrolls(true);
-// }
 
 function skinHideScrolls(immediate) {
 	qspGameSkin.hideScrollMain = ((skinHideScrollsOriginal === 1) || skinInv) ? 1 : 0;
@@ -130,12 +90,6 @@ function skinHideScrolls(immediate) {
 		qspApplyScrollsVisibility();
 	}
 }
-
-// function skinmoveinv() {
-	// $('#qsp-wrapper-objs').toggle(skininv);
-	// $('#qsp-user2').toggle(skininv);
-	// qsprefreshobjsscroll();
-// }
 
 function skinSetMusicButton() {
 	skinToggleButton('#qsp-user-music img', '(button_music_)(on|off)(_pressed)?', '$1' + (skinMusic ? 'on' : 'off') + '$3');
@@ -162,12 +116,4 @@ function skinToggleButton(selector, pattern, replacement) {
 	var btn2 = t.attr('data-pressed').replace(re, replacement);
 	t.attr('src', btn1);
 	t.attr('data-pressed', btn2);
-}
-
-function skinRefreshBugfix()
-{
-	// Показываем и сразу скрываем невидимый блок размером с экран.
-	// Без этого в эмуляторе не обновляется описание.
-	$('#qsp-refresh-bugfix').show();
-	$('#qsp-refresh-bugfix').hide();
 }
