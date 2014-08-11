@@ -150,6 +150,7 @@ namespace QuestNavigator {
 		// В потоке Ui
 		void processLibJsCall();
 		void jsCallApiFromUi(string name, JSValue arg);
+		void onWebDeviceReady();
 		void qspShowSaveSlotsDialog(JSObject content);
 		void qspFillLocalGamesList(JSArray games);
 
@@ -170,9 +171,6 @@ namespace QuestNavigator {
 		// ********************************************************************
 		// ********************************************************************
 		// ********************************************************************
-
-		// Вспомогательная функция.
-		void doRestartGame();
 
 		void restartGame(WebView* caller, const JSArray& args);
 		void executeAction(WebView* caller, const JSArray& args);

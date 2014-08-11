@@ -164,11 +164,11 @@ namespace QuestNavigator {
 		int64 frame_id,
 		bool is_main_frame,
 		const Awesomium::WebURL& url) {
-		// Перезапускаем игру.
-		// Мы могли бы делать это из JS,
-		// но методы колбэков не успевают привязаться и вызов "QspLib.restartGame" просто не срабатывает.
-		// Видимо баг Awesomium.
-		doRestartGame();
+		// Инициализация Awesomium закончена.
+		// Ещё раньше выполнены все обработчики "$(document).ready".
+		// Страница полностью загружена, объект "QspLibAwesomium" загружен и к нему привязаны колбэки.
+		// Сообщаем JS, что всё готово к запуску API.
+		onWebDeviceReady();
 	};
 	/// This event occurs when the DOM has finished parsing and the
 	/// window object is available for JavaScript execution.
@@ -970,6 +970,12 @@ namespace QuestNavigator {
 		// Дожидаемся ответа, что JS-запрос выполнен.
 		waitForSingleLib(evJsExecuted);
 	}
+	void QnApplicationListener::onWebDeviceReady()
+	{
+		// Контекст UI
+		JSValue v;
+		jsCallApiFromUi("onWebDeviceReady", v);
+	}
 	void QnApplicationListener::qspShowSaveSlotsDialog(JSObject content)
 	{
 		// Контекст UI
@@ -1027,17 +1033,12 @@ namespace QuestNavigator {
 	// ********************************************************************
 	// ********************************************************************
 	// ********************************************************************
-	void QnApplicationListener::doRestartGame()
+	void QnApplicationListener::restartGame(WebView* caller, const JSArray& args)
 	{
 		// Контекст UI
 		string gameFile = Configuration::getString(ecpGameFilePath);
 		StopGame(true);
 		runGame(gameFile);
-	}
-	void QnApplicationListener::restartGame(WebView* caller, const JSArray& args)
-	{
-		// Контекст UI
-		doRestartGame();
 	}
 
 	void QnApplicationListener::executeAction(WebView* caller, const JSArray& args)
