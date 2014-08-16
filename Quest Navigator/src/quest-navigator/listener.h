@@ -149,8 +149,8 @@ namespace QuestNavigator {
 
 		// В потоке Ui
 		void processLibJsCall();
-		void jsCallApiFromUi(string name, JSValue arg);
-		void onWebDeviceReady();
+		bool jsCallApiFromUi(string name, JSValue arg);
+		bool onWebDeviceReady();
 		void qspShowSaveSlotsDialog(JSObject content);
 		void qspFillLocalGamesList(JSArray games);
 

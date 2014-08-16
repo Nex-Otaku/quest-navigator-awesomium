@@ -168,7 +168,15 @@ namespace QuestNavigator {
 		// Ещё раньше выполнены все обработчики "$(document).ready".
 		// Страница полностью загружена, объект "QspLibAwesomium" загружен и к нему привязаны колбэки.
 		// Сообщаем JS, что всё готово к запуску API.
-		onWebDeviceReady();
+		if (!jsLibObjectCreated) {
+			showError("JS-объект \"QspLibAwesomium\" не был инициализирован к моменту завершения загрузки фрейма");
+			app_->Quit();
+			return;
+		}
+		if (!onWebDeviceReady()) {
+			app_->Quit();
+			return;
+		}
 	};
 	/// This event occurs when the DOM has finished parsing and the
 	/// window object is available for JavaScript execution.
@@ -935,7 +943,7 @@ namespace QuestNavigator {
 		runSyncEvent(evJsExecuted);
 	}
 
-	void QnApplicationListener::jsCallApiFromUi(string name, JSValue arg)
+	bool QnApplicationListener::jsCallApiFromUi(string name, JSValue arg)
 	{
 		// Контекст UI
 		// Получение ссылки на объект окна выполняется за 0.005 секунд, 
@@ -950,10 +958,13 @@ namespace QuestNavigator {
 			Error err = windowObject.last_error();
 			if (err != Error::kError_None) {
 				showError("Ошибка при выполнении JS-вызова.");
+				return false;
 			}
 		} else {
 			showError("Не удалось получить доступ к объекту окна.");
+			return false;
 		}
+		return true;
 	}
 	void QnApplicationListener::jsCallApiFromLib(string name, JSValue arg)
 	{
@@ -970,11 +981,11 @@ namespace QuestNavigator {
 		// Дожидаемся ответа, что JS-запрос выполнен.
 		waitForSingleLib(evJsExecuted);
 	}
-	void QnApplicationListener::onWebDeviceReady()
+	bool QnApplicationListener::onWebDeviceReady()
 	{
 		// Контекст UI
 		JSValue v;
-		jsCallApiFromUi("onWebDeviceReady", v);
+		return jsCallApiFromUi("onWebDeviceReady", v);
 	}
 	void QnApplicationListener::qspShowSaveSlotsDialog(JSObject content)
 	{
