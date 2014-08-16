@@ -600,10 +600,11 @@ namespace QuestNavigator {
 		//инвентарь
 		JSArray objs;
 		bool bObjsPrepared = false;
-		if ((QSPIsObjectsChanged() == QSP_TRUE) || Skin::isHtmlModeChanged)
+		int nSelectedObject = QSPGetSelObjectIndex();
+		if ((QSPIsObjectsChanged() == QSP_TRUE) || (nSelectedObject != objectSelectionIndex) || Skin::isHtmlModeChanged)
 		{
+			objectSelectionIndex = nSelectedObject;
 			int nObjsCount = QSPGetObjectsCount();
-			int nSelectedObject = QSPGetSelObjectIndex();
 			for (int i = 0; i < nObjsCount; i++)
 			{
 				QSP_CHAR* pImgPath;
@@ -1327,6 +1328,8 @@ namespace QuestNavigator {
 	clock_t QnApplicationListener::gameStartTime = 0;
 	int QnApplicationListener::timerInterval = 0;
 
+	int QnApplicationListener::objectSelectionIndex = -2;
+
 	//******************************************************************************
 	//******************************************************************************
 	//****** / THREADS \ ***********************************************************
@@ -1664,6 +1667,11 @@ namespace QuestNavigator {
 						lockData();
 						pos = g_sharedData[evSelectObject].num;
 						unlockData();
+						// Костыль - следим за номером выбранного предмета,
+						// так как иначе невозможно будет обновить
+						// окно предметов при вызове UNSEL в ONOBJSEL.
+						// Нужно исправить это в библиотеке QSP.
+						objectSelectionIndex = -2;
 						QSP_BOOL res = QSPSetSelObjectIndex(pos, QSP_TRUE);
 						CheckQspResult(res, "QSPSetSelObjectIndex");
 					}

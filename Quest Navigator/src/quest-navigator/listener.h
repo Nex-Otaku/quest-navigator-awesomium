@@ -206,6 +206,8 @@ namespace QuestNavigator {
 		static clock_t gameStartTime;
 		static int timerInterval;
 
+		static int objectSelectionIndex;
+
 		// ********************************************************************
 		// THREADS
 		// ********************************************************************
