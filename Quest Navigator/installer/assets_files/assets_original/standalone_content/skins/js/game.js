@@ -37,6 +37,10 @@ function skinHideSplashScreen() {
 	$("#skin-ui-wrapper").show();
 	$("#skin-splashscreen-foreground").fadeOut('slow');
 }
+// Показываем сплэш-скрин.
+function skinShowSplashScreen(callback) {
+	$("#skin-splashscreen-foreground").fadeIn('slow', callback);
+}
 
 /* Функции скина для игры */
 
@@ -67,6 +71,18 @@ function qspSkinOnSetGroupedContent() {
 function qspSkinOnFillLocalGamesList() {
 	// Гасим сплэш-скрин по завершению заполнения списка игр.
 	skinHideSplashScreen();
+}
+
+function qspSkinOnSelectLocalGameInGamestock(hash) {
+	// Показываем сплэш-скрин при выборе игры из списка.
+	// Тем самым обеспечиваем плавный переход.
+	skinShowSplashScreen(function() {
+		// По завершению анимации вызываем библиотечный метод для запуска игры из списка.
+		QspLib.selectLocalGameInGamestock(hash);
+	});
+	// Так как мы запускаем игру из скина, отменяем запуск в API.
+	// Без этого у нас не получилось бы сделать анимацию перехода.
+	return false;
 }
 
 function qspSkinOnSave() {
