@@ -32,6 +32,11 @@ function skinToggleInv() {
 	$("#skin-inv-toggle").toggleClass('open');
 }
 
+// Гасим сплэш-скрин.
+function skinHideSplashScreen() {
+	$("#skin-ui-wrapper").show();
+	$("#skin-splashscreen-foreground").fadeOut('slow');
+}
 
 /* Функции скина для игры */
 
@@ -57,6 +62,11 @@ function qspSkinOnSetGroupedContent() {
 		// Когда ответ будет получен, список заполнится автоматически.
 		QspLib.listLocalGames();
 	}
+}
+
+function qspSkinOnFillLocalGamesList() {
+	// Гасим сплэш-скрин по завершению заполнения списка игр.
+	skinHideSplashScreen();
 }
 
 function qspSkinOnSave() {
