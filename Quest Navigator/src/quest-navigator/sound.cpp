@@ -20,18 +20,31 @@ namespace QuestNavigator {
 			ContainerMusic& it = vecMusic[i];
 			if (it.name == file)
 			{
-				foundPlaying = setVolume || !cacheEnabled || it.sound->isPlaying();
-				if (setVolume)
-				{
-					it.volume = volume;
-					float realVolume = getRealVolume(volume);
-					it.sound->setVolume(realVolume);
-					// Если файл уже не проигрывается, но остался в кэше,
-					// запускаем проигрывание.
-					// Трек по завершению был отмотан на начало,
-					// поэтому просто вызываем play().
-					if (cacheEnabled && !it.sound->isPlaying()) {
-						it.sound->play();
+				if (it.isMidi) {
+					foundPlaying = setVolume || MidiService::isPlaying(it.name);
+					if (setVolume)
+					{
+						it.volume = volume;
+						float realVolume = getRealVolume(volume);
+
+						// STUB
+						// Сделать установку громкости проигрываемого файла.
+						//it.sound->setVolume(realVolume);
+					}
+				} else {
+					foundPlaying = setVolume || !cacheEnabled || it.sound->isPlaying();
+					if (setVolume)
+					{
+						it.volume = volume;
+						float realVolume = getRealVolume(volume);
+						it.sound->setVolume(realVolume);
+						// Если файл уже не проигрывается, но остался в кэше,
+						// запускаем проигрывание.
+						// Трек по завершению был отмотан на начало,
+						// поэтому просто вызываем play().
+						if (cacheEnabled && !it.sound->isPlaying()) {
+							it.sound->play();
+						}
 					}
 				}
 				break;
@@ -158,40 +171,58 @@ namespace QuestNavigator {
 			showError("Не удалось открыть звуковой файл: " + file);
 			return;
 		}
-		// Читаем файл в память
-		void* buffer = NULL;
-		int bufferLength = 0;
-		if (!loadFileToBuffer(fullPath, &buffer, &bufferLength)) {
-			showError("Не удалось прочесть звуковой файл: " + file);
-			return;
-		}
 
-		// Создаём объект файла на основе блока памяти
-		FilePtr fp = CreateMemoryFile((const void*)buffer, bufferLength);
-		// Содержимое буфера скопировано, он нам больше не нужен, высвобождаем память.
-		delete buffer;
-		if (!fp) {
-			showError("Не удалось разместить в памяти звуковой файл: " + file);
-			return;
-		}
-		OutputStreamPtr sound = OpenSound(audioDevice, fp);
-		if (!sound)
-		{
-			showError("Неизвестный формат звукового файла: " + file);
-			return;
-		}
+		if (endsWith(file, ".mid")) {
+			// Добавляем файл в список
+			lockMusicData();
+			float realVolume = getRealVolume(volume);
+			MidiService::play(file, volume);
+			//sound->setVolume(realVolume);
+			//sound->play();
+			ContainerMusic container;
+			container.isMidi = true;
+			container.name = file;
+			container.volume = volume;
+			//container.sound = sound;
+			vecMusic.push_back(container);
+			unlockMusicData();
+		} else {
+			// Читаем файл в память
+			void* buffer = NULL;
+			int bufferLength = 0;
+			if (!loadFileToBuffer(fullPath, &buffer, &bufferLength)) {
+				showError("Не удалось прочесть звуковой файл: " + file);
+				return;
+			}
 
-		// Добавляем файл в список
-		lockMusicData();
-		float realVolume = getRealVolume(volume);
-		sound->setVolume(realVolume);
-		sound->play();
-		ContainerMusic container;
-		container.name = file;
-		container.volume = volume;
-		container.sound = sound;
-		vecMusic.push_back(container);
-		unlockMusicData();
+			// Создаём объект файла на основе блока памяти
+			FilePtr fp = CreateMemoryFile((const void*)buffer, bufferLength);
+			// Содержимое буфера скопировано, он нам больше не нужен, высвобождаем память.
+			delete buffer;
+			if (!fp) {
+				showError("Не удалось разместить в памяти звуковой файл: " + file);
+				return;
+			}
+			OutputStreamPtr sound = OpenSound(audioDevice, fp);
+			if (!sound)
+			{
+				showError("Неизвестный формат звукового файла: " + file);
+				return;
+			}
+
+			// Добавляем файл в список
+			lockMusicData();
+			float realVolume = getRealVolume(volume);
+			sound->setVolume(realVolume);
+			sound->play();
+			ContainerMusic container;
+			container.isMidi = false;
+			container.name = file;
+			container.volume = volume;
+			container.sound = sound;
+			vecMusic.push_back(container);
+			unlockMusicData();
+		}
 	}
 
 	bool SoundManager::isPlaying(string file)
@@ -209,20 +240,30 @@ namespace QuestNavigator {
 			ContainerMusic& container = vecMusic[i];
 			if (closeAll || (container.name == file))
 			{
-				if (container.sound->isPlaying())
-					container.sound->stop();
-				if (cacheEnabled) {
-					// Устанавливаем трек на начало
-					container.sound->reset();
-				} else {
-					// Высвобождаем память
-					container.sound = 0;
-				}
-				if (!closeAll)
-				{
-					if (!cacheEnabled)
+				if (container.isMidi) {
+					MidiService::close(closeAll, file);
+					if (!closeAll)
+					{
 						vecMusic.erase(vecMusic.begin() + i);
-					break;
+						break;
+					}
+				} else {
+					if (container.sound->isPlaying())
+						container.sound->stop();
+					if (cacheEnabled) {
+						// Устанавливаем трек на начало
+						container.sound->reset();
+					}
+					else {
+						// Высвобождаем память
+						container.sound = 0;
+					}
+					if (!closeAll)
+					{
+						if (!cacheEnabled)
+							vecMusic.erase(vecMusic.begin() + i);
+						break;
+					}
 				}
 			}
 		}
@@ -238,8 +279,12 @@ namespace QuestNavigator {
 		for (int i = 0; i < (int)vecMusic.size(); i++)
 		{
 			ContainerMusic& container = vecMusic[i];
-			float realVolume = getRealVolume(container.volume);
-			container.sound->setVolume(realVolume);
+			if (container.isMidi) {
+				MidiService::mute(toBeMuted);
+			} else {
+				float realVolume = getRealVolume(container.volume);
+				container.sound->setVolume(realVolume);
+			}
 		}
 		unlockMusicData();
 	}

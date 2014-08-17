@@ -5,6 +5,7 @@
 #include <vector>
 #include "audiere.h"
 #include <Windows.h>
+#include "midi.h"
 
 using namespace std;
 using namespace audiere;
@@ -22,6 +23,7 @@ namespace QuestNavigator {
 		struct ContainerMusic {
 			string name; // Путь к файлу - такой, как задан в игре
 			int volume;
+			bool isMidi;
 			OutputStreamPtr sound;
 		};
 	private:

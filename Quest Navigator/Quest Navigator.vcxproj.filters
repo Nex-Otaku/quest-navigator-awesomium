@@ -201,6 +201,9 @@
     <ClCompile Include="src\quest-navigator\gamestock.cpp">
       <Filter>Файлы исходного кода\special</Filter>
     </ClCompile>
+    <ClCompile Include="src\quest-navigator\midi.cpp">
+      <Filter>Файлы исходного кода\special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\application.h">
@@ -240,6 +243,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="src\quest-navigator\gamestock.h">
+      <Filter>Заголовочные файлы\special</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quest-navigator\midi.h">
       <Filter>Заголовочные файлы\special</Filter>
     </ClInclude>
   </ItemGroup>

@@ -63,7 +63,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;sqlite3.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;$(ProjectDir)src\deps\sqlite;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -90,7 +90,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinSparkle.lib;audiere.lib;shlwapi.lib;awesomium.lib;sqlite3.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>D:\dev\sdks\WinSparkle-0.3;D:\dev\sdks\audiere-1.9.4-win32\lib;$(ProjectDir)src\deps\sqlite;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -156,6 +156,7 @@
     <ClCompile Include="src\quest-navigator\gamestock.cpp" />
     <ClCompile Include="src\quest-navigator\interceptor.cpp" />
     <ClCompile Include="src\quest-navigator\listener.cpp" />
+    <ClCompile Include="src\quest-navigator\midi.cpp" />
     <ClCompile Include="src\quest-navigator\skin.cpp" />
     <ClCompile Include="src\quest-navigator\sound.cpp" />
     <ClCompile Include="src\quest-navigator\utils.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="src\quest-navigator\gamestock.h" />
     <ClInclude Include="src\quest-navigator\interceptor.h" />
     <ClInclude Include="src\quest-navigator\listener.h" />
+    <ClInclude Include="src\quest-navigator\midi.h" />
     <ClInclude Include="src\quest-navigator\resource.h" />
     <ClInclude Include="src\quest-navigator\skin.h" />
     <ClInclude Include="src\quest-navigator\sound.h" />
