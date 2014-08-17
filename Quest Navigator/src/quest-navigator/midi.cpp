@@ -9,10 +9,8 @@ namespace QuestNavigator {
 	void MidiService::play(string file, int volume)
 	{
 		// Предварительно закрываем предыдущий файл.
-		// В один момент времени может проигрываться только один файл.
-		if (!midiFile.empty()) {
-			close(false, midiFile);
-		}
+		// В один момент времени может проигрываться только один файл MIDI.
+		close(true, "");
 
 		// Открываем файл.
 		string command = "open \"" + file + "\" type sequencer alias MidiFile";
@@ -45,8 +43,11 @@ namespace QuestNavigator {
 		WCHAR szReturnString[128];
 		LPWSTR pszReturnString = szReturnString;
 		MCIERROR err = mciSendString(L"status MidiFile mode", pszReturnString, sizeof(szReturnString), NULL);
-		if (err != 0)
-		{
+		if (err == MCIERR_INVALID_DEVICE_NAME) {
+			// Устройство ещё не зарегистрировано, следовательно и файл не проигрывается.
+			return false;
+		}
+		if (err != 0) {
 			showError("Не удалось опросить MIDI-файл: " + file);
 			return false;
 		}
@@ -59,17 +60,19 @@ namespace QuestNavigator {
 		if (!closeAll && ((int)file.length() == 0))
 			return;
 		if (closeAll || (midiFile == file)) {
-			MCIERROR err = mciSendString(L"stop MidiFile", NULL, 0, NULL);
-			if (err != 0)
-			{
-				showError("Не удалось остановить MIDI-файл: " + file);
-				return;
-			}
-			err = mciSendString(L"close MidiFile", NULL, 0, NULL);
-			if (err != 0)
-			{
-				showError("Не удалось закрыть MIDI-файл: " + file);
-				return;
+			if (isPlaying(midiFile)) {
+				MCIERROR err = mciSendString(L"stop MidiFile", NULL, 0, NULL);
+				if (err != 0)
+				{
+					showError("Не удалось остановить MIDI-файл: " + midiFile);
+					return;
+				}
+				err = mciSendString(L"close MidiFile", NULL, 0, NULL);
+				if (err != 0)
+				{
+					showError("Не удалось закрыть MIDI-файл: " + midiFile);
+					return;
+				}
 			}
 			midiFile = "";
 		}
@@ -83,26 +86,21 @@ namespace QuestNavigator {
 	DWORD MidiService::getRealVolume(int volume)
 	{
 		DWORD result = 0;
-		if (!muted)
-			result = (volume * 0xFFFF) / 100;
-		else
+		if (!muted) {
+			// Значение громкости для одного канала от 0 до 65535.
+			WORD v = ((volume * 0xFFFF) / 100) & 0xFFFF;
+			// Громкость для обоих каналов.
+			result = (v << 16) | v;
+		} else {
 			result = 0;
+		}
+			
 		return result;
 	}
 
 	void MidiService::setVolume(int volume)
 	{
-		// Увы, этот способ установки громкости не работает.
-
-		// Громкость задаётся целым числом от 0 до 1000.
-		//string command = "setaudio MidiFile volume to " + intToString(getRealVolume(volume));
-		//wstring wCommand = widen(command);
-		//LPCWSTR pCommand = wCommand.c_str();
-		//MCIERROR err = mciSendString(pCommand, NULL, 0, NULL);
-		//if (err != 0)
-		//{
-		//	showError("Не удалось установить громкость для воспроизведения MIDI-файла");
-		//	return;
-		//}
+		// Неизвестно, как установить громкость для MIDI.
+		// Поэтому все MIDI-файлы будут проигрываться на 100% громкости.
 	}
 }
