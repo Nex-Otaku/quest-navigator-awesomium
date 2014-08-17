@@ -21,7 +21,7 @@ namespace QuestNavigator {
 			if (it.name == file)
 			{
 				if (it.isMidi) {
-					foundPlaying = setVolume || MidiService::isPlaying(it.name);
+					foundPlaying = MidiService::isPlaying(it.name);
 					if (setVolume)
 					{
 						it.volume = volume;
@@ -32,7 +32,7 @@ namespace QuestNavigator {
 						//it.sound->setVolume(realVolume);
 					}
 				} else {
-					foundPlaying = setVolume || !cacheEnabled || it.sound->isPlaying();
+					foundPlaying = (setVolume && cacheEnabled) || !cacheEnabled || it.sound->isPlaying();
 					if (setVolume)
 					{
 						it.volume = volume;
@@ -173,17 +173,26 @@ namespace QuestNavigator {
 		}
 
 		if (endsWith(file, ".mid")) {
-			// Добавляем файл в список
 			lockMusicData();
+			// Очищаем список от других файлов MIDI.
+			// Допускается прогигрывать не более одного MIDI-файла одновременно.
+			// Мы найдём лишь один файл, поэтому достаточно прогнать цикл по вектору всего один раз.
+			for (int i = 0; i < (int)vecMusic.size(); i++)
+			{
+				ContainerMusic& container = vecMusic[i];
+				if (container.isMidi) {
+					vecMusic.erase(vecMusic.begin() + i);
+					break;
+				}
+			}
+
+			// Добавляем файл в список.
 			float realVolume = getRealVolume(volume);
 			MidiService::play(file, volume);
-			//sound->setVolume(realVolume);
-			//sound->play();
 			ContainerMusic container;
 			container.isMidi = true;
 			container.name = file;
 			container.volume = volume;
-			//container.sound = sound;
 			vecMusic.push_back(container);
 			unlockMusicData();
 		} else {
