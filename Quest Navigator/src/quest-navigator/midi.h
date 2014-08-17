@@ -20,6 +20,12 @@ using namespace std;
 
 // В будущем нужно будет попробовать перейти на DirectMusic.
 
+//http://www.codeproject.com/Articles/2651/Developing-MIDI-applications-with-DirectMusic
+
+//http ://www.codeproject.com/Articles/1560/Playing-Midi-Files-with-DirectMusic
+
+//http ://msdn.microsoft.com/en-us/library/windows/desktop/ms807157.aspx
+
 namespace QuestNavigator {
 
 	class MidiService {
