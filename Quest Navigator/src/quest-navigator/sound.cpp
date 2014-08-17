@@ -22,14 +22,10 @@ namespace QuestNavigator {
 			{
 				if (it.isMidi) {
 					foundPlaying = MidiService::isPlaying(it.name);
-					if (setVolume)
+					if (setVolume && foundPlaying)
 					{
 						it.volume = volume;
-						float realVolume = getRealVolume(volume);
-
-						// STUB
-						// Сделать установку громкости проигрываемого файла.
-						//it.sound->setVolume(realVolume);
+						MidiService::setVolume(volume);
 					}
 				} else {
 					foundPlaying = (setVolume && cacheEnabled) || !cacheEnabled || it.sound->isPlaying();
@@ -187,7 +183,6 @@ namespace QuestNavigator {
 			}
 
 			// Добавляем файл в список.
-			float realVolume = getRealVolume(volume);
 			MidiService::play(file, volume);
 			ContainerMusic container;
 			container.isMidi = true;
@@ -290,6 +285,7 @@ namespace QuestNavigator {
 			ContainerMusic& container = vecMusic[i];
 			if (container.isMidi) {
 				MidiService::mute(toBeMuted);
+				MidiService::setVolume(container.volume);
 			} else {
 				float realVolume = getRealVolume(container.volume);
 				container.sound->setVolume(realVolume);

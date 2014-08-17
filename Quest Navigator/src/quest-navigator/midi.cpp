@@ -5,7 +5,6 @@ namespace QuestNavigator {
 
 	bool MidiService::muted = false;
 	string MidiService::midiFile = "";
-	int MidiService::volume = 0;
 
 	void MidiService::play(string file, int volume)
 	{
@@ -15,6 +14,7 @@ namespace QuestNavigator {
 			close(false, midiFile);
 		}
 
+		// Открываем файл.
 		string command = "open \"" + file + "\" type sequencer alias MidiFile";
 		wstring wCommand = widen(command);
 		LPCWSTR pCommand = wCommand.c_str();
@@ -24,15 +24,17 @@ namespace QuestNavigator {
 			showError("Не удалось открыть MIDI-файл: " + file);
 			return;
 		}
+		// Запускаем проигрывание.
 		err = mciSendString(L"play MidiFile from 0", NULL, 0, NULL);
 		if (err != 0)
 		{
 			showError("Не удалось запустить MIDI-файл: " + file);
 			return;
 		}
+		// Устанавливаем громкость проигрываемого файла.
+		setVolume(volume);
+		// Сохраняем имя файла.
 		midiFile = file;
-		// STUB
-		// Сделать установку громкости проигрываемого файла.
 	}
 
 	bool MidiService::isPlaying(string file)
@@ -75,16 +77,32 @@ namespace QuestNavigator {
 
 	void MidiService::mute(bool toBeMuted)
 	{
-		// STUB
+		muted = toBeMuted;
 	}
 
-	float MidiService::getRealVolume(int volume)
+	DWORD MidiService::getRealVolume(int volume)
 	{
-		float result = 0;
+		DWORD result = 0;
 		if (!muted)
-			result = ((float)volume) / 100;
+			result = (volume * 0xFFFF) / 100;
 		else
 			result = 0;
 		return result;
+	}
+
+	void MidiService::setVolume(int volume)
+	{
+		// Увы, этот способ установки громкости не работает.
+
+		// Громкость задаётся целым числом от 0 до 1000.
+		//string command = "setaudio MidiFile volume to " + intToString(getRealVolume(volume));
+		//wstring wCommand = widen(command);
+		//LPCWSTR pCommand = wCommand.c_str();
+		//MCIERROR err = mciSendString(pCommand, NULL, 0, NULL);
+		//if (err != 0)
+		//{
+		//	showError("Не удалось установить громкость для воспроизведения MIDI-файла");
+		//	return;
+		//}
 	}
 }
