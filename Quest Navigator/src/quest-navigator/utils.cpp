@@ -802,6 +802,8 @@ namespace QuestNavigator {
 			masks.push_back("*.gif");
 			masks.push_back("*.bmp");
 			masks.push_back("*.png");
+			masks.push_back("*.cur");
+			masks.push_back("*.ani");
 			// Стили и скрипты - ".css", ".js".
 			// Если bCopySkin == false, значит, мы используем скин из папки игры.
 			// Поэтому копируем из папки игры CSS и JS файлы.
